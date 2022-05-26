@@ -24,7 +24,7 @@ import itertools
 import math
 import subprocess
 from monty.serialization import loadfn
-import pymatgen as mg
+import pymatgen.core as mg
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
 #print("Yes I am being executed for readinf the symmetry opertors")

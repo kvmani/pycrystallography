@@ -3,14 +3,14 @@
 # Distributed under the terms of the MIT License.
 
 from __future__ import unicode_literals
-from .orientation import Orientation
-from .crystalOrientation import CrystalOrientation
-from .quaternion import Quaternion
-from .millerDirection import MillerDirection
-from .millerPlane import MillerPlane
-from .saedAnalyzer import SaedAnalyzer
-from .orientationRelation import OrientationRelation
-from .crystallographyFigure import CrystallographyFigure
+#from .orientation import Orientation
+#from .crystalOrientation import CrystalOrientation
+#from .quaternion import Quaternion
+#from .millerDirection import MillerDirection
+#from .millerPlane import MillerPlane
+#from .saedAnalyzer import SaedAnalyzer
+#from .orientationRelation import OrientationRelation
+#from .crystallographyFigure import CrystallographyFigure
 
 
 """

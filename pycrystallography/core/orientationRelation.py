@@ -53,7 +53,7 @@ import copy
 
 import pycrystallography.utilities.pytransformations as pt 
 import pycrystallography.utilities.pymathutilityfunctions as pmt 
-import pymatgen as mg
+import pymatgen.core as mg
 import logging
 from tabulate import tabulate
 import pandas as pd

@@ -11,7 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from imutils import contours
-from skimage import measure
+#from skimage import measure
 import numpy as np
 import argparse
 import imutils

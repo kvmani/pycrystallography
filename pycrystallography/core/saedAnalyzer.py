@@ -35,7 +35,7 @@ import warnings
 
 import cv2
 import imutils
-from skimage import measure
+#from skimage import measure
 from imutils import contours
 from sympy.geometry import *
 import matplotlib.pyplot as plt
@@ -45,7 +45,7 @@ import sympy.geometry as gm
 from operator import itemgetter
 import time
 from scipy import optimize
-import pymatgen as mg
+import pymatgen.core as mg
 import os
 import json
 from sympy.codegen.cnodes import static
@@ -200,7 +200,7 @@ class SaedAnalyzer(MSONable,object):
         thresh = cv2.threshold(blurred, options["THRESHOLD_LOW"], options["THRESHOLD_HIGH"], cv2.THRESH_BINARY)[1]
         thresh = cv2.erode(thresh, None, iterations=2)
         thresh = cv2.dilate(thresh, None, iterations=4)
-        labels = measure.label(thresh, neighbors=8, background=0)
+        #labels = measure.label(thresh, neighbors=8, background=0)
         mask = np.zeros(thresh.shape, dtype="uint8")
         self._expImageData=image
         plt.imshow(thresh)

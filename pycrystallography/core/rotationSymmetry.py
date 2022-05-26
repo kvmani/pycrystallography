@@ -6,7 +6,7 @@ Created on 18-Dec-2017
 import numpy as np
 import spglib as spg
 from pycrystallography.core.orientation import Orientation 
-import pymatgen as mg
+import pymatgen.core as mg
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
 

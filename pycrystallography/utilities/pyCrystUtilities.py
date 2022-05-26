@@ -30,7 +30,7 @@ def getAtomDataFromStructure(structure):
     atomData=[]
     if isinstance(structure,Structure):
         for site in structure:
-            for sp, occu in site.species_and_occu.items():
+            for sp, occu in site.species.items():
                 atomData.append([sp.Z, site.frac_coords, occu, ])
 
     else:
