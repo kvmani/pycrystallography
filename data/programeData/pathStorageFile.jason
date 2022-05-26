@@ -1,0 +1,14 @@
+{
+    "dirForProgramTmpData": {
+        "path": "../../data/programeData/"
+    },
+    "lastUsedDirForConfigFile": {
+        "default": "",
+        "path": "D:/CurrentProjects/python_trials/work_pycrystallography/pycrystallography/data/SiSinglecrystal/Zone3_alpha_N3.0_beta_P27.0_30Cm.json"
+    },
+    "lastUsedDirForPattern": {
+        "default": "",
+        "path": "V:/TEM/WQ"
+    },
+    "pathStorageFile": "../../data/programeData/pathStorageFile.jason"
+}

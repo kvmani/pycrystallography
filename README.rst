@@ -1,0 +1,118 @@
+**Official docs:** http://www.pycrystalograhy.org
+
+.. image:: https://circleci.com/gh/materialsproject/Pycrystallography.svg?style=shield&circle-token=:circle-token
+
+.. image:: https://ci.appveyor.com/api/projects/status/akdyke5jxg6gps45?svg=true
+
+.. image:: https://anaconda.org/matsci/Pycrystallography/badges/downloads.svg
+
+.. image:: https://coveralls.io/repos/github/materialsproject/Pycrystallography/badge.svg?branch=master
+
+Pycrystallography (Python Crystallography) is a open-source Python library
+for materials analysis with a focus on making crystallographic clacualtions easy for practicing 
+materials scientists, esp in the feild of phase transformations. Following are the main intended
+features of the project.
+
+1. Fully object orieanted classes for majority of the common operations like finding angle, 
+   distance etc. crystallographic directions planes.
+   Structure objects.
+2. Extensive visualization support to make understaqnd the crystal orieantion etc easy.
+3. Powerful analysis tools, including generation of diffraction patterns, kikuchi lines etc which
+   are used in orientation analysis of crystals (for e.g. in TEM and EBSD)
+
+Pycrystallography is free to use. However, we also welcome your help to improve this
+library by making your own contributions.  These contributions can be in the
+form of additional tools or modules you develop, or feature requests and bug
+reports. 
+
+
+1. **It is targetted to be well documented.** A fairly comprehensive documentation is being 
+   written to help you get to grips with it quickly.
+2. **It is open.** You are free to use and contribute to Pycrystallography. It also means
+   that Pycrystallography is continuously being improved. 
+ 
+
+It is targetted from the beginning to support both Python 2.7 as well
+as Python 3.x. 
+
+Getting Pycrystallography
+================
+
+Before installing Pycrystallography, you may need to first install a few critical
+dependencies manually. Please refer to the official `Pycrystallography page`_ for
+installation details and requirements, including instructions for the
+bleeding edge developmental version. 
+
+The version at the Python Package Index (PyPI) is always the latest stable
+release that is relatively bug-free. The easiest way to install Pycrystallography on
+any system is to use pip::
+
+    pip install Pycrystallography
+
+
+Change Log
+==========
+
+This is the very first version.
+
+Using Pycrystallography
+==============
+
+Please refer to the official `Pycrystallography page`_ for tutorials and examples.
+
+
+License
+=======
+
+Pycrystallography is released under the MIT License. The terms of the license are as
+follows::
+
+    The MIT License (MIT)
+    Copyright (c) 2011-2012 MIT & LBNL
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy of
+    this software and associated documentation files (the "Software"), to deal in
+    the Software without restriction, including without limitation the rights to
+    use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+    the Software, and to permit persons to whom the Software is furnished to do so,
+    subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+    FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+    COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+    IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+About the Pycrystallography Development Team
+===================================
+
+K V Mani Krishna is the project lead.
+It is not clear if any other will join this project at the moment.
+
+
+Our Copyright Policy
+====================
+
+Pycrystallography uses a shared copyright model. Each contributor maintains copyright
+over their contributions to Pycrystallography. But, it is important to note that these
+contributions are typically only changes to the repositories. Thus, the
+Pycrystallography source code, in its entirety is not the copyright of any
+single person or institution. Instead, it is the collective copyright of the
+entire Pycrystallography Development Team. If individual contributors want to maintain a
+record of what changes/contributions they have specific copyright on, they
+should indicate their copyright in the commit message of the change, when
+they commit the change to one of the Pycrystallography repositories.
+
+With this in mind, the following banner should be used in any source code file
+to indicate the copyright and license terms::
+
+    # Copyright (c) Pycrystallography Development Team.
+    # Distributed under the terms of the MIT License.
+
+.. _`Pycrystallography page` : http://www.Pycrystallography.org
+.. _`Materials Project` : https://www.materialsproject.org
+.. _`Materials Virtual Lab`: http://www.materialsvirtuallab.org

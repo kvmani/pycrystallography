@@ -1,0 +1,37 @@
+{
+    "Origin": [
+        2084,
+        1164
+    ],
+    "Spot1": [
+        1927,
+        843
+    ],
+    "Spot2": [
+        1714,
+        1133
+    ],
+    "imageFileName": "..\\data\\testingData\\SAED_n4_p26_30cm.png",
+    "markSpots": true,
+    "patternBounds": [
+        0,
+        0,
+        4008,
+        2671
+    ],
+    "solverOptions": {
+        "allowedAngleError": 2.0,
+        "allowedDError": 5.0,
+        "cameraConstant": 435.0,
+        "dMax": 3.0,
+        "dMin": 1.0,
+        "maxHkl": 4
+    },
+    "structureFiles": [
+        "D:\\CurrentProjects\\python_trials\\work_pycrystallography\\pycrystallography\\data\\structureData\\FeFcc.cif"
+    ],
+    "structureNames": [
+        "FeFcc"
+    ],
+    "workingDirectory": "D:\\CurrentProjects\\python_trials\\work_pycrystallography\\pycrystallography\\data\\testingData"
+}
