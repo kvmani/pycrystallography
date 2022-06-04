@@ -118,7 +118,7 @@ class Orientation(Quaternion, MSONable):
         """
         #self._isRotationFlipped=False
         s = len(args)
-        if s is 0:
+        if s == 0:
             # No positional arguments supplied
             if len(kwargs) > 0:
                 # Keyword arguments provided
@@ -148,7 +148,7 @@ class Orientation(Quaternion, MSONable):
                 else :
                     q = Quaternion(*args, **kwargs)
                     Quaternion.__init__(self, q)
-        elif s is 1:
+        elif s == 1:
             # Single positional argument supplied
             if isinstance(args[0], Orientation):
                 #self.q = args[0].q
@@ -197,7 +197,7 @@ class Orientation(Quaternion, MSONable):
                 raise ValueError("One or more elements in sequence <" + repr(seq) + "> cannot be interpreted as a real number")
             else:
                 return np.asarray(l)
-        elif len(seq) is 0:
+        elif len(seq) == 0:
             return np.zeros(n)
         else:
             raise ValueError("Unexpected number of elements in sequence. Got: " + str(len(seq)) + ", Expected: " + str(n) + ".")

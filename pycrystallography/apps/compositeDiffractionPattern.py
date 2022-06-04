@@ -366,6 +366,18 @@ mainData={
 "rakesh-U-Mo-Gamma-Alpha-GammaPrime-RT2":{ #### case of one parent and 2 products with RT2 !!!!
 
             "parent":[
+                {"PhaseName": "Gamma",
+                 ### parent data for product Gamma prime(g/g')
+                 "symbol": r"$\gamma$",
+                 "cifName": "Gamma-U.cif",
+                 "requiredZones": [[0, 0, 1],
+                                   # [1,1,0],
+                                   # [1,1,0],
+                                   # [1,1,2],
+                                   ],
+                 "OR_Plane": [1, 1, 0],
+                 "OR_Direction": [0, 0, 1],
+                 },
 
                      {"PhaseName":"Gamma",  ### parent data for product alpha(g/a)
                       "symbol":r"$\gamma$",
@@ -379,21 +391,20 @@ mainData={
                       "OR_Plane":[0,0,1],
                       "OR_Direction":[1,-1,0],
                       },
-                    {"PhaseName":"Gamma",### parent data for product Gamma prime(g/g')
-                      "symbol":r"$\gamma$",
-                     "cifName":"Gamma-U.cif",
-                     "requiredZones":[ [1,1,1],
-                                       #[1,1,0],
-                                       #[1,1,0],
-                                       #[1,1,2],
-                                    ],
-                      "OR_Plane":[1,1,0],
-                      "OR_Direction":[0,0,1],
-                      },
+
                       ],
 
             "products":[
 
+
+                {"PhaseName": "GammaPrime",  ### one of RT2 Product GammaPrime
+                 "symbol": r"$\gamma^{'}$",
+                 "cifName": "U2Mo.cif",  ### one of (Ordered_UZr2.cif,Zr-omega.cif)
+                 "OR_Plane": [1,1,0],
+                 "OR_Direction": [0,0,1],
+                 "requiredZones": [[0, 0, 1],
+                                   ],
+                 },
                     {"PhaseName":"Alpha", ### one of RT2 Product alpha
                      "symbol":r"$\alpha$",
                      "cifName":"Alpha-U_ver2.cif", ### one of (Ordered_UZr2.cif,Zr-omega.cif) with modified lattice parameters
@@ -402,14 +413,6 @@ mainData={
                      "requiredZones":[[1,0,1],
                                     ],
                       },
-                {"PhaseName": "GammaPrime",  ### one of RT2 Product GammaPrime
-                 "symbol": r"$\gamma^{'}$",
-                 "cifName": "U2Mo.cif",  ### one of (Ordered_UZr2.cif,Zr-omega.cif)
-                 "OR_Plane": [1, 1, 0],
-                 "OR_Direction": [0, 0, 1],
-                 "requiredZones": [[0, 0, 1],
-                                   ],
-                 },
                        ]
 },
 
@@ -461,60 +464,6 @@ mainData={
                  "requiredZones": [[0, 0, 1],
                                    ],
                  },
-                       ]
-},
-
-"rakesh-U-Mo-Gamma-Alpha-GammaPrime-RT3":{ #### case of one parent and 2 products with RT3 !!!! OR as per mail on 31-12-2021
-
-            "parent":[
-                {"PhaseName": "Gamma",  ### parent data for product alpha(g/a)
-                 "symbol": r"$\gamma$",
-                 "cifName": "Gamma-U.cif",
-                 "requiredZones": [[0,0,1],
-                                    # [1,2,2],
-                                    # [1,1,3],
-                                    # [1,1,0],
-                                    # [1,1,2],
-                                   ],
-                 "OR_Plane": [1, -1, 1],
-                 "OR_Direction": [1,1,0],
-                 },
-
-                {"PhaseName":"Gamma",### parent data for product Gamma prime(g/g')
-                      "symbol":r"$\gamma$",
-                     "cifName":"Gamma-U.cif",
-                     # "requiredZones":[ [1,1,3],
-                     #                   #[1,1,0],
-                     #                #[1, 2, 2],
-                     #                   # [1, 1, 3],
-                     #                   # [1, 1, 0],
-                     #                   # [1, 1, 2],
-                     #                ],
-                      "OR_Plane":[1,1,0],
-                      "OR_Direction":[0,0,1],
-                      },
-
-
-                      ],
-
-            "products":[
-
-                    {"PhaseName":"Alpha", ### Product alpha
-                     "symbol":r"$\alpha$",
-                     "cifName":"Alpha-U_ver4.cif", ###
-                     "OR_Plane":[1,0,0],
-                     "OR_Direction":[0,0,1],
-                     # "requiredZones":[[1,0,0],
-                     #                ],
-                      },
-                        {"PhaseName":"GammaPrime", ### one of RT2 Product GammaPrime
-                     "symbol":r"$\gamma^{'}$",
-                     "cifName":"U2Mo.cif", ### one of (Ordered_UZr2.cif,Zr-omega.cif)
-                     "OR_Plane":[1,1,0],
-                     "OR_Direction":[0,0,1],
-                     # "requiredZones":[[0,0,1],
-                     #                ],
-                      },
                        ]
 },
 
@@ -627,6 +576,64 @@ mainData={
                        ]
 },
 
+
+
+"rakesh-U-Mo-Gamma-Alpha-GammaPrime-RT1a":{ #### case of one parent and 2 products with RT1 !!!!
+
+            "parent":[
+                {"PhaseName": "Gamma",  ### parent data for product alpha(g/a)
+                 "symbol": r"$\gamma$",
+                 "cifName": "Gamma-U.cif",
+                 "requiredZones": [[0,0,1],
+                                    # [1,2,2],
+                                    # [1,1,3],
+                                    # [1,1,0],
+                                    # [1,1,2],
+                                   ],
+                 "OR_Plane": [1, 1, 0],
+                 "OR_Direction": [0, 0, 1],
+                 },
+
+                {"PhaseName":"Gamma",### parent data for product Gamma prime(g/g')
+                      "symbol":r"$\gamma$",
+                     "cifName":"Gamma-U.cif",
+                     "requiredZones":[ [1,1,3],
+                                       #[1,1,0],
+                                    #[1, 2, 2],
+                                       # [1, 1, 3],
+                                       # [1, 1, 0],
+                                       # [1, 1, 2],
+                                    ],
+                      "OR_Plane":[1,1,0],
+                      "OR_Direction":[0,0,1],
+                      },
+
+
+                      ],
+
+            "products":[
+
+                    {"PhaseName":"Alpha", ### one of RT2 Product alpha
+                     "symbol":r"$\alpha$",
+                     "cifName":"Alpha-U_ver2.cif", ###
+                     "OR_Plane":[0,0,1],
+                     "OR_Direction":[1,0,0], #### changed to 010 from 100
+                     # "requiredZones":[[1,0,0],
+                     #                ],
+                      },
+                        {"PhaseName":"GammaPrime", ### one of RT2 Product GammaPrime
+                     "symbol":r"$\gamma^{'}$",
+                     "cifName":"U2Mo.cif", ### one of (Ordered_UZr2.cif,Zr-omega.cif)
+                     "OR_Plane":[0,0,1],
+                     "OR_Direction":[1,0,0],
+                     # "requiredZones":[[0,0,1],
+                     #                ],
+                      },
+                       ]
+},
+
+
+
 "rakesh-U-Mo-Gamma-Alpha-GammaPrime-Suman":{ #### case of one parent and 2 products with suman !!!!
 
             "parent":[
@@ -695,11 +702,17 @@ dataChoice = "gamma-delta"
 # dataChoice = "gamma-mu"
 #dataChoice = "rakesh-U-Mo-Gamma-Alpha-GammaPrime-RT3"
 # dataChoice = "rakesh-U-Mo-Gamma-Alpha-GammaPrime-RM1"
+dataChoice = "rakesh-U-Mo-Gamma-Alpha-GammaPrime-Suman"
+dataChoice = "rakesh-U-Mo-Gamma-Alpha-GammaPrime-RT2"
+
 parentsData = mainData[dataChoice]["parent"]
 productsData = mainData[dataChoice]["products"]
 OrParentToProduct=[]
 allSadData=[]
 for i, item in enumerate(zip(parentsData,productsData)):
+    if i>0:
+        print("Skipping i>0 case !!!!! dont forget to change it later!!!")
+        continue
 
     parentData, productData = item[0],item[1]
     parentCif = os.path.join(cifPathName, parentData["cifName"])
@@ -736,72 +749,71 @@ for i, item in enumerate(zip(parentsData,productsData)):
         planeMiller = MillerPlane(hkl=dir, lattice=latParent)
         print(f"vec Mag = {dirMiller} : {dirMiller.mag}  {planeMiller} : {planeMiller.dspacing}")
     #exit(-150)
-
-    ### code for JB book
-    variants = OrParentToProduct[i].getVariants()
-    baseMatrix = np.array([[-1, 2 / 3, 1 / 2], [1, 2 / 3, 1 / 2], [0, 2 / 3, -1]])
-    baseMatrix = np.array([[6.0,4.,3.],[-6.,4.,3.],[0.,4.,-6.0]]) ## JB version
-    baseMatrix = np.array([[3, -6, 4],[3, 6, 4],[-6, 0, 4]]) ### mani version  ## use the variantsCrossChecking.py for determining this one
-    baseMatrixInverse = np.array([[2,2,-4],[-3,3,0],[3,3,3]]) ### This is the inverse matrix for the above ## use the variantsCrossChecking.py for determining this one
-    outList = []
-    for ii, variant in enumerate(variants[0]):
-        if ii==0:
-            #correctionMatrix = np.matmul(variant.rotation_matrix,baseMatrix)
-            correctionMatrix = variant.rotation_matrix.T ## inv of Rotation
-        preMultipler = np.matmul(correctionMatrix,variant.rotation_matrix)
-        variantJB = np.around(np.matmul(preMultipler, baseMatrix),0)
-        variantJBMatrix = sp.Matrix(variantJB)
-        variantJBMatrixInv = 36*variantJBMatrix.inv()
-        #variantJBMatrixInv =
-
-        # variantJB[variantJB==5]=6
-        # variantJB[variantJB==-5]=-6
-        #variantJB[0] =variantJB[0]*6./4. ### because we are getting 4 instead of 6 for some reason
-        #variantJB[0] =variantJB[0]*6/4 ### because we are getting 4 instead of 6 for some reason
-        #variantJB = variantJB.T
-        inVariantJB = np.around(np.matmul(preMultipler, baseMatrixInverse),0)
-
-        variantJBMatrixInv = np.array(variantJBMatrixInv).astype(int) ### converting back to numpy array
-        #variantJBMatrixInv=variantJBMatrixInv.inv()
-        #variantJB = variantJB.T ### just for easy copying in ut put remove later
-        #inVariantJB =
-        row1 = [f"{ii+1:2d}", str(variantJB[0]).replace('[','').replace(']',''),str(inVariantJB[0]).replace('[','').replace(']','')+',' ,
-                str(variantJBMatrixInv[0,:]).replace('[','').replace(']','').replace("Matrix(","").replace(")","")+',' ,
-                #"det="+str(np.around(float(sp.Matrix(variantJBMatrix).det()))), "inv="+str(np.around(float(sp.Matrix(variantJBMatrixInv).det())))
-                ]
-        row2 = ["  ", str(variantJB[1]).replace('[','').replace(']',''),str(inVariantJB[1]).replace('[','').replace(']','')+',',
-                str(variantJBMatrixInv[1,:]).replace('[','').replace(']','').replace("Matrix(","").replace(")","")+',']
-        row3 = ["  ", str(variantJB[2]).replace('[','').replace(']',''),str(inVariantJB[2]).replace('[','').replace(']','')+',',
-                str(variantJBMatrixInv[2,:]).replace('[','').replace(']','').replace("Matrix(","").replace(")","")+',']
-        tmp =  "["+str(variantJB[0]).replace('[','').replace(']','')+","+str(variantJB[1]).replace('[','').replace(']','')+","+str(variantJB[2]).replace('[','').replace(']','')+"],"
-        if tmp[1]==' ':
-            tmp = "["+tmp[2:]
-        tmp = tmp.replace(" ",", ")
-        tmp = tmp.replace(",, ",",")
-        tmp = tmp.replace(", ,",",")
-
-        row = [f" ", tmp, " ", " "]
-
-        outList.append(row1)
-        outList.append(row2)
-        outList.append(row3)
-        outList.append(["", "", ""])
-        #outList.append(row)
-        # outList.append(["", "", ""])
-        #print(f"[{ii}]: {np.around(variant.rotation_matrix,3)} \n baseMatrix : {baseMatrix} \n JB variant : {variantJB.T}   \n correction : {correctionMatrix}  ")
-
-    table = tabulate(outList,headers=('variantId','CubicToOrtho','OrthoToCubic'),tablefmt='html')
-    with open('../../tmp/variantsOut.html','w') as f:
-        f.write(table)
-    print(table) ### this html file will generate all the transformation matrices from gamma to delta. copy the output and put it in the script variantsCrossChecking.py for genrating the plane correspondence table
-    #exit(-100)
-    ### end of code for JB book
-
-
-
-
-
-
+    # ### code for JB book
+    # variants = OrParentToProduct[i].getVariants()
+    # baseMatrix = np.array([[-1, 2 / 3, 1 / 2], [1, 2 / 3, 1 / 2], [0, 2 / 3, -1]])
+    # baseMatrix = np.array([[6.0,4.,3.],[-6.,4.,3.],[0.,4.,-6.0]]) ## JB version
+    # baseMatrix = np.array([[3, -6, 4],[3, 6, 4],[-6, 0, 4]]) ### mani version  ## use the variantsCrossChecking.py for determining this one
+    # baseMatrixInverse = np.array([[2,2,-4],[-3,3,0],[3,3,3]]) ### This is the inverse matrix for the above ## use the variantsCrossChecking.py for determining this one
+    # outList = []
+    # for ii, variant in enumerate(variants[0]):
+    #     if ii==0:
+    #         #correctionMatrix = np.matmul(variant.rotation_matrix,baseMatrix)
+    #         correctionMatrix = variant.rotation_matrix.T ## inv of Rotation
+    #     preMultipler = np.matmul(correctionMatrix,variant.rotation_matrix)
+    #     variantJB = np.around(np.matmul(preMultipler, baseMatrix),0)
+    #     variantJBMatrix = sp.Matrix(variantJB)
+    #     variantJBMatrixInv = 36*variantJBMatrix.inv()
+    #     #variantJBMatrixInv =
+    #
+    #     # variantJB[variantJB==5]=6
+    #     # variantJB[variantJB==-5]=-6
+    #     #variantJB[0] =variantJB[0]*6./4. ### because we are getting 4 instead of 6 for some reason
+    #     #variantJB[0] =variantJB[0]*6/4 ### because we are getting 4 instead of 6 for some reason
+    #     #variantJB = variantJB.T
+    #     inVariantJB = np.around(np.matmul(preMultipler, baseMatrixInverse),0)
+    #
+    #     variantJBMatrixInv = np.array(variantJBMatrixInv).astype(int) ### converting back to numpy array
+    #     #variantJBMatrixInv=variantJBMatrixInv.inv()
+    #     #variantJB = variantJB.T ### just for easy copying in ut put remove later
+    #     #inVariantJB =
+    #     row1 = [f"{ii+1:2d}", str(variantJB[0]).replace('[','').replace(']',''),str(inVariantJB[0]).replace('[','').replace(']','')+',' ,
+    #             str(variantJBMatrixInv[0,:]).replace('[','').replace(']','').replace("Matrix(","").replace(")","")+',' ,
+    #             #"det="+str(np.around(float(sp.Matrix(variantJBMatrix).det()))), "inv="+str(np.around(float(sp.Matrix(variantJBMatrixInv).det())))
+    #             ]
+    #     row2 = ["  ", str(variantJB[1]).replace('[','').replace(']',''),str(inVariantJB[1]).replace('[','').replace(']','')+',',
+    #             str(variantJBMatrixInv[1,:]).replace('[','').replace(']','').replace("Matrix(","").replace(")","")+',']
+    #     row3 = ["  ", str(variantJB[2]).replace('[','').replace(']',''),str(inVariantJB[2]).replace('[','').replace(']','')+',',
+    #             str(variantJBMatrixInv[2,:]).replace('[','').replace(']','').replace("Matrix(","").replace(")","")+',']
+    #     tmp =  "["+str(variantJB[0]).replace('[','').replace(']','')+","+str(variantJB[1]).replace('[','').replace(']','')+","+str(variantJB[2]).replace('[','').replace(']','')+"],"
+    #     if tmp[1]==' ':
+    #         tmp = "["+tmp[2:]
+    #     tmp = tmp.replace(" ",", ")
+    #     tmp = tmp.replace(",, ",",")
+    #     tmp = tmp.replace(", ,",",")
+    #
+    #     row = [f" ", tmp, " ", " "]
+    #
+    #     outList.append(row1)
+    #     outList.append(row2)
+    #     outList.append(row3)
+    #     outList.append(["", "", ""])
+    #     #outList.append(row)
+    #     # outList.append(["", "", ""])
+    #     #print(f"[{ii}]: {np.around(variant.rotation_matrix,3)} \n baseMatrix : {baseMatrix} \n JB variant : {variantJB.T}   \n correction : {correctionMatrix}  ")
+    #
+    # table = tabulate(outList,headers=('variantId','CubicToOrtho','OrthoToCubic'),tablefmt='html')
+    # with open('../../tmp/variantsOut.html','w') as f:
+    #     f.write(table)
+    # print(table) ### this html file will generate all the transformation matrices from gamma to delta. copy the output and put it in the script variantsCrossChecking.py for genrating the plane correspondence table
+    # #exit(-100)
+    # ### end of code for JB book
+    #
+    #
+    #
+    #
+    #
+    #
     for zoneAxis in parentData["requiredZones"]:
 
         parentZoneAxis = MillerDirection(vector=zoneAxis,lattice=latParent)
@@ -829,12 +841,7 @@ for i, item in enumerate(zip(parentsData,productsData)):
         for ii, plane in enumerate(parallelPlaneListProduct):
             print(f"ref zone {parentPlane} and parallel in variant id {ii}  :{plane.integerize()}, cartesian : {plane.getCartesianVec()}")
 
-        #exit(-200)
-
-
-
-
-
+    #     #exit(-200)
 
         # # sadData = OrParentToProduct.calculateCompositeSAED(parentZoneAxis=parentZoneAxis, productId=0, variantIds=[0,1,2,3,4,5,6,7,8,9,10,11],
         # #                                                   pc=[0.,0],sf=1.,Tol=1,inPlaneRotation=-15.) ## 111 zone

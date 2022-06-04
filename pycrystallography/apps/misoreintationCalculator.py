@@ -49,8 +49,8 @@ logging.basicConfig(level=logging.INFO, )
 orientation = CrysOri(orientation=Orientation(euler=[0., 0., 0.]), lattice=olt.cubic(1))
 cifPathName = r'../../data/structureData'
 
-phase1Data = {"cifName":'Gamma-U.cif'}
-phase2Data = {"cifName":"Alpha-U_ver2.cif"}
+phase1Data = {"cifName":'Cr.cif'}
+phase2Data = {"cifName":"Fe.cif"}
 
 phase1Cif = os.path.join(cifPathName, phase1Data["cifName"])
 phase2Cif = os.path.join(cifPathName, phase2Data["cifName"])
@@ -60,6 +60,6 @@ stphase1, latphase1 = OriReln.getStructureFromCif(phase1Cif)
 stphase2, latphase2 = OriReln.getStructureFromCif(phase2Cif)
 
 Ori1 = CrysOri(orientation=Orientation(euler=[45.0*degree, 90.*degree, 90*degree]), lattice=latphase2)
-Ori2 = CrysOri(orientation=Orientation(euler=[225.*degree, 90*degree, 90*degree]), lattice=latphase2)
+Ori2 = CrysOri(orientation=Orientation(euler=[135.*degree, 90*degree, 90*degree]), lattice=latphase2)
 print("Misor= ", Ori1.misorientation(Ori2), "Disor= ", Ori1.disoreintation(Ori2))
 print("MisorAngle = ", Ori1.misorientation(Ori2).angle/degree, "Disor Angle= ", Ori1.disoreintation(Ori2).angle/degree)
