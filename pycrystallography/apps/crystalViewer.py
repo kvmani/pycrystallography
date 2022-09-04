@@ -1,5 +1,5 @@
 from pymatgen.vis.structure_vtk import StructureVis
-from pymatgen import Lattice, Structure
+from pymatgen.core import Lattice, Structure
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d import proj3d
@@ -48,8 +48,6 @@ def plot_lattice(lat,ax,color='k',isreciprocal=False,markBasisVectors=True):
         if markBasisVectors:
             ax.text(x,y,z, basisVectorsNames[i], zdir,fontsize=14,)
     ax.axis('off')
-
-
 
     ax.grid(visible=False)
 

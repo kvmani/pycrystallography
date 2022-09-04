@@ -2150,7 +2150,7 @@ def eulerAngles_from_rotMat_ebsd_mod(RotMatrix, tol=1e-4):
     
     return(EulAngles)
    
-def _import_module(name, package=None, warn=True, prefix='_py_', ignore='_'):
+def _import_module(name, package=None, warn=False, prefix='_py_', ignore='_'):
     """Try import all public attributes from module into global namespace.
 
     Existing attributes with name clashes are renamed with prefix.

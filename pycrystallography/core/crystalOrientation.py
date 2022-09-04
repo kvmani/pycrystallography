@@ -77,7 +77,7 @@ class CrystalOrientation(Orientation, MSONable):
         
         self._lattice=None
         s = len(args)
-        if s is 0:
+        if s == 0:
             # No positional arguments supplied
             if len(kwargs) > 0:
                 # Keyword arguments provided
@@ -241,6 +241,8 @@ class CrystalOrientation(Orientation, MSONable):
         -------
         out : ``Crystal orientation`` object 
             An Orientation object, representing the disorientaton (i.e. lowest misorieantion angle one) between the slef, and other
+            : minAngle (disorienation angle in radians)
+
           
    
         """
@@ -251,7 +253,8 @@ class CrystalOrientation(Orientation, MSONable):
             if abs(misori.angle)<minAngle:
                 disOri = misori
                 minAngle = abs(misori.angle)
-        return disOri
+
+        return disOri,minAngle
             
             
     
