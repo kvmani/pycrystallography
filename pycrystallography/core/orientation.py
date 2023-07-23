@@ -340,14 +340,14 @@ class Orientation(Quaternion, MSONable):
     
     
     
-    def getEulerAngles(self, units='radians'):
+    def getEulerAngles(self, units='radians',applyModulo=False):
         """ Return the Euler angles in Radinas as 1X3 numpy array. 
             
         Parameters
         ----------
         units : string, optional  
              if Deg or Degrees, retuned angles will be in Degrees.
-              
+        applyModulo : if True will return the modulo of [360 180 360] to ensure that 360 is treated as 0.
 
         Returns
         --------
@@ -366,7 +366,8 @@ class Orientation(Quaternion, MSONable):
 
         """
         eulerAngles = pt.eulerAngles_from_rotMat_ebsd(self.rotation_matrix)
-        eulerAngles = ((eulerAngles*180/np.pi).round(5)%[360.0,180.0,360.0])*np.pi/180 ### to make 360 as 0 and 180 as 0
+        if applyModulo:
+            eulerAngles = ((eulerAngles*180.0/np.pi).round(5)%[360.0,180.0,360.0])*np.pi/180 ### to make 360 as 0 and 180 as 0
 
         if units.lower() == 'degree' or units.lower() =='deg' or units.lower() == 'degrees':
             eulerAngles *= 180.0/pi  # converting to degree

@@ -8,6 +8,8 @@ import os
 import logging
 import string
 import copy
+from random import shuffle
+
 from pycrystallography.core.orientedLattice  import OrientedLattice
 from pycrystallography.core.orientation  import Orientation
 from pycrystallography.core.orientedLattice import OrientedLattice as olt
@@ -181,7 +183,8 @@ class Ebsd(object):
         """
         utility method for saving the euler map as png image
         """
-        
+
+        self.__makeEulerData()
         im = Image.fromarray(self._oriData)
         logging.debug("the shape of the euler map is :"+str(self._oriData.shape))
         tiffName = self._ebsdFilePath[:-3]+"png"
@@ -362,6 +365,9 @@ class Ebsd(object):
         columnNames = ["Euler1", "Euler2", "Euler3", "X", "Y", "IQ","CI", "Fit", "Phase", "sem"]
 
         self._data = pd.DataFrame(FinalData,columns=columnNames)
+        self._oriData = OriData
+        self.nXPixcels=NoOfXPixcels
+        self.nYPixcels=NoOfYPixcels
         for columnName in self._data:
             self._data[columnName] = self._data[columnName].astype(dType[columnName])
 
@@ -412,23 +418,29 @@ if __name__ == '__main__':
         print(oriData)
         exit(-1)
 
-    cubicOri1 = CrysOri(orientation=Orientation(euler=[0., 0., 0.]), lattice=olt.cubic(1))
+    deg=np.pi/180
+    cubicOri1 = CrysOri(orientation=Orientation(euler=[0.*deg, 0.*deg, 0.*deg]), lattice=olt.cubic(1))
+    cubicOri2 = CrysOri(orientation=Orientation(euler=[90.*deg, 0.*deg, 0.*deg]), lattice=olt.cubic(1))
     oriList = cubicOri1.symmetricSet()
-    oriList = [i.projectTofundamentalZone()[0].getEulerAngles(units="degree").tolist() for i in oriList]
+    oriList = [i.projectTofundamentalZone()[0].getEulerAngles(units="degree",applyModulo=True).tolist() for i in oriList]
+    oriList2 = cubicOri2.symmetricSet()
+    oriList2= [i.getEulerAngles(units="degree").tolist() for i in oriList2]
+    oriList.extend(oriList2)
+    shuffle(oriList)
 
 
     ebsd.generateSimulatedEbsdMap(orientationList=oriList,
                                   headerFileName="bcc_header.txt",
                                   simulatedEbsdOutPutFilefilePath=r"../../tmp/simulatedEbsd.ang",sizeOfGrain=5,)
-    exit(-1)
-    ebsd.fromCtf(fileName)
-    ebsd.applyMask(maskImge=r'D:\CurrentProjects\python_trials\work_pycrystallography\pycrystallography\data\ebsdData\maskFolder\mask (1).png',maskSize=[50,50])
-    ebsd.applyMask(maskImge=r'D:\CurrentProjects\python_trials\work_pycrystallography\pycrystallography\data\ebsdData\maskFolder\mask (4).png',maskSize=[10,10])
-    
-    ebsd.writeEulerAsPng(showMap=True)
-    ebsd.makePropertyMap(property="MAD")
+
+    # ebsd.fromCtf(fileName)
+    # ebsd.applyMask(maskImge=r'D:\CurrentProjects\python_trials\work_pycrystallography\pycrystallography\data\ebsdData\maskFolder\mask (1).png',maskSize=[50,50])
+    # ebsd.applyMask(maskImge=r'D:\CurrentProjects\python_trials\work_pycrystallography\pycrystallography\data\ebsdData\maskFolder\mask (4).png',maskSize=[10,10])
+    #
+    #ebsd.writeEulerAsPng(showMap=True)
+    #ebsd.makePropertyMap(property="MAD")
     #ebsd.addNewDataColumn(dataColumnName="isMod", )
-    ebsd.writeCtf(pathName=None)
+    #ebsd.writeCtf(pathName=None)
     ebsd.writeNpyFile(pathName=None)
     #ebsd.readPhaseFromCtfString(ebsd._header[13])
     print("Done")     

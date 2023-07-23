@@ -221,7 +221,7 @@ class CrystalOrientation(Orientation, MSONable):
         index=0
         if self._oriInfundamentalZone is None:
             symmetricOriSet = self.symmetricSet()
-            eulerAnglesSet = [((np.array(i.getEulerAngles(units="degree")).round(5)%[360.0, 180.0,360.0])*np.pi/180.0).tolist()
+            eulerAnglesSet = [i.getEulerAngles(applyModulo=True).tolist()
                               for i in symmetricOriSet]
             mags =np.linalg.norm(np.array(eulerAnglesSet), axis=1) ### remainder being applied to bring everything back to 360 180 360 space
             index = np.argmin(mags)
@@ -239,7 +239,7 @@ class CrystalOrientation(Orientation, MSONable):
             #
 
 
-            assert all(euler<limits), "Could not find the fundamental Ori Something is Wrong !!!!"
+            assert all(euler<limits), f"Could not find the fundamental Ori Something is Wrong !!!! {euler=} : {limits=}"
         return  self._oriInfundamentalZone,index
     
     
