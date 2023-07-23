@@ -9,6 +9,9 @@ import logging
 import string
 import copy
 from pycrystallography.core.orientedLattice  import OrientedLattice
+from pycrystallography.core.orientation  import Orientation
+from pycrystallography.core.orientedLattice import OrientedLattice as olt
+from pycrystallography.core.crystalOrientation  import CrystalOrientation as CrysOri
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -398,7 +401,7 @@ if __name__ == '__main__':
     fileName =r'D:\CurrentProjects\python_trials\machineLearning\EnhanceMicroStructure\kikuchiProject\ebsdCleanUp\EBSD maps\def_map_1_sw_cleaned.ctf'
     line='3.570;3.570;3.570    90.000;90.000;90.000    Ni-superalloy    11    225            Generic superalloy' 
     ebsd = Ebsd(logger=logger)
-    loadFromFile=True
+    loadFromFile=False
     if loadFromFile:
         inputFileName = r'C:\Users\Admin\PycharmProjects\pycrystallography\tmp\uniformGridOut.txt'
         oriData = np.genfromtxt(inputFileName, delimiter=",")
@@ -409,9 +412,14 @@ if __name__ == '__main__':
         print(oriData)
         exit(-1)
 
+    cubicOri1 = CrysOri(orientation=Orientation(euler=[0., 0., 0.]), lattice=olt.cubic(1))
+    oriList = cubicOri1.symmetricSet()
+    oriList = [i.projectTofundamentalZone()[0].getEulerAngles(units="degree").tolist() for i in oriList]
 
-    ebsd.generateSimulatedEbsdMap(orientationList=[[66,8,336],[44,10,1],[55,10,348],[0,0,0,]],
-                                  simulatedEbsdOutPutFilefilePath="ravikanthSteelOR.ang",sizeOfGrain=5,)
+
+    ebsd.generateSimulatedEbsdMap(orientationList=oriList,
+                                  headerFileName="bcc_header.txt",
+                                  simulatedEbsdOutPutFilefilePath=r"../../tmp/simulatedEbsd.ang",sizeOfGrain=5,)
     exit(-1)
     ebsd.fromCtf(fileName)
     ebsd.applyMask(maskImge=r'D:\CurrentProjects\python_trials\work_pycrystallography\pycrystallography\data\ebsdData\maskFolder\mask (1).png',maskSize=[50,50])

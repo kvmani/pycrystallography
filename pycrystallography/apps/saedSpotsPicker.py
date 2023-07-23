@@ -275,7 +275,7 @@ if __name__ == '__main__':
     cross = np.cross(vec1,vec2)
     print(vec1, vec2, "cross is = ", cross)
 
-    exit(-10)
+    #exit(-10)
 
     dataChoice = "5596"
     patternData = {

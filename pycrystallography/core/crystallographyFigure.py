@@ -617,6 +617,8 @@ class CrystallographyFigure(object):
             ax.legend(handles=self._mainLegend, loc='right')
             ax.set_aspect('equal')
             ax.axis('equal')
+            ax.text(0.35,0.01,"Developed by Mani Krishna, BARC",transform=ax.transAxes,
+                    horizontalalignment='center',fontsize=14)
             self._fig.suptitle(self._figTitle, fontsize=16)
             # mng = plt.get_current_fig_manager()
             # mng.full_screen_toggle()
@@ -770,7 +772,11 @@ class CrystallographyFigure(object):
             if optionName in defaultOptions[optionBelongsTo]:
                 tmp = defaultOptions[optionBelongsTo][optionName]
                 if isinstance(tmp,(list,tuple)):
-                    return tmp[Ind]
+                    if Ind>=len(tmp):
+                        warnings.warn("index exceeded the limit and hence assinging last value")
+                        return tmp[-1]
+                    else:
+                        return tmp[Ind]
                 else:
                     return tmp
             else:

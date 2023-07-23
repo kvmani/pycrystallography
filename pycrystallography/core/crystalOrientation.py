@@ -216,17 +216,31 @@ class CrystalOrientation(Orientation, MSONable):
         """
         tol = 1e-3
         limits = self._lattice._EulerLimits+tol
+        eligibleCandidates=[]
+        eligibleIndices=[]
+        index=0
         if self._oriInfundamentalZone is None:
-            eulerSet = self.symmetricSet()
-            found = False
-            for i,item in enumerate(eulerSet):
-                euler =np.abs(item.getEulerAngles()) 
-                if all(euler<limits):
-                    self._oriInfundamentalZone = CrystalOrientation(orientation=Orientation(euler=euler),lattice=self._lattice)
-                    found = True
-                    break;
-            assert found, "Could not find the fundamental Ori Something is Wrong !!!!"
-        return  self._oriInfundamentalZone,i   
+            symmetricOriSet = self.symmetricSet()
+            eulerAnglesSet = [((np.array(i.getEulerAngles(units="degree")).round(5)%[360.0, 180.0,360.0])*np.pi/180.0).tolist()
+                              for i in symmetricOriSet]
+            mags =np.linalg.norm(np.array(eulerAnglesSet), axis=1) ### remainder being applied to bring everything back to 360 180 360 space
+            index = np.argmin(mags)
+            self._oriInfundamentalZone = symmetricOriSet[index]
+            euler = np.abs(eulerAnglesSet[index])
+            #     if all(euler<limits):
+            # found = False
+            # for i,item in enumerate(eulerSet):
+            #     euler =np.abs(item.getEulerAngles())
+            #     if all(euler<limits):
+            #         self._oriInfundamentalZone = CrystalOrientation(orientation=Orientation(euler=euler),lattice=self._lattice)
+            #         found = True
+            #         eligibleCandidates.append(euler*180.0/np.pi)
+            #         eligibleIndices.append(i)
+            #
+
+
+            assert all(euler<limits), "Could not find the fundamental Ori Something is Wrong !!!!"
+        return  self._oriInfundamentalZone,index
     
     
     def disoreintation(self, other):

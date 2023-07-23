@@ -63,6 +63,40 @@ cifPathName = r'../../data/structureData'
 
 mainData={
 
+
+    "SameehanFe2B/Fe":{
+        "parent":[
+            {"PhaseName": "Alpha",  ### parent data for product alpha(g/a)
+             "symbol": r"Fe-$\alpha$",
+             "cifName": "Fe.cif",
+             "requiredZones": [
+                               # [0, 0, 1, ],
+                                [1,1,3],
+                               # [1,2,2],
+                               # [1,1,3],
+                               # [1,1,0],
+                               # [1,1,2],
+                               ],
+             "OR_Plane": [2,1,1],
+             "OR_Direction": [1,1,-3],
+             },
+
+        ],
+        "products": [
+
+            {"PhaseName": "Fe2B",  ### Product alpha
+             "symbol": r"$\beta$",
+             "cifName": "Fe2B_BCT.cif",  ###
+             "OR_Plane": [3,3,0],
+             "OR_Direction": [1,-1,3],
+             # "requiredZones":[[1,0,0],
+             #                ],
+             },
+
+        ]
+
+    },
+
     "ZrBetaToOmega":{
         "parent":[{"PhaseName":"Beta",
                       "symbol":r"$\beta",
@@ -690,7 +724,7 @@ mainData={
 # dataChoice = "gamma-M23C6"
 #dataChoice = "gamma-sigma"
 # dataChoice = "gamma-mu"
-dataChoice = "gamma-delta"
+dataChoice = "SameehanFe2B/Fe"
 #dataChoice = "gamma-GammaPrime"
 # dataChoice = "gamma-M23C6"
 # dataChoice = "gamma-M6C"
@@ -701,9 +735,9 @@ dataChoice = "gamma-delta"
 # dataChoice = "gamma-mu"
 # dataChoice = "gamma-mu"
 #dataChoice = "rakesh-U-Mo-Gamma-Alpha-GammaPrime-RT3"
-# dataChoice = "rakesh-U-Mo-Gamma-Alpha-GammaPrime-RM1"
-dataChoice = "rakesh-U-Mo-Gamma-Alpha-GammaPrime-Suman"
-dataChoice = "rakesh-U-Mo-Gamma-Alpha-GammaPrime-RT2"
+# # dataChoice = "rakesh-U-Mo-Gamma-Alpha-GammaPrime-RM1"
+# dataChoice = "rakesh-U-Mo-Gamma-Alpha-GammaPrime-Suman"
+# dataChoice = "rakesh-U-Mo-Gamma-Alpha-GammaPrime-RT2"
 
 parentsData = mainData[dataChoice]["parent"]
 productsData = mainData[dataChoice]["products"]
@@ -863,5 +897,5 @@ for i, item in enumerate(zip(parentsData,productsData)):
 
 
     # OrParentToProduct[i].plotSaed([allSadData[0],allSadData[1],allSadData[2],])
-    OrParentToProduct[i].plotSaed(allSadData)
+    OrParentToProduct[i].plotSaed(allSadData[0:2])
     plt.gcf().suptitle(dataChoice, fontsize=16)

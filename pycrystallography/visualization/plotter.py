@@ -32,7 +32,7 @@ from numpy import arange, sin, pi
 
 
 from matplotlib.figure import Figure
-from Augmentor.Operations import HistogramEqualisation
+#from Augmentor.Operations import HistogramEqualisation
 from pycrystallography.core.saedAnalyzer import SaedAnalyzer
 
 

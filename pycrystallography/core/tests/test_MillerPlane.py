@@ -152,9 +152,6 @@ class MillerPlaneOutputCases(MillerPlaneCreationTestCases):
         self.assertEqual(u'hkl = (1.00 -1.00 0.00 2.00)  lattice = hexagonal', strFormat,'Error in __format__ function')
 
 
-        
-        
-        
     
 class MillerPlaneArithmeticCases(MillerPlaneCreationTestCases):
     
