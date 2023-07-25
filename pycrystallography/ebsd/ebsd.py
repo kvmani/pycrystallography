@@ -43,9 +43,53 @@ class Ebsd(object):
         self._extn=''
         self._data=None
         self._nHeaderLines=None
+        self._ebsdFormat=None
         self._logger=logger
         
-    
+    def fromAng(self, fileName):
+        """
+        method for reading ang Files
+        """
+
+        count=0
+        header=[]
+        logging.debug("Attempting to read the file :"+fileName)
+        self._ebsdFilePath=fileName
+        with open(fileName, "r") as f:
+            for line in f:
+                if line[0]=="#":
+                    header.append(line)
+                    if "# COLUMN_COUNT" in line:
+                        self.nColumns = int(line.split(' ')[-1])
+                    elif "# COLUMN_HEADERS" in line:
+                        self.columnNames = line.replace("# COLUMN_HEADERS: ","").split(" ")
+                    elif "# XSTEP" in line:
+                        self.xStep = float(line.split(' ')[-1])
+                    elif "# YSTEP" in line:
+                        self.yStep = float(line.split(' ')[-1])
+                    elif "# NCOLS_ODD:" in line:
+                        self.nXPixcels = int(line.split(' ')[-1])
+                    elif "# NROWS:" in line:
+                        self.nYPixcels = int(line.split(' ')[-1])
+
+                    else:
+                        continue
+                else:
+                    break;
+
+        self._nHeaderLines = len(header)
+        self._header=header
+        self._ebsdFormat="ang"
+        self.columnNames= [element for element in self.columnNames if element != "index"]
+        dType = {"phi1": np.float16, "PHI": np.float64, "phi2": np.float64,
+                 "x": np.float16, "y": np.float16,
+                 "IQ": np.float16, "CI": np.float16, "Phase": np.uint8,
+                 "SEM":np.uint16, "FIT":np.float16}
+        columnNames = ["phi1", "PHI", "phi2","x", "y", "IQ", "CI", "Phase", "SEM", "FIT"]
+        self._data = pd.read_csv(self._ebsdFilePath, names=columnNames, dtype=dType, skiprows=self._nHeaderLines,
+                                 sep="\s+|\t+|\s+\t+|\t+\s+")
+        self.__makeEulerData()
+
     def fromCtf(self, fileName):
         """
         method for reading the ctf files
@@ -85,6 +129,9 @@ class Ebsd(object):
                 else:
                     continue
                     
+        self._ebsdFormat='ctf'
+        self._isSquareGrid=True
+        self._gridType="SqrGrid"
         self._header=header
         self._nHeaderLines=count
         logging.info("The header line count in the given EBSD file is :"+str(self._nHeaderLines)) 
@@ -106,7 +153,13 @@ class Ebsd(object):
         data = self._data
         xPixcels = self.nXPixcels
         yPixcels = self.nYPixcels
-        eulerData = np.array([data["Euler1"],data["Euler2"],data["Euler2"]]).T
+        if "ang" in self._ebsdFormat:
+            eulerData = np.array([data["phi1"], data["PHI"], data["phi2"]]).T
+        elif "ctf" in self._ebsdFormat:
+            eulerData = np.array([data["Euler1"],data["Euler2"],data["Euler2"]]).T
+        else:
+            raise ValueError("Unknown format only ctf and ang are supported as of now")
+
         shape=yPixcels,xPixcels,
         eulerData = np.stack([eulerData[:,0].reshape(shape), eulerData[:,1].reshape(shape),eulerData[:,2].reshape(shape)],axis=2)
         oriData = np.zeros_like(eulerData, dtype=np.uint8,)
@@ -157,28 +210,56 @@ class Ebsd(object):
         logging.info("sucesffuly parsed the phase : and it is \n"+str(self._lattice))             
                     
     
-    def makePropertyMap(self, property=None):
+    def makePropertyMap(self, property=None,scaleRange=None,ifWriteImage=False):
         """
-        mak a map out of any property of the ebsd data file
+        make a map out of any property of the ebsd data file
         property : a str indicating the which field of the EBSD data one wants to plot as Image 
         """
         
         if property in self._data.columns:
-            dataLimitsRequired=(0,255,)
             data = self._data[property]
-            mapData = np.zeros_like(data,dtype=np.uint8,) 
-            mapData= np.interp(data, (data.min(), data.max()), dataLimitsRequired).astype(np.uint8)
-            mapData=mapData.reshape(self._shape)
-            imName = self._ebsdFilePath[:-4]+"_"+property+".png"
-            im = Image.fromarray(mapData)
-            im.save(imName)
+            if scaleRange is not None:
+                dataLimitsRequired=scaleRange
+            #mapData = np.zeros_like(data,dtype=np.uint8,)
+                mapData= np.interp(data, (data.min(), data.max()), dataLimitsRequired).astype(np.uint8)
+            else:
+                mapData = data
+            mapData=np.array(mapData).reshape(self._shape)
+            if ifWriteImage:
+                imName = self._ebsdFilePath[:-4]+"_"+property+".png"
+                im = Image.fromarray(mapData)
+                im.save(imName)
+            return mapData
+
         else:
             logging.critical("NO field named "+property+" exists in the ebsd data")
             raise ValueError("NO field named "+property+" exists in the ebsd data")
-            
-            
+
+
     
-    
+    def makeEulerDatainImFormat(self,saveAsNpy=False,pathName=None):
+        if "ctf" in self._ebsdFormat:
+            euler1 = self.makePropertyMap(property="Euler1")
+            euler2 = self.makePropertyMap(property="Euler2")
+            euler3 = self.makePropertyMap(property="Euler3")
+        else:
+            euler1 = self.makePropertyMap(property="phi1")
+            euler2 = self.makePropertyMap(property="PHI")
+            euler3 = self.makePropertyMap(property="phi2")
+
+        eulerDataMap = np.stack([euler1,euler2,euler3], axis=-1)
+        if saveAsNpy:
+            if pathName is None:
+                pathName = self._ebsdFilePath[:-4] + ".npy"
+
+            logging.debug("the shape of the data is :" + str(eulerDataMap.shape))
+            np.save(pathName, eulerDataMap)
+            logging.debug("Saved the file :" + pathName)
+
+
+        return eulerDataMap
+
+
     def writeEulerAsPng(self,showMap=False):
         """
         utility method for saving the euler map as png image
@@ -359,15 +440,16 @@ class Ebsd(object):
         FinalData[:, 5] = IQData.flatten() ### note this is made to plot any given property  value to  be  sent  to  IQ data
         FinalData[:, 8] = 50;
         FinalData[:, 9] = 1.5;
-        dType = {"Euler1": np.float64,"Euler2": np.float64, "Euler3": np.float64,"X": np.float16, "Y": np.float16,
+        dType = {"phi1": np.float64,"PHI": np.float64, "phi2": np.float64,"x": np.float16, "y": np.float16,
                    "IQ": np.float64, "CI": np.float64,
-                  "Fit": np.uint16, "Phase": np.uint8, "sem": np.float64} ### sem means detecor signal
-        columnNames = ["Euler1", "Euler2", "Euler3", "X", "Y", "IQ","CI", "Fit", "Phase", "sem"]
+                  "FIT": np.uint16, "Phase": np.uint8, "SEM": np.float64} ### sem means detecor signal
+        columnNames = ["phi1", "PHI", "phi2", "x", "y", "IQ","CI", "FIT", "Phase", "SEM"]
 
         self._data = pd.DataFrame(FinalData,columns=columnNames)
         self._oriData = OriData
         self.nXPixcels=NoOfXPixcels
         self.nYPixcels=NoOfYPixcels
+        self._shape=(NoOfXPixcels,NoOfYPixcels)
         for columnName in self._data:
             self._data[columnName] = self._data[columnName].astype(dType[columnName])
 
@@ -378,7 +460,10 @@ class Ebsd(object):
             for line in f:
                 self._header.append(line)
         self._ebsdFilePath = simulatedEbsdOutPutFilefilePath
-
+        self._ebsdFormat="ang"
+        self._isSquareGrid=True
+        self._gridType="SqrGrid"
+        self._nHeaderLines = len(self._header)
         self.writeAng(pathName=simulatedEbsdOutPutFilefilePath)
 
     def writeAng(self,pathName=None):
@@ -387,13 +472,21 @@ class Ebsd(object):
 
         with open(pathName, "wb") as f:
             for line in self._header[:-1]:
-                f.write(line)
+                if isinstance(line,str): ### happens when header is string data
+                    f.write(line.encode())
+                else:
+                    f.write(line) ## when header is read as binary byte data (from standard ang file)
 
         df = self._data
         with open(pathName, "ab") as f:
             for ind in self._data.index:
-                line = f"{df['Euler1'][ind]:.5f} {df['Euler2'][ind]:.5f} {df['Euler3'][ind]:.5f} {df['X'][ind]:.2f} {df['Y'][ind]:.2f} " \
-                       f"{np.around(df['IQ'][ind],2):.2f} {df['CI'][ind]:.2f} {df['Phase'][ind]:2d} {df['Fit'][ind]:3d} {df['sem'][ind]:.4f}\n"
+                if "ang" in self._ebsdFormat:
+                    line = f"{df['phi1'][ind]:.5f} {df['PHI'][ind]:.5f} {df['phi2'][ind]:.5f} {df['x'][ind]:.4f} {df['y'][ind]:.4f} " \
+                       f"{np.around(df['IQ'][ind],2):.2f} {df['CI'][ind]:.2f} {df['Phase'][ind]:2d}  {df['SEM'][ind]:.4f} {df['FIT'][ind]:.3f}\n"
+                elif "ctf" in self._ebsdFormat:
+                    line = f"{df['Euler1'][ind]:.5f} {df['Euler2'][ind]:.5f} {df['Euler3'][ind]:.5f} {df['X'][ind]:.2f} {df['Y'][ind]:.2f} " \
+                           f"{np.around(df['IQ'][ind], 2):.2f} {df['CI'][ind]:.2f} {df['Phase'][ind]:2d} {df['Fit'][ind]:3d} {df['sem'][ind]:.4f}\n"
+
                 f.write(line.encode())
 
         logging.info("Wrote the EBSD data file :"+pathName +" Succesfully !!!")
@@ -404,6 +497,15 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
     fileName=r'..\data\ebsdData\SuperNi-Ni-Fcc.ctf'
+
+    testFromAng=False
+    if testFromAng:
+        fileName = r'..\..\tmp\simulatedEbsd_OIM.ang'
+        ebsd = Ebsd(logger=logger)
+        ebsd.fromAng(fileName=fileName)
+        ebsd.writeAng(pathName=r"..\..\tmp\simulatedEbsd_OIM_recreated.ang")
+        exit(-100)
+
     fileName =r'D:\CurrentProjects\python_trials\machineLearning\EnhanceMicroStructure\kikuchiProject\ebsdCleanUp\EBSD maps\def_map_1_sw_cleaned.ctf'
     line='3.570;3.570;3.570    90.000;90.000;90.000    Ni-superalloy    11    225            Generic superalloy' 
     ebsd = Ebsd(logger=logger)
@@ -418,22 +520,35 @@ if __name__ == '__main__':
         print(oriData)
         exit(-1)
 
-    deg=np.pi/180
-    cubicOri1 = CrysOri(orientation=Orientation(euler=[0.*deg, 0.*deg, 0.*deg]), lattice=olt.cubic(1))
-    cubicOri2 = CrysOri(orientation=Orientation(euler=[90.*deg, 0.*deg, 0.*deg]), lattice=olt.cubic(1))
-    oriList = cubicOri1.symmetricSet()
-    oriList = [i.projectTofundamentalZone()[0].getEulerAngles(units="degree",applyModulo=True).tolist() for i in oriList]
-    oriList2 = cubicOri2.symmetricSet()
-    oriList2= [i.getEulerAngles(units="degree").tolist() for i in oriList2]
-    oriList.extend(oriList2)
-    shuffle(oriList)
+    testGenerateSimulatedEbsdMap=True
+    if testGenerateSimulatedEbsdMap:
+        deg=np.pi/180.0
+        cubicOri1 = CrysOri(orientation=Orientation(euler=[0.*deg, 0.*deg, 0.*deg]), lattice=olt.cubic(1))
+        cubicOri2 = CrysOri(orientation=Orientation(euler=[90.*deg, 0.*deg, 0.*deg]), lattice=olt.cubic(1))
+        oriList = cubicOri1.symmetricSet()
+        oriList = [i.projectTofundamentalZone()[0].getEulerAngles(units="degree",applyModulo=True).tolist() for i in oriList]
+        oriList2 = cubicOri2.symmetricSet()
+        projectToFundamentalZOne=True
+        if projectToFundamentalZOne:
+            oriList2 = [i.projectTofundamentalZone()[0].getEulerAngles(units="degree", applyModulo=True).tolist() for i in
+                       oriList2]
+        else:
+            oriList2 = [i.getEulerAngles(units="degree").tolist() for i in oriList2]
 
+        #oriList2= [i.getEulerAngles(units="degree").tolist() for i in oriList2]
+        oriList.extend(oriList2)
+        shuffle(oriList)
 
-    ebsd.generateSimulatedEbsdMap(orientationList=oriList,
-                                  headerFileName="bcc_header.txt",
-                                  simulatedEbsdOutPutFilefilePath=r"../../tmp/simulatedEbsd.ang",sizeOfGrain=5,)
+        ebsd.generateSimulatedEbsdMap(orientationList=oriList,
+                                      headerFileName="bcc_header.txt",
+                                      simulatedEbsdOutPutFilefilePath=r"../../tmp/simulatedEbsd.ang",sizeOfGrain=5,)
+        ebsd.makeEulerDatainImFormat(saveAsNpy=True)
+        # ebsd.writeNpyFile(pathName=None)
+        # ebsd.readPhaseFromCtfString(ebsd._header[13])
+        print("Done")
+        exit(-300)
 
-    # ebsd.fromCtf(fileName)
+        # ebsd.fromCtf(fileName)
     # ebsd.applyMask(maskImge=r'D:\CurrentProjects\python_trials\work_pycrystallography\pycrystallography\data\ebsdData\maskFolder\mask (1).png',maskSize=[50,50])
     # ebsd.applyMask(maskImge=r'D:\CurrentProjects\python_trials\work_pycrystallography\pycrystallography\data\ebsdData\maskFolder\mask (4).png',maskSize=[10,10])
     #
@@ -441,9 +556,7 @@ if __name__ == '__main__':
     #ebsd.makePropertyMap(property="MAD")
     #ebsd.addNewDataColumn(dataColumnName="isMod", )
     #ebsd.writeCtf(pathName=None)
-    ebsd.writeNpyFile(pathName=None)
-    #ebsd.readPhaseFromCtfString(ebsd._header[13])
-    print("Done")     
+
         
         
         

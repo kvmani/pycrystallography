@@ -226,7 +226,9 @@ class CrystalOrientation(Orientation, MSONable):
             mags =np.linalg.norm(np.array(eulerAnglesSet), axis=1) ### remainder being applied to bring everything back to 360 180 360 space
             index = np.argmin(mags)
             self._oriInfundamentalZone = symmetricOriSet[index]
-            euler = np.abs(eulerAnglesSet[index])
+            euler = eulerAnglesSet[index]
+            self._oriInfundamentalZone = CrystalOrientation(orientation=Orientation(euler=euler),lattice=self._lattice)
+
             #     if all(euler<limits):
             # found = False
             # for i,item in enumerate(eulerSet):

@@ -367,7 +367,7 @@ class Orientation(Quaternion, MSONable):
         """
         eulerAngles = pt.eulerAngles_from_rotMat_ebsd(self.rotation_matrix)
         if applyModulo:
-            eulerAngles = ((eulerAngles*180.0/np.pi).round(5)%[360.0,180.0,360.0])*np.pi/180 ### to make 360 as 0 and 180 as 0
+            eulerAngles = ((eulerAngles*180.0/np.pi).round(7)%[360.0,180.0,360.0])*np.pi/180 ### to make 360 as 0 and 180 as 0
 
         if units.lower() == 'degree' or units.lower() =='deg' or units.lower() == 'degrees':
             eulerAngles *= 180.0/pi  # converting to degree
