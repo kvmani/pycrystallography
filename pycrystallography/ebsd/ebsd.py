@@ -71,6 +71,11 @@ class Ebsd(object):
                         self.nXPixcels = int(line.split(' ')[-1])
                     elif "# NROWS:" in line:
                         self.nYPixcels = int(line.split(' ')[-1])
+                    elif "# GRID:" in line:
+                        self._gridType = line.split(' ')[-1]
+                        if "hex" in self._gridType.lower():
+                            logger.warning(f"Detected the scan to have hexagonal grid. I am not sure if the things are going to work well!!!!")
+
 
                     else:
                         continue
@@ -83,8 +88,8 @@ class Ebsd(object):
         self.columnNames= [element for element in self.columnNames if element != "index"]
         dType = {"phi1": np.float16, "PHI": np.float64, "phi2": np.float64,
                  "x": np.float16, "y": np.float16,
-                 "IQ": np.float16, "CI": np.float16, "Phase": np.uint8,
-                 "SEM":np.uint16, "FIT":np.float16}
+                 "IQ": np.double, "CI": np.double, "Phase": np.uint8,
+                 "SEM":np.int, "FIT":np.float16}
         columnNames = ["phi1", "PHI", "phi2","x", "y", "IQ", "CI", "Phase", "SEM", "FIT"]
         self._data = pd.read_csv(self._ebsdFilePath, names=columnNames, dtype=dType, skiprows=self._nHeaderLines,
                                  sep="\s+|\t+|\s+\t+|\t+\s+")
@@ -320,7 +325,7 @@ class Ebsd(object):
         
         
     
-    def applyMask(self,maskImge, maskSize=[10,10],maskLocation=None):
+    def applyMask(self,maskImge, maskSize=[30,30],maskLocation=None):
         """
         maskImage : is a path to binary image or numpy boolean array.
         maskSize mXn of mask to which the given input mask is scaled. Ignored if the input mask is np.ndarray of bool type.
@@ -338,7 +343,11 @@ class Ebsd(object):
                 mask = mask==0
             except Exception as e:
                 logging.fatal(e)
-        elif type(maskImge)!=np.ndarray:
+
+        elif type(maskImge)==np.ndarray:
+            mask = maskImge
+            maskSize=mask.shape
+        else:
             raise ValueError("The supplied mask is neither a file path nor a valid boolen numpy array.")
         
         mainMask = np.full((self._shape),False, )
@@ -349,7 +358,7 @@ class Ebsd(object):
             ebsdDataImageDimSmall = min(self._shape)
             maskLocation = np.random.randint(low = maskMargin+5, high = ebsdDataImageDimSmall-maskMargin-5, size=(2,) )
             
-        assert mask.dtype==np.bool, "The supplied mask is not of boolen type !!!!" 
+        assert mask.dtype==bool, f"The supplied mask is not of boolen type !!!! as the type is : {type()}"
         
         startInd = maskLocation[0]-int(maskSize[0]/2), maskLocation[1]-int(maskSize[1]/2)
         endInd = maskLocation[0]+int(maskSize[0]/2), maskLocation[1]+int(maskSize[1]/2)
@@ -358,11 +367,19 @@ class Ebsd(object):
         mainMask[startInd[0]:endInd[0], startInd[1]:endInd[1]]= mask
         indx = np.where(mainMask.reshape(-1))
         indx = indx[0].tolist()
-        self._data["MAD"][indx] = 0.0
-        self._data["Euler1"][indx] = 0.0
-        self._data["Euler2"][indx] = 0.0
-        self._data["Euler3"][indx] = 0.0
-        self._data["isModified"][indx]=True
+        if "ctf" in self._ebsdFormat:
+            self._data["MAD"][indx] = 0.0
+            self._data["Euler1"][indx] = 0.0
+            self._data["Euler2"][indx] = 0.0
+            self._data["Euler3"][indx] = 0.0
+            self._data["isModified"][indx]=True
+        elif "ang" in self._ebsdFormat:
+            self._data["CI"][indx] = -1.0
+            self._data["phi1"][indx] = 0.0
+            self._data["PHI"][indx] = 0.0
+            self._data["phi2"][indx] = 0.0
+            self._data["isModified"][indx] = True
+
         
         self.__makeEulerData()       
         self.writeEulerAsPng()
@@ -482,7 +499,7 @@ class Ebsd(object):
             for ind in self._data.index:
                 if "ang" in self._ebsdFormat:
                     line = f"{df['phi1'][ind]:.5f} {df['PHI'][ind]:.5f} {df['phi2'][ind]:.5f} {df['x'][ind]:.4f} {df['y'][ind]:.4f} " \
-                       f"{np.around(df['IQ'][ind],2):.2f} {df['CI'][ind]:.2f} {df['Phase'][ind]:2d}  {df['SEM'][ind]:.4f} {df['FIT'][ind]:.3f}\n"
+                       f"{np.around(df['IQ'][ind],2):.2f} {df['CI'][ind]:.2f} {df['Phase'][ind]:2d}  {df['SEM'][ind]:8d} {df['FIT'][ind]:.3f}\n"
                 elif "ctf" in self._ebsdFormat:
                     line = f"{df['Euler1'][ind]:.5f} {df['Euler2'][ind]:.5f} {df['Euler3'][ind]:.5f} {df['X'][ind]:.2f} {df['Y'][ind]:.2f} " \
                            f"{np.around(df['IQ'][ind], 2):.2f} {df['CI'][ind]:.2f} {df['Phase'][ind]:2d} {df['Fit'][ind]:3d} {df['sem'][ind]:.4f}\n"
@@ -498,11 +515,13 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
     fileName=r'..\data\ebsdData\SuperNi-Ni-Fcc.ctf'
 
-    testFromAng=False
+    testFromAng=True
     if testFromAng:
-        fileName = r'..\..\tmp\simulatedEbsd_OIM.ang'
+        fileName = r'D:\mani\Al-B4C-Composites\Al-B4CModelScan.ang'
         ebsd = Ebsd(logger=logger)
         ebsd.fromAng(fileName=fileName)
+        maskImg = np.full((80, 50), True, dtype=bool)
+        ebsd.applyMask(maskImg)
         ebsd.writeAng(pathName=r"..\..\tmp\simulatedEbsd_OIM_recreated.ang")
         exit(-100)
 
@@ -520,15 +539,17 @@ if __name__ == '__main__':
         print(oriData)
         exit(-1)
 
-    testGenerateSimulatedEbsdMap=True
+
+
+    testGenerateSimulatedEbsdMap=False
     if testGenerateSimulatedEbsdMap:
         deg=np.pi/180.0
         cubicOri1 = CrysOri(orientation=Orientation(euler=[0.*deg, 0.*deg, 0.*deg]), lattice=olt.cubic(1))
-        cubicOri2 = CrysOri(orientation=Orientation(euler=[90.*deg, 0.*deg, 0.*deg]), lattice=olt.cubic(1))
+        cubicOri2 = CrysOri(orientation=Orientation(euler=[45.*deg, 30.*deg, 0.*deg]), lattice=olt.cubic(1))
         oriList = cubicOri1.symmetricSet()
         oriList = [i.projectTofundamentalZone()[0].getEulerAngles(units="degree",applyModulo=True).tolist() for i in oriList]
         oriList2 = cubicOri2.symmetricSet()
-        projectToFundamentalZOne=True
+        projectToFundamentalZOne=False
         if projectToFundamentalZOne:
             oriList2 = [i.projectTofundamentalZone()[0].getEulerAngles(units="degree", applyModulo=True).tolist() for i in
                        oriList2]
