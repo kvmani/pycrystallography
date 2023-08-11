@@ -434,10 +434,10 @@ class OrientationRelation(MSONable):
             print("Constructing the trnasformation operators : Please wait:::")
             for product in self._productData["Orientations"]:
                 misOri = self._parentData["Orientations"].misorientation(product)
-                misOriFundamental = misOri.projectTofundamentalZone()             
+                misOriFundamental = misOri.projectToFundamentalZone()
                 
                 inverseMisOri=product.misorientation(self._parentData["Orientations"]) 
-                inverseMisOriFundamental =  inverseMisOri.projectTofundamentalZone()              
+                inverseMisOriFundamental =  inverseMisOri.projectToFundamentalZone()
                 
                 parentSymmetricSet = self._parentData["Orientations"].symmetricSet()
                 tmp=[]

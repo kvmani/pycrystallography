@@ -80,10 +80,10 @@ class CrystalOrientationArithmenticCases(CrystalOrientationCreationTestCases):
         self.assertEqual(len(oriList), 12, "Probelm in symmetric Oris")    
     def test_projectTofundamentalZone(self):
         cubicOri1 = CrysOri(orientation=Orientation(euler=[np.pi/2., 0., 0.]), lattice=olt.cubic(1))
-        fundOri, ind = cubicOri1.projectTofundamentalZone()
+        fundOri, ind = cubicOri1.projectToFundamentalZone()
         self.assertArrayAlmostEqual(fundOri.getEulerAngles(units='deg',applyModulo=True), [0, 0, 0], 5, 'Problem in Fundamental Zone')
         hcpOri1 = CrysOri(orientation=Orientation(euler=[np.pi/3,0,0]),lattice=self.hexLat2)
-        fundOri,ind = hcpOri1.projectTofundamentalZone()
+        fundOri,ind = hcpOri1.projectToFundamentalZone()
         self.assertArrayAlmostEqual(fundOri.getEulerAngles(units='deg',applyModulo=True), [0,0,0], 5, 'Problem in Fundamental Zone')
         print("Done with the project to fundamenta zone testing")
               

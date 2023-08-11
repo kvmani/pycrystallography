@@ -210,9 +210,9 @@ class CrystalOrientation(Orientation, MSONable):
             self._symmetricSet=symSet
         return self._symmetricSet
 
-    def projectTofundamentalZone(self):
+    def projectToFundamentalZone(self):
         """
-        returns the Orientation projection to fundamental Euler space of the crystal system
+        returns the 0- projection to fundamental Euler space of the crystal system
         """
         tol = 1e-3
         limits = self._lattice._EulerLimits+tol
@@ -227,18 +227,19 @@ class CrystalOrientation(Orientation, MSONable):
             index = np.argmin(mags)
             self._oriInfundamentalZone = symmetricOriSet[index]
             euler = eulerAnglesSet[index]
-            self._oriInfundamentalZone = CrystalOrientation(orientation=Orientation(euler=euler),lattice=self._lattice)
-
-            #     if all(euler<limits):
-            # found = False
-            # for i,item in enumerate(eulerSet):
-            #     euler =np.abs(item.getEulerAngles())
-            #     if all(euler<limits):
-            #         self._oriInfundamentalZone = CrystalOrientation(orientation=Orientation(euler=euler),lattice=self._lattice)
-            #         found = True
-            #         eligibleCandidates.append(euler*180.0/np.pi)
-            #         eligibleIndices.append(i)
-            #
+            if all(euler<limits):
+                self._oriInfundamentalZone = CrystalOrientation(orientation=Orientation(euler=euler),lattice=self._lattice)
+                return self._oriInfundamentalZone,index
+            else:
+                warnings.warn("could not find the fundamental ori as per first logic now trying the old scheme")
+                found = False
+                for i,item in enumerate(symmetricOriSet):
+                    euler =np.abs(item.getEulerAngles())
+                    if all(euler<limits):
+                        self._oriInfundamentalZone = CrystalOrientation(orientation=Orientation(euler=euler),lattice=self._lattice)
+                        found = True
+                        index=i
+                        break
 
 
             assert all(euler<limits), f"Could not find the fundamental Ori Something is Wrong !!!! {euler=} : {limits=}"
@@ -247,7 +248,7 @@ class CrystalOrientation(Orientation, MSONable):
     
     def disoreintation(self, other):
         """
-        returns the minimum miso betwween two crystal orientation considering their respective symmetries
+        returns the minimum miso between two crystal orientation considering their respective symmetries
         Parameters
         ----------
         other : ``Crystal orientation`` object 

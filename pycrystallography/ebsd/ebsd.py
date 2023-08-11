@@ -10,10 +10,12 @@ import string
 import copy
 from random import shuffle
 
+from tqdm import tqdm
+
 from pycrystallography.core.orientedLattice  import OrientedLattice
 from pycrystallography.core.orientation  import Orientation
 from pycrystallography.core.orientedLattice import OrientedLattice as olt
-from pycrystallography.core.crystalOrientation  import CrystalOrientation as CrysOri
+from pycrystallography.core.crystalOrientation import CrystalOrientation as CrysOri, CrystalOrientation
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -24,6 +26,7 @@ from pycrystallography.utilities import pymathutilityfunctions as mtu
 import pathlib
 
 
+degree=np.pi/180
 
 class Ebsd(object):
     '''
@@ -163,22 +166,23 @@ class Ebsd(object):
         elif "ctf" in self._ebsdFormat:
             eulerData = np.array([data["Euler1"],data["Euler2"],data["Euler2"]]).T
         else:
-            raise ValueError("Unknown format only ctf and ang are supported as of now")
+            raise ValueError(f"Unknown format {self._ebsdFormat} only ctf and ang are supported as of now")
 
         shape=yPixcels,xPixcels,
         eulerData = np.stack([eulerData[:,0].reshape(shape), eulerData[:,1].reshape(shape),eulerData[:,2].reshape(shape)],axis=2)
         oriData = np.zeros_like(eulerData, dtype=np.uint8,)
+        self._eulerData = eulerData
         oriData[:,:,0]= np.interp(eulerData[:,:,0], (eulerData[:,:,0].min(), eulerData[:,:,0].max()), eulerLimits).astype(np.uint8)
         oriData[:,:,1]= np.interp(eulerData[:,:,1], (eulerData[:,:,1].min(), eulerData[:,:,1].max()), eulerLimits).astype(np.uint8)
         oriData[:,:,2]= np.interp(eulerData[:,:,2], (eulerData[:,:,2].min(), eulerData[:,:,2].max()), eulerLimits).astype(np.uint8)
         
-        self._oriData=oriData
+        self._oriData=oriData ### data suitable for image display
         self._shape=shape
         self._numPixcels = xPixcels*yPixcels
         #self.writeEulerAsPng()
         
 
-        
+
         
     def readPhaseFromCtfString(self,line=None):
         tmpLine = copy.copy(line)
@@ -243,6 +247,11 @@ class Ebsd(object):
 
     
     def makeEulerDatainImFormat(self,saveAsNpy=False,pathName=None):
+        """
+        returns the euler data in the form of a MXNX3 image suitable for ML work
+        if path is provided, it can save the data in to respective file as npy format
+        """
+
         if "ctf" in self._ebsdFormat:
             euler1 = self.makePropertyMap(property="Euler1")
             euler2 = self.makePropertyMap(property="Euler2")
@@ -256,7 +265,6 @@ class Ebsd(object):
         if saveAsNpy:
             if pathName is None:
                 pathName = self._ebsdFilePath[:-4] + ".npy"
-
             logging.debug("the shape of the data is :" + str(eulerDataMap.shape))
             np.save(pathName, eulerDataMap)
             logging.debug("Saved the file :" + pathName)
@@ -325,7 +333,7 @@ class Ebsd(object):
         
         
     
-    def applyMask(self,maskImge, maskSize=[30,30],maskLocation=None):
+    def applyMask(self,maskImge, maskSize=[30,30],maskLocation=None, displayImage=False):
         """
         maskImage : is a path to binary image or numpy boolean array.
         maskSize mXn of mask to which the given input mask is scaled. Ignored if the input mask is np.ndarray of bool type.
@@ -333,11 +341,11 @@ class Ebsd(object):
         """ 
         
         self.addNewDataColumn("isModified", fillValues=False)
+
         if type(maskImge)==str: 
             try:
                 mask = Image.open(maskImge)
-                
-                mask=mask.resize(maskSize, Image.ANTIALIAS)
+                mask=mask.resize(self._shape, Image.ANTIALIAS)
                 #mask.show()
                 mask = np.array(mask)
                 mask = mask==0
@@ -346,43 +354,46 @@ class Ebsd(object):
 
         elif type(maskImge)==np.ndarray:
             mask = maskImge
+            if not maskSize==mask.shape:
+                maskImg = Image.fromarray(mask)
+                maskImg.resize(maskSize)
+                mask = np.array(maskImg)
             maskSize=mask.shape
         else:
             raise ValueError("The supplied mask is neither a file path nor a valid boolen numpy array.")
         
         mainMask = np.full((self._shape),False, )
-        
-        
-        if maskLocation is None:
-            maskMargin = max(maskSize)
-            ebsdDataImageDimSmall = min(self._shape)
-            maskLocation = np.random.randint(low = maskMargin+5, high = ebsdDataImageDimSmall-maskMargin-5, size=(2,) )
+
+        # if maskLocation is None:
+        #     maskMargin = max(maskSize)
+        #     ebsdDataImageDimSmall = min(self._shape)
+        #     maskLocation = np.random.randint(low = 0, high = ebsdDataImageDimSmall, size=(2,) )
             
         assert mask.dtype==bool, f"The supplied mask is not of boolen type !!!! as the type is : {type()}"
-        
-        startInd = maskLocation[0]-int(maskSize[0]/2), maskLocation[1]-int(maskSize[1]/2)
-        endInd = maskLocation[0]+int(maskSize[0]/2), maskLocation[1]+int(maskSize[1]/2)
-#         tmp1 = np.arange(startInd[0],endInd[0])
-#         tmp2= np.arange(startInd[1],endInd[1])
-        mainMask[startInd[0]:endInd[0], startInd[1]:endInd[1]]= mask
-        indx = np.where(mainMask.reshape(-1))
+#         ebsdShape = self._shape
+#         startInd = min(maskLocation[0]-int(maskSize[0]/2),0), min(maskLocation[1]-int(maskSize[1]/2),0)
+#         endInd = min(maskLocation[0]+int(maskSize[0]/2), ebsdShape[0]), min(maskLocation[1]+int(maskSize[1]/2),ebsdShape[1])
+# #         tmp1 = np.arange(startInd[0],endInd[0])
+# #         tmp2= np.arange(startInd[1],endInd[1])
+        #mainMask[startInd[0]:endInd[0], startInd[1]:endInd[1]]= mask
+        indx = np.where(mask.T.reshape(-1))
         indx = indx[0].tolist()
+        logging.debug(f"number of point being changes are {len(indx)}")
         if "ctf" in self._ebsdFormat:
-            self._data["MAD"][indx] = 0.0
+            self._data["MAD"][indx] = 5.0
             self._data["Euler1"][indx] = 0.0
             self._data["Euler2"][indx] = 0.0
             self._data["Euler3"][indx] = 0.0
             self._data["isModified"][indx]=True
         elif "ang" in self._ebsdFormat:
             self._data["CI"][indx] = -1.0
-            self._data["phi1"][indx] = 0.0
-            self._data["PHI"][indx] = 0.0
-            self._data["phi2"][indx] = 0.0
+            self._data["phi1"][indx] = -10.0*degree
+            self._data["PHI"][indx] = -10.0*degree
+            self._data["phi2"][indx] = -10.0*degree
             self._data["isModified"][indx] = True
-
-        
         self.__makeEulerData()       
-        self.writeEulerAsPng()
+        self.writeEulerAsPng(showMap=displayImage)
+
         logging.debug("Done with masking")             
         
 
@@ -508,20 +519,92 @@ class Ebsd(object):
 
         logging.info("Wrote the EBSD data file :"+pathName +" Succesfully !!!")
 
+    def reduceEulerAngelsToFundamentalZone(self):
+        self.readPhaseFromAng()
+        logging.info(f"Done with euler angel reduction to fundamental zone!!")
+        eulerData =np.array(self._data.iloc[:,0:3])
+        nPoints = self.nXPixcels*self.nYPixcels
+
+        for i in tqdm(np.arange(nPoints)):
+            euler = eulerData[i]
+            ori = CrystalOrientation(orientation=Orientation(euler=euler.tolist()),
+                                     lattice=self._lattice)
+            ori, index = ori.projectToFundamentalZone()
+            tmp = ori.getEulerAngles(applyModulo=True)
+            logging.debug(f"euler angeles before : {euler}--> {tmp}")
+            eulerData[i]=tmp
+
+        if "ang" in self._ebsdFormat:
+            self._data["phi1"] = eulerData[:,0]
+            self._data["PHI"] = eulerData[:,1]
+            self._data["phi2"] = eulerData[:,2]
+
+        elif "ctf" in self._ebsdFormat:
+            self._data["Euler1"] = eulerData[:, 0]
+            self._data["Euler2"] = eulerData[:, 1]
+            self._data["Euler2"] = eulerData[:, 2]
+        else:
+            raise ValueError(f"Unknown ebsd format : {self._ebsdFormat} only ang and ctf are supported")
+
+        self.__makeEulerData()
+        logging.info(f"Converted the euler angeles into fundamental zone")
+
+    def readPhaseFromAng(self):
+        if "ang" in self._ebsdFormat:
+            for line in self._header:
+                if "LatticeConstants" in line:
+                    tmp = line.replace("# LatticeConstants", "")
+                    tmp = np.fromstring(tmp, dtype=np.double, sep = " ")
+                    a,b,c , alpha,beta,gamma= tmp ### in angstroms and degrees
+                    latticeConstants = tmp[0:3]
+                    latticeAngles = tmp[3:6]
+                    latticeParameterLine = line
+                if "# MaterialName" in line:
+                    self._phaseName = line.split("\t")[1].split(" ")[0]
+
+            logging.warning(f"Currently checking the lattice parameters only for determing the crystal sytems assuming only cubic and hexagonal are proceessed. Modify this part for "
+                            f"other crystal systems !!!")
+
+
+
+            if np.allclose(latticeConstants - latticeConstants[0], [0., 0., 0.]) and np.allclose(latticeAngles,
+                                                                                                 [90., 90.,
+                                                                                                  90.]) :
+                self.crystalSystem = 'cubic'
+                self._lattice = OrientedLattice.cubic(a=latticeConstants[0], pointgroup='m-3m',
+                                                      name=self._phaseName)
+                logging.debug(f"Found the {self._phaseName} to be cubic!!!")
+            elif np.allclose(latticeConstants[:2], -latticeConstants[0], [0., 0., ]) and np.allclose(latticeAngles,
+                                                                                                     [90., 90.,
+                                                                                                      120.]) :
+                self.crystalSystem = 'hexagonal'
+                self._lattice = OrientedLattice.hexagonal(a=latticeConstants[0], c=latticeConstants[2],
+                                                          pointgroup='6/mmm', name=self._phaseName)
+                logging.debug(f"Found the {self._phaseName} to be hexagonal!!!")
+
+            else:
+                logging.critical("Unknown crystal system : the line being parsed is : " + latticeParameterLine)
+                raise ValueError("Unknown system !!!!" + latticeParameterLine)
+
+            logging.info("Succesfully parse ang header and populated the crystal structure info!!!")
+            return(0)
+
 
 if __name__ == '__main__':
     
-    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
     fileName=r'..\data\ebsdData\SuperNi-Ni-Fcc.ctf'
 
     testFromAng=True
     if testFromAng:
-        fileName = r'D:\mani\Al-B4C-Composites\Al-B4CModelScan.ang'
+        fileName = r'../../data/testingData/Al-B4CModelScan.ang'
         ebsd = Ebsd(logger=logger)
         ebsd.fromAng(fileName=fileName)
-        maskImg = np.full((80, 50), True, dtype=bool)
-        ebsd.applyMask(maskImg)
+        # maskImg = np.full((80, 50), True, dtype=bool)
+        #maskImg = r"../../data/programeData/ebsdMaskFolder/3.png"
+        #ebsd.applyMask(maskImg,displayImage=True)
+        ebsd.reduceEulerAngelsToFundamentalZone()
         ebsd.writeAng(pathName=r"..\..\tmp\simulatedEbsd_OIM_recreated.ang")
         exit(-100)
 
@@ -539,20 +622,18 @@ if __name__ == '__main__':
         print(oriData)
         exit(-1)
 
-
-
     testGenerateSimulatedEbsdMap=False
     if testGenerateSimulatedEbsdMap:
         deg=np.pi/180.0
         cubicOri1 = CrysOri(orientation=Orientation(euler=[0.*deg, 0.*deg, 0.*deg]), lattice=olt.cubic(1))
         cubicOri2 = CrysOri(orientation=Orientation(euler=[45.*deg, 30.*deg, 0.*deg]), lattice=olt.cubic(1))
         oriList = cubicOri1.symmetricSet()
-        oriList = [i.projectTofundamentalZone()[0].getEulerAngles(units="degree",applyModulo=True).tolist() for i in oriList]
+        oriList = [i.projectToFundamentalZone()[0].getEulerAngles(units="degree", applyModulo=True).tolist() for i in oriList]
         oriList2 = cubicOri2.symmetricSet()
         projectToFundamentalZOne=False
         if projectToFundamentalZOne:
-            oriList2 = [i.projectTofundamentalZone()[0].getEulerAngles(units="degree", applyModulo=True).tolist() for i in
-                       oriList2]
+            oriList2 = [i.projectToFundamentalZone()[0].getEulerAngles(units="degree", applyModulo=True).tolist() for i in
+                        oriList2]
         else:
             oriList2 = [i.getEulerAngles(units="degree").tolist() for i in oriList2]
 
