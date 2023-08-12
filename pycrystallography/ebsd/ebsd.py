@@ -6,6 +6,7 @@ Created on 27-Jun-2019
 
 import os
 import logging
+import re
 import string
 import copy
 from random import shuffle
@@ -48,6 +49,7 @@ class Ebsd(object):
         self._nHeaderLines=None
         self._ebsdFormat=None
         self._logger=logger
+        self._isCropped=False ## useful to test if the scan data is cropped after loading
         
     def fromAng(self, fileName):
         """
@@ -549,6 +551,87 @@ class Ebsd(object):
         self.__makeEulerData()
         logging.info(f"Converted the euler angeles into fundamental zone")
 
+    @staticmethod
+    def __replace_numberFromHeader(text, new_integer):
+        """
+        used for replacing the integer at the end of the header line.
+        Also puts line ending character at the end
+        """
+        pattern = r"(\D*)(\d+)$"
+        match = re.match(pattern, text)
+
+        if match:
+            prefix = match.group(1)
+            updated_text = prefix + str(new_integer)+"\n"
+            return updated_text
+        else:
+            return text
+
+    def crop(self, start=(0,0),dimensions=(10,10)):
+        """
+        crop the ebsd data to have dimensions=(l,w) from start point (x,y)
+        l = length of crop (in pixcels)
+        w = width of crop in pixcels
+        (x,y) = start point of crop.
+        all dimensions are to be specified in the form of pixcels (integers)
+        """
+        shape = self._shape
+        cropParameters = start[0],start[0]+dimensions[0],start[1],start[1]+dimensions[1],
+
+        if start[0]+dimensions[0]>shape[0] or start[1]+dimensions[1]>shape[1]:
+            raise ValueError(f"the ebsd data has shape {shape} but cropping parameters are :{cropParameters}")
+
+        mask = np.zeros(shape=shape, dtype=bool)
+        mask[cropParameters[0]:cropParameters[1], cropParameters[2]:cropParameters[3]] = True
+        indx = np.where(mask.reshape(-1)==False)
+        indx = indx[0].tolist()
+
+        logging.info(f"removing {len(indx)} number of data points for croppiing the ebsd data")
+        if "ang" in self._ebsdFormat:
+            x, y = "x", "y"
+        elif "ctf" in self._ebsdFormat:
+            x, y = "X", "Y"
+        else:
+            raise ValueError(f"Uknown ebsd format {self._ebsdFormat} only '.ang' and '.ctf' are supported as of now")
+
+        ind = mtu.sub2ind(self._shape,start[0],start[1])
+        newOriginInXYsystem = (self._data.iloc[ind, self._data.columns.get_loc(x)],
+                               self._data.iloc[ind, self._data.columns.get_loc(y)])
+
+        self._data[x] = self._data[x] - self._data.iloc[ind, self._data.columns.get_loc(x)]
+        self._data[y] = self._data[y] - self._data.iloc[ind, self._data.columns.get_loc(y)]
+
+        self._data = self._data.drop(index = indx)
+        ### now adjusting the first point X Y to become 0,0
+
+
+        self._shape = (dimensions[0],dimensions[1])
+        numberOfchangedValues=0
+        for i,line in enumerate(self._header):
+            if "# NCOLS_ODD:" in line:
+                self._header[i] = self.__replace_numberFromHeader(line, dimensions[1])
+                numberOfchangedValues+=1
+            elif "# NROWS:" in line:
+                self._header[i] = self.__replace_numberFromHeader(line, dimensions[0])
+                numberOfchangedValues += 1
+            elif "# NCOLS_EVEN:" in line:
+                self._header[i] = self.__replace_numberFromHeader(line, dimensions[1])
+                numberOfchangedValues += 1
+            else:
+                continue
+        assert numberOfchangedValues ==3 , f"Suposed to have changed 3 values but could change only {numberOfchangedValues}. " \
+                                           f"The modified header is {self._header}"
+        logging.debug(f"modifd headeris : {self._header}")
+
+        self._isCropped=True
+        self.nXPixcels, self.nYPixcels = self._shape[1],self._shape[0]
+        logging.info(f"cropped the ebsd data points now the cropped size of the data is : {self._shape}")
+
+
+
+
+
+
     def readPhaseFromAng(self):
         if "ang" in self._ebsdFormat:
             for line in self._header:
@@ -604,7 +687,8 @@ if __name__ == '__main__':
         # maskImg = np.full((80, 50), True, dtype=bool)
         #maskImg = r"../../data/programeData/ebsdMaskFolder/3.png"
         #ebsd.applyMask(maskImg,displayImage=True)
-        ebsd.reduceEulerAngelsToFundamentalZone()
+        ebsd.crop(start = (69,60), dimensions=(90,88))
+        #ebsd.reduceEulerAngelsToFundamentalZone()
         ebsd.writeAng(pathName=r"..\..\tmp\simulatedEbsd_OIM_recreated.ang")
         exit(-100)
 
