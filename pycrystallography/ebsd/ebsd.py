@@ -13,10 +13,38 @@ from random import shuffle
 
 from tqdm import tqdm
 
-from pycrystallography.core.orientedLattice  import OrientedLattice
-from pycrystallography.core.orientation  import Orientation
-from pycrystallography.core.orientedLattice import OrientedLattice as olt
-from pycrystallography.core.crystalOrientation import CrystalOrientation as CrysOri, CrystalOrientation
+try:
+    from pycrystallography.core.orientation  import Orientation
+    from pycrystallography.core.quaternion  import Quaternion
+    from pycrystallography.core.millerDirection  import MillerDirection
+    from pycrystallography.core.millerPlane  import MillerPlane
+    from pycrystallography.core.orientedLattice import OrientedLattice as olt
+    from pycrystallography.core.crystalOrientation  import CrystalOrientation as CrysOri
+    from pycrystallography.core.orientationRelation  import OrientationRelation as OriReln
+    from pycrystallography.core.saedAnalyzer import SaedAnalyzer as Sad
+    from pycrystallography.core.crystallographyFigure import CrystallographyFigure as crysFig
+    import pycrystallography.utilities.pyCrystUtilities as pyCrysUt
+    import pycrystallography.utilities.pymathutilityfunctions as pmut
+except:
+    print("Unable to find the pycrystallography package!!! trying to now alter the system path !!")
+    sys.path.insert(0, os.path.abspath('.'))
+    sys.path.insert(0, os.path.dirname('..'))
+    sys.path.insert(0, os.path.dirname('../../pycrystallography'))
+    sys.path.insert(0, os.path.dirname('../../..'))
+    
+    for item in sys.path:
+        print(f"Updated Path : {item}")
+    from pycrystallography.core.orientation  import Orientation
+    from pycrystallography.core.quaternion  import Quaternion
+    from pycrystallography.core.millerDirection  import MillerDirection
+    from pycrystallography.core.millerPlane  import MillerPlane
+    from pycrystallography.core.orientedLattice import OrientedLattice as olt
+    from pycrystallography.core.crystalOrientation  import CrystalOrientation as CrysOri
+    from pycrystallography.core.orientationRelation  import OrientationRelation as OriReln
+    from pycrystallography.core.saedAnalyzer import SaedAnalyzer as Sad
+    from pycrystallography.core.crystallographyFigure import CrystallographyFigure as crysFig
+    import pycrystallography.utilities.pyCrystUtilities as pyCrysUt
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -687,14 +715,17 @@ class Ebsd(object):
 
         if flipMode is not None:
             flippedData = np.flip(rotatedData, axis=axis)
+        else:
+            flippedData=rotatedData
+
         if "ang" in self._ebsdFormat:
             self._data["phi1"]=flippedData[:,:,0].reshape(-1)
-            self._data["PHI"]=flippedData[:,:,0].reshape(-1)
-            self._data["phi2"]=flippedData[:,:,0].reshape(-1)
+            self._data["PHI"]=flippedData[:,:,1].reshape(-1)
+            self._data["phi2"]=flippedData[:,:,2].reshape(-1)
         elif "ctf" in self._ebsdFormat:
             self._data["Euler1"] = flippedData[:, :, 0].reshape(-1)
-            self._data["Euler2"] = flippedData[:, :, 0].reshape(-1)
-            self._data["Euler3"] = flippedData[:, :, 0].reshape(-1)
+            self._data["Euler2"] = flippedData[:, :, 1].reshape(-1)
+            self._data["Euler3"] = flippedData[:, :, 2].reshape(-1)
         else:
             raise ValueError(f"Unknown format {self._ebsdFormat} only ctf and ang are supported as of now")
 
@@ -769,7 +800,7 @@ if __name__ == '__main__':
         #maskImg = r"../../data/programeData/ebsdMaskFolder/3.png"
         #ebsd.applyMask(maskImg,displayImage=True)
         ebsd.crop(start = (10,10), dimensions=(150,150))
-        ebsd.rotateAndFlipData(flipMode='vertical', rotate=180)
+        ebsd.rotateAndFlipData(flipMode='vertical',rotate=90)
         #ebsd.reduceEulerAngelsToFundamentalZone()
         ebsd.writeAng()
         exit(-100)
