@@ -49,6 +49,7 @@ class Ebsd(object):
         self._nHeaderLines=None
         self._ebsdFormat=None
         self._logger=logger
+        self._autoName="ebsd" ## used for creating the data set name automatically
         self._isCropped=False ## useful to test if the scan data is cropped after loading
         
     def fromAng(self, fileName):
@@ -59,6 +60,7 @@ class Ebsd(object):
         count=0
         header=[]
         logging.debug("Attempting to read the file :"+fileName)
+        ebsdFilebaseName= os.path.basename(fileName)
         self._ebsdFilePath=fileName
         with open(fileName, "r") as f:
             for line in f:
@@ -98,6 +100,7 @@ class Ebsd(object):
         columnNames = ["phi1", "PHI", "phi2","x", "y", "IQ", "CI", "Phase", "SEM", "FIT"]
         self._data = pd.read_csv(self._ebsdFilePath, names=columnNames, dtype=dType, skiprows=self._nHeaderLines,
                                  sep="\s+|\t+|\s+\t+|\t+\s+")
+        self._autoName=ebsdFilebaseName
         self.__makeEulerData()
 
     def fromCtf(self, fileName):
@@ -496,9 +499,20 @@ class Ebsd(object):
         self._nHeaderLines = len(self._header)
         self.writeAng(pathName=simulatedEbsdOutPutFilefilePath)
 
+    @staticmethod
+    def __replace_all_except_last__(input_string, old_substring, new_substring):
+        occurrences = input_string.count(old_substring)
+        if occurrences <= 1:
+            return input_string
+
+        parts = input_string.rsplit(old_substring, occurrences - 1)
+        modified_parts = [new_substring.join(parts[:-1])] + parts[-1:]
+        return old_substring.join(modified_parts)
+
     def writeAng(self,pathName=None):
         if pathName is None:
-            pathName =self._ebsdFilePath[:-4]+"_mod.ang"
+            basename = self.__replace_all_except_last__(self._autoName+"_mod.ang",".ang","_")
+            pathName =os.path.join(os.path.dirname(self._ebsdFilePath),basename)
 
         with open(pathName, "wb") as f:
             for line in self._header[:-1]:
@@ -623,19 +637,25 @@ class Ebsd(object):
         self._isCropped=True
         self.nXPixcels, self.nYPixcels = self._shape[1],self._shape[0]
         self.__makeEulerData()
+        self._autoName = self._autoName + self.__replace_characters__(f"cropped_{dimensions}")
         logging.info(f"cropped the ebsd data points now the cropped size of the data is : {self._shape}")
 
-    def flipData(self, flipMode='vertical'):
+    def rotateAndFlipData(self, flipMode=None, rotate=0):
         """
         flip the ebsd data, typically useful for augmentation in machine learning
-        flipMode: one of vertical, horizontal
+        flipMode: one of None, vertical, horizontal
+        rotate one of 90,180,270 : Note that it is physcial rotation not orienation rotation
         """
+        operationString=""
         shape = self._shape
         data = self._data
-        if "h" in flipMode: ##horizontal flip
+        if flipMode is not None and "h" in flipMode: ##horizontal flip
             axis = 0
-        else:
+            operationString += f'flipped_hor'
+        elif flipMode is not None:
             axis = 1 ##vertical flip
+            operationString+=f'flipped_vert'
+
         if "ang" in self._ebsdFormat:
             eulerData = np.array([data["phi1"], data["PHI"], data["phi2"]]).T
         elif "ctf" in self._ebsdFormat:
@@ -646,7 +666,27 @@ class Ebsd(object):
         eulerData = np.stack(
             [eulerData[:, 0].reshape(shape), eulerData[:, 1].reshape(shape), eulerData[:, 2].reshape(shape)], axis=2)
 
-        flippedData = np.flip(eulerData, axis=axis)
+
+        rotatedData = eulerData
+        if rotate > 0:
+            if shape[0] == shape[1]:
+                logging.debug(f"attempting the ebsd data physcial rotation")
+                if rotate ==90:
+                    rotatedData = np.rot90(rotatedData, k=1,axes = (0,1))
+                elif rotate ==180:
+                    rotatedData = np.rot90(rotatedData, k=2, axes=(0, 1))
+                elif rotate ==270:
+                    rotatedData = np.rot90(rotatedData, k=2, axes=(0, 1))
+                else:
+                    raise ValueError (f"rotation provided is {rotate} but only one of [90,180,270] degree are supported")
+                operationString+=f'_rotation_{rotate}'
+
+            else:
+                logging.warning(f"skipping the rotation as the ebsd data is not of square shape. "
+                                f"ebsd shape :{shape}")
+
+        if flipMode is not None:
+            flippedData = np.flip(rotatedData, axis=axis)
         if "ang" in self._ebsdFormat:
             self._data["phi1"]=flippedData[:,:,0].reshape(-1)
             self._data["PHI"]=flippedData[:,:,0].reshape(-1)
@@ -659,8 +699,19 @@ class Ebsd(object):
             raise ValueError(f"Unknown format {self._ebsdFormat} only ctf and ang are supported as of now")
 
         self.__makeEulerData()
+        self._autoName = self._autoName+operationString
         logging.info(f"completd the flipping of orienation data.")
         logging.warning(f"Only the orientation data is flipped rest of data such as IQ, Fit etc are not as of now!!!")
+
+    @staticmethod
+    def __replace_characters__(input_string):
+        characters_to_replace = ['(', ')', '[', ']', "'", ',']
+        replacement_char = '_'
+
+        for char in characters_to_replace:
+            input_string = input_string.replace(char, replacement_char)
+
+        return input_string
 
     def readPhaseFromAng(self):
         if "ang" in self._ebsdFormat:
@@ -711,16 +762,16 @@ if __name__ == '__main__':
 
     testFromAng=True
     if testFromAng:
-        fileName = r'../../data/testingData/Al-B4CModelScan.ang'
+        fileName = r'../../tmp/Al-B4CModelScan.ang'
         ebsd = Ebsd(logger=logger)
         ebsd.fromAng(fileName=fileName)
         # maskImg = np.full((80, 50), True, dtype=bool)
         #maskImg = r"../../data/programeData/ebsdMaskFolder/3.png"
         #ebsd.applyMask(maskImg,displayImage=True)
-        #ebsd.crop(start = (69,60), dimensions=(50,150))
-        ebsd.flipData(flipMode='vertical')
+        ebsd.crop(start = (10,10), dimensions=(150,150))
+        ebsd.rotateAndFlipData(flipMode='vertical', rotate=180)
         #ebsd.reduceEulerAngelsToFundamentalZone()
-        ebsd.writeAng(pathName=r"..\..\tmp\simulatedEbsd_OIM_recreated.ang")
+        ebsd.writeAng()
         exit(-100)
 
     fileName =r'D:\CurrentProjects\python_trials\machineLearning\EnhanceMicroStructure\kikuchiProject\ebsdCleanUp\EBSD maps\def_map_1_sw_cleaned.ctf'
