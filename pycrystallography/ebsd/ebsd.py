@@ -603,8 +603,6 @@ class Ebsd(object):
 
         self._data = self._data.drop(index = indx)
         ### now adjusting the first point X Y to become 0,0
-
-
         self._shape = (dimensions[0],dimensions[1])
         numberOfchangedValues=0
         for i,line in enumerate(self._header):
@@ -622,15 +620,47 @@ class Ebsd(object):
         assert numberOfchangedValues ==3 , f"Suposed to have changed 3 values but could change only {numberOfchangedValues}. " \
                                            f"The modified header is {self._header}"
         logging.debug(f"modifd headeris : {self._header}")
-
         self._isCropped=True
         self.nXPixcels, self.nYPixcels = self._shape[1],self._shape[0]
+        self.__makeEulerData()
         logging.info(f"cropped the ebsd data points now the cropped size of the data is : {self._shape}")
 
+    def flipData(self, flipMode='vertical'):
+        """
+        flip the ebsd data, typically useful for augmentation in machine learning
+        flipMode: one of vertical, horizontal
+        """
+        shape = self._shape
+        data = self._data
+        if "h" in flipMode: ##horizontal flip
+            axis = 0
+        else:
+            axis = 1 ##vertical flip
+        if "ang" in self._ebsdFormat:
+            eulerData = np.array([data["phi1"], data["PHI"], data["phi2"]]).T
+        elif "ctf" in self._ebsdFormat:
+            eulerData = np.array([data["Euler1"],data["Euler2"],data["Euler2"]]).T
+        else:
+            raise ValueError(f"Unknown format {self._ebsdFormat} only ctf and ang are supported as of now")
 
+        eulerData = np.stack(
+            [eulerData[:, 0].reshape(shape), eulerData[:, 1].reshape(shape), eulerData[:, 2].reshape(shape)], axis=2)
 
+        flippedData = np.flip(eulerData, axis=axis)
+        if "ang" in self._ebsdFormat:
+            self._data["phi1"]=flippedData[:,:,0].reshape(-1)
+            self._data["PHI"]=flippedData[:,:,0].reshape(-1)
+            self._data["phi2"]=flippedData[:,:,0].reshape(-1)
+        elif "ctf" in self._ebsdFormat:
+            self._data["Euler1"] = flippedData[:, :, 0].reshape(-1)
+            self._data["Euler2"] = flippedData[:, :, 0].reshape(-1)
+            self._data["Euler3"] = flippedData[:, :, 0].reshape(-1)
+        else:
+            raise ValueError(f"Unknown format {self._ebsdFormat} only ctf and ang are supported as of now")
 
-
+        self.__makeEulerData()
+        logging.info(f"completd the flipping of orienation data.")
+        logging.warning(f"Only the orientation data is flipped rest of data such as IQ, Fit etc are not as of now!!!")
 
     def readPhaseFromAng(self):
         if "ang" in self._ebsdFormat:
@@ -687,7 +717,8 @@ if __name__ == '__main__':
         # maskImg = np.full((80, 50), True, dtype=bool)
         #maskImg = r"../../data/programeData/ebsdMaskFolder/3.png"
         #ebsd.applyMask(maskImg,displayImage=True)
-        ebsd.crop(start = (69,60), dimensions=(90,88))
+        #ebsd.crop(start = (69,60), dimensions=(50,150))
+        ebsd.flipData(flipMode='vertical')
         #ebsd.reduceEulerAngelsToFundamentalZone()
         ebsd.writeAng(pathName=r"..\..\tmp\simulatedEbsd_OIM_recreated.ang")
         exit(-100)
