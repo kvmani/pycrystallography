@@ -524,16 +524,16 @@ class Ebsd(object):
         FinalData[:, 4] = Y.flatten()
         FinalData[:, 0:3] = OriData
         # Ind = np.where(FinalData[:, 1] < 0); ### pixcels  not assigned ori
+        FinalData[:, 5] = IQData.flatten()
         FinalData[:, 6] = CIData.flatten()  # '##-1; ## Assgning   CI - 1
         # note this is made to plot any given property  value to  be  sent  to  IQ data
-        FinalData[:, 5] = IQData.flatten()
-        FinalData[:, 8] = 50
+        FinalData[:, 8] = 50.0
         FinalData[:, 9] = 1.5
         dType = {"phi1": np.float64, "PHI": np.float64, "phi2": np.float64, "x": np.float16, "y": np.float16,
-                 "IQ": np.float64, "CI": np.float64,
-                 "FIT": np.uint16, "Phase": np.uint8, "SEM": np.float64}  # sem means detecor signal
+                 "IQ": np.float64, "CI": np.float64, "Phase": np.uint8,
+                 "SEM": np.float64, "FIT": np.float64, }  # sem means detecor signal
         columnNames = ["phi1", "PHI", "phi2", "x",
-                       "y", "IQ", "CI", "FIT", "Phase", "SEM"]
+                       "y", "IQ", "CI", "Phase", "SEM", "FIT"]
 
         self._data = pd.DataFrame(FinalData, columns=columnNames)
         self._oriData = OriData
@@ -588,7 +588,7 @@ class Ebsd(object):
             for ind in self._data.index:
                 if "ang" in self._ebsdFormat:
                     line = f"{df['phi1'][ind]:.5f} {df['PHI'][ind]:.5f} {df['phi2'][ind]:.5f} {df['x'][ind]:.4f} {df['y'][ind]:.4f} " \
-                        f"{np.around(df['IQ'][ind],2):.2f} {df['CI'][ind]:.2f} {df['Phase'][ind]:2d}  {df['SEM'][ind]:8d} {df['FIT'][ind]:.3f}\n"
+                        f"{np.around(df['IQ'][ind],2):.2f} {df['CI'][ind]:.2f} {df['Phase'][ind]:2d}  {df['SEM'][ind]:.3f} {df['FIT'][ind]:.3f}\n"
                 elif "ctf" in self._ebsdFormat:
                     line = f"{df['Euler1'][ind]:.5f} {df['Euler2'][ind]:.5f} {df['Euler3'][ind]:.5f} {df['X'][ind]:.2f} {df['Y'][ind]:.2f} " \
                            f"{np.around(df['IQ'][ind], 2):.2f} {df['CI'][ind]:.2f} {df['Phase'][ind]:2d} {df['Fit'][ind]:3d} {df['sem'][ind]:.4f}\n"
@@ -753,7 +753,7 @@ class Ebsd(object):
                 elif rotate == 180:
                     rotatedData = np.rot90(rotatedData, k=2, axes=(0, 1))
                 elif rotate == 270:
-                    rotatedData = np.rot90(rotatedData, k=2, axes=(0, 1))
+                    rotatedData = np.rot90(rotatedData, k=3, axes=(0, 1))
                 else:
                     raise ValueError(
                         f"rotation provided is {rotate} but only one of [90,180,270] degree are supported")
@@ -861,7 +861,7 @@ if __name__ == '__main__':
         except OSError as e:
             print("Error:", e)
 
-    testFromAng = True
+    testFromAng = False
     if testFromAng:
         fileName = r'../../tmp/Al-B4CModelScan.ang'
         ebsd = Ebsd(logger=logger)
@@ -869,7 +869,7 @@ if __name__ == '__main__':
         ebsd.fromAng(fileName=fileName)
         # maskImg = np.full((80, 50), True, dtype=bool)
         # maskImg = r"../../data/programeData/ebsdMaskFolder/3.png"
-        # ebsd.applyMask(maskImg,displayImage=True)
+        # ebsd.applyMask(maskImg, displayImage=True)
         ebsd.crop(start=(10, 10), dimensions=(150, 150))
         ebsd.rotateAndFlipData(flipMode='vertical', rotate=90)
         # ebsd.reduceEulerAngelsToFundamentalZone()
@@ -890,13 +890,13 @@ if __name__ == '__main__':
         print(oriData)
         exit(-1)
 
-    testGenerateSimulatedEbsdMap = False
+    testGenerateSimulatedEbsdMap = True
     if testGenerateSimulatedEbsdMap:
         deg = np.pi/180.0
         cubicOri1 = CrysOri(orientation=Orientation(
-            euler=[0.*deg, 0.*deg, 0.*deg]), lattice=olt.cubic(1))
+            euler=[0.*deg, 45.*deg, 0.*deg]), lattice=olt.cubic(1))
         cubicOri2 = CrysOri(orientation=Orientation(
-            euler=[45.*deg, 30.*deg, 0.*deg]), lattice=olt.cubic(1))
+            euler=[0.*deg, 30.*deg, 0.*deg]), lattice=olt.cubic(1))
         oriList = cubicOri1.symmetricSet()
         oriList = [i.projectToFundamentalZone()[0].getEulerAngles(
             units="degree", applyModulo=True).tolist() for i in oriList]
@@ -915,7 +915,7 @@ if __name__ == '__main__':
 
         ebsd.generateSimulatedEbsdMap(orientationList=oriList,
                                       headerFileName="bcc_header.txt",
-                                      simulatedEbsdOutPutFilefilePath=r"../../tmp/simulatedEbsd.ang", sizeOfGrain=5,)
+                                      simulatedEbsdOutPutFilefilePath=r"../../tmp/simulatedEbsdMeenakshi.ang", sizeOfGrain=5,)
         ebsd.makeEulerDatainImFormat(saveAsNpy=True)
         # ebsd.writeNpyFile(pathName=None)
         # ebsd.readPhaseFromCtfString(ebsd._header[13])
