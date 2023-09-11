@@ -98,6 +98,9 @@ class Ebsd(object):
                     header.append(line)
                     if "# COLUMN_COUNT" in line:
                         self.nColumns = int(line.split(' ')[-1])
+                    elif "# Column 11: PRIAS Bottom Strip" in line:
+                        readPriasData = True
+
                     elif "# COLUMN_HEADERS" in line:
                         self.columnNames = line.replace(
                             "# COLUMN_HEADERS: ", "").split(" ")
@@ -125,12 +128,23 @@ class Ebsd(object):
         self._ebsdFormat = "ang"
         self.columnNames = [
             element for element in self.columnNames if element != "index"]
-        dType = {"phi1": np.float16, "PHI": np.float64, "phi2": np.float64,
-                 "x": np.float16, "y": np.float16,
-                 "IQ": np.double, "CI": np.double, "Phase": np.uint8,
-                 "SEM": np.int, "FIT": np.float16}
-        columnNames = ["phi1", "PHI", "phi2", "x",
-                       "y", "IQ", "CI", "Phase", "SEM", "FIT"]
+
+        if readPriasData:
+            dType = {"phi1": np.float16, "PHI": np.float64, "phi2": np.float64,
+                     "x": np.float16, "y": np.float16,
+                     "IQ": np.double, "CI": np.double, "Phase": np.uint8,
+                     "SEM": np.int, "FIT": np.float16,
+                     "PRIAS_Bottom": np.float16, "PRIAS_Center": np.float16, "PRIAS_Top": np.float16}
+            columnNames = ["phi1", "PHI", "phi2", "x",
+                           "y", "IQ", "CI", "Phase", "SEM", "FIT", "PRIAS_Bottom", "PRIAS_Center", "PRIAS_Top"]
+        else:
+            dType = {"phi1": np.float16, "PHI": np.float64, "phi2": np.float64,
+                     "x": np.float16, "y": np.float16,
+                     "IQ": np.double, "CI": np.double, "Phase": np.uint8,
+                     "SEM": np.int, "FIT": np.float16}
+            columnNames = ["phi1", "PHI", "phi2", "x",
+                           "y", "IQ", "CI", "Phase", "SEM", "FIT"]
+
         self._data = pd.read_csv(self._ebsdFilePath, names=columnNames, dtype=dType, skiprows=self._nHeaderLines,
                                  sep="\s+|\t+|\s+\t+|\t+\s+")
         self._autoName = ebsdFilebaseName
@@ -598,9 +612,18 @@ class Ebsd(object):
         logging.info("Wrote the EBSD data file :" +
                      pathName + " Succesfully !!!")
 
+    @staticmethod
+    def makeEbsdScanFromNpzFile(npzFile):
+        """
+        Thi is a method to convert an euler angle data file (npz file used in ML work)
+        to equivalent ebsd scan assuming it is of cubic material.
+
+        """
+        data = np.load(npzFile)
+
     def reduceEulerAngelsToFundamentalZone(self):
         self.readPhaseFromAng()
-        logging.info(f"Done with euler angel reduction to fundamental zone!!")
+        logging.info(f"performing euler angel reduction to fundamental zone!!")
         eulerData = np.array(self._data.iloc[:, 0:3])
         nPoints = self.nXPixcels*self.nYPixcels
 
@@ -861,17 +884,18 @@ if __name__ == '__main__':
         except OSError as e:
             print("Error:", e)
 
-    testFromAng = False
+    testFromAng = True
     if testFromAng:
         fileName = r'../../tmp/Al-B4CModelScan.ang'
+        fileName = r'C:\Users\vk0237\OneDrive - UNT System\Desktop\Model_256X256_EbsdData.ang'
         ebsd = Ebsd(logger=logger)
         logging.info(f"current dir is : {os.getcwd()}")
         ebsd.fromAng(fileName=fileName)
         # maskImg = np.full((80, 50), True, dtype=bool)
         # maskImg = r"../../data/programeData/ebsdMaskFolder/3.png"
         # ebsd.applyMask(maskImg, displayImage=True)
-        ebsd.crop(start=(10, 10), dimensions=(150, 150))
-        ebsd.rotateAndFlipData(flipMode='vertical', rotate=90)
+        ebsd.crop(start=(1, 1), dimensions=(256, 256))
+        # ebsd.rotateAndFlipData(flipMode='vertical', rotate=90)
         # ebsd.reduceEulerAngelsToFundamentalZone()
         ebsd.writeAng()
         exit(-100)
