@@ -780,7 +780,7 @@ class Ebsd(object):
         if flipMode is not None and "h" in flipMode:  # horizontal flip
             axis = 0
             operationString += f'flipped_hor'
-        elif flipMode is not None:
+        elif flipMode is not None and "v" in flipMode:
             axis = 1  # vertical flip
             operationString += f'flipped_vert'
 
@@ -800,6 +800,7 @@ class Ebsd(object):
         if rotate > 0:
             if shape[0] == shape[1]:
                 logging.debug(f"attempting the ebsd data physcial rotation")
+
                 if rotate == 90:
                     rotatedData = np.rot90(rotatedData, k=1, axes=(0, 1))
                 elif rotate == 180:

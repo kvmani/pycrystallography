@@ -9,6 +9,9 @@ import os
 import pathlib
 import matplotlib
 import logging
+import numpy as np
+import random
+from tqdm import tqdm
 # matplotlib.use('TkAgg')
 cwd = pathlib.Path(__file__).parent.parent.resolve()
 pyCrystallographyDir = cwd
@@ -43,28 +46,38 @@ logger = logging.getLogger(__name__)
 ebsdAngFile = r'tmp/Al-B4CModelScan.ang'
 fileDir = os.path.dirname(ebsdAngFile)
 fileName = os.path.basename(ebsdAngFile)
-ebsd = Ebsd(logger=logger)
-logging.info(f"current dir is : {os.getcwd()}")
-ebsd.fromAng(fileName=ebsdAngFile)
-ebsd.crop(start=(1, 1), dimensions=(150, 150))
-ebsd.reduceEulerAngelsToFundamentalZone()
-ebsd.writeNpyFile(pathName=os.path.join(
-    fileDir, 'Target_'+fileName[:-3]+'.npy'))
-ebsd.writeAng(pathName=os.path.join(
-    fileDir, 'Target_'+fileName))
-ebsd.writeEulerAsPng(pathName=os.path.join(
-    fileDir, 'Target_'+fileName[:-3]+'.tiff'), showMap=False)
-# maskImg = np.full((80, 50), True, dtype=bool)
-maskImg = r"data/programeData/ebsdMaskFolder/3.png"
-ebsd.applyMask(maskImg, displayImage=False)
-# ebsd.rotateAndFlipData(flipMode='vertical', rotate=90)
-# ebsd.reduceEulerAngelsToFundamentalZone()
 
-ebsd.writeNpyFile(pathName=os.path.join(
-    fileDir, 'Source_'+fileName[:-3]+'.npy'))
-ebsd.writeAng(pathName=os.path.join(
-    fileDir, 'Source_'+fileName))
-ebsd.writeEulerAsPng(pathName=os.path.join(
-    fileDir, 'Source_'+fileName[:-3]+'.tiff'), showMap=False)
+for i in tqdm(range(10)):
+    ebsd = Ebsd(logger=logger)
+    logging.info(f"current dir is : {os.getcwd()}")
+    ebsd.fromAng(fileName=ebsdAngFile)
+    rotationAngle = random.choice([0, 90, 180, 270])
+    flipMode = random.choice([None, 'h', 'v'])
+    maskNumber = random.randint(0, 25)
+    fileSuffix = f"rot_{rotationAngle}_flip_{flipMode}_mask_{maskNumber}"
+    ebsd.rotateAndFlipData(
+        flipMode=flipMode, rotate=rotationAngle)  # augmentation
 
-logging.info(f"done with the processing written the files")
+    ebsd.crop(start=(1, 1), dimensions=(150, 150))
+
+    ebsd.reduceEulerAngelsToFundamentalZone()
+    ebsd.writeNpyFile(pathName=os.path.join(
+        fileDir, f'Target_{i}_{fileSuffix}_'+fileName[:-4]+'.npy'))
+    ebsd.writeAng(pathName=os.path.join(
+        fileDir, f'Target_{i}_{fileSuffix}_'+fileName))
+    ebsd.writeEulerAsPng(pathName=os.path.join(
+        fileDir, f'Target_{i}_{fileSuffix}_'+fileName[:-4]+'.tiff'), showMap=False)
+    # maskImg = np.full((80, 50), True, dtype=bool)
+    maskImg = f"data/programeData/ebsdMaskFolder/{maskNumber}.png"
+    ebsd.applyMask(maskImg, displayImage=False)
+    # ebsd.rotateAndFlipData(flipMode='vertical', rotate=90)
+    # ebsd.reduceEulerAngelsToFundamentalZone()
+
+    ebsd.writeNpyFile(pathName=os.path.join(
+        fileDir, f'Source_{i}_{fileSuffix}_'+fileName[:-4]+'.npy'))
+    ebsd.writeAng(pathName=os.path.join(
+        fileDir, f'Source_{i}_{fileSuffix}_'+fileName))
+    ebsd.writeEulerAsPng(pathName=os.path.join(
+        fileDir, f'Source_{i}_{fileSuffix}_'+fileName[:-4]+'.tiff'), showMap=False)
+
+    logging.info(f"done with the processing written the files")
