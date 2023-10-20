@@ -9,7 +9,7 @@ from pymatgen.core.lattice import Lattice
 import math as mt
 import numpy as np
 import matplotlib.pyplot as plt
-
+import logging
 from imutils import contours
 from skimage import measure
 import numpy as np
@@ -67,6 +67,8 @@ def broken2DLineWithText(point1,point2,text='',lineFraction=0.5,ls='-',lc=''):
                     textcoords='offset points', ha='center', va='center',
                     rotation=-textAngle,size=12,color=lc)  
     
+
+
 
 
 

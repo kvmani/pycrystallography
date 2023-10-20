@@ -20,9 +20,67 @@ import itertools
 import numpy
 #from sympy import *
 from sympy.geometry import *
+import logging
 #from pycrystallography.core.millerDirection import MillerDirection
 
+def plotComparitiveImages(images, titles=[], mainTitle="", figLayoutChoice=-1, shouldBlock=True, filePath="",cmap='gray'):
+    """
+    utility method for plotting the images side by side for easy comparision:
+    images : list of numpy arrays (2D arrays/3d arrays to be plotted as images)
+    titles : list of caption for each image.
+    mainTitle main title of the figure
+    if shouldBlock is set to False, figure will be drwan in non blocking mode so that automation/animation can be achieved
+    """
+    fig = plt.figure()
+    fig.suptitle(mainTitle)
+    numOfImages = len(images)
+    figLayout = [[(1, 1, 1)],
+                 [(1, 2, 1), (1, 2, 2)],
+                 [(1, 3, 1), (1, 3, 2), (1, 3, 3)],
+                 [(2, 2, 1), (2, 2, 2), (2, 2, 3), (2, 2, 4)],
+                 [(2, 3, 1), (2, 3, 2), (2, 3, 3), (2, 3, 4), (2, 3, 5), (2, 3, 6)],  ## for 5 images
+                 [(2, 3, 1), (2, 3, 2), (2, 3, 3), (2, 3, 4), (2, 3, 5), (2, 3, 6)],  ## for 6 images
+                 [(3, 3, 1), (3, 3, 2), (3, 3, 3), (3, 3, 4), (3, 3, 5), (3, 3, 6), (3, 3, 7), (3, 3, 8), (3, 3, 9)],
+                 ## for 7 images
+                 [(3, 3, 1), (3, 3, 2), (3, 3, 3), (3, 3, 4), (3, 3, 5), (3, 3, 6), (3, 3, 7), (3, 3, 8), (3, 3, 9)],
+                 ## for 8 images
+                 [(3, 3, 1), (3, 3, 2), (3, 3, 3), (3, 3, 4), (3, 3, 5), (3, 3, 6), (3, 3, 7), (3, 3, 8), (3, 3, 9)],
+                 ## for 9 images
+                 [(3, 3, 1), (3, 3, 3), (3, 3, 4), (3, 3, 5), (3, 3, 6), (3, 3, 7), (3, 3, 9)],
+                 ## special case for showing the kikuchi of neighbors
 
+                 ]
+
+    numImages = len(images)
+    ax = []
+    if len(titles) == 0:
+        titles = ["image_" + str(i) for i in range(numOfImages)]
+    for i, image in enumerate(images):
+        if figLayoutChoice < 0:  ### automatic depending on number of images
+            ax.append(fig.add_subplot(*figLayout[numImages - 1][i]))
+        else:
+            ax.append(
+                fig.add_subplot(*figLayout[figLayoutChoice - 1][i]))  # figLayoutChoice = 10 special case for kikuchi
+        ax[i].set_title(titles[i])
+        ax[i].imshow(image, cmap=cmap)
+        ax[i].axis('off')
+
+    if len(filePath)>0:
+        ### this means that path is provided and we should save the file in that path.
+
+        try:
+            plt.savefig(filePath)
+            shouldBlock=False
+            plt.close()
+            logging.debug(f"plotComparitiveImages: saved the plot to {filePath}")
+            if shouldBlock:
+                plt.show(block=shouldBlock)
+            return
+
+        except:
+            logging.error(f"plotComparitiveImages: unable to save the plot to {filePath}")
+
+    plt.show(block=shouldBlock)
 
 
 def broken2DLineWithText(point1,point2,axisHandle=None,text='',lineFraction=0.5,ls='-',lc=''):
