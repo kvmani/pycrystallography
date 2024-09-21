@@ -914,7 +914,7 @@ if __name__ == '__main__':
         except OSError as e:
             print("Error:", e)
 
-    testFromAng = True
+    testFromAng = False
     if testFromAng:
         fileName = r'../../tmp/Al-B4CModelScan.ang'
         # fileName = r'C:\Users\vk0237\OneDrive - UNT System\Desktop\Model_256X256_EbsdData.ang'
