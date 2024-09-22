@@ -6,6 +6,8 @@ from PIL import Image
 from scipy.ndimage import map_coordinates
 import matplotlib.gridspec as gridspec
 
+import matplotlib.cm as cm
+
 class BandWidthDetector:
     def __init__(self, band_input_data, smoothing_sigma=2):
         """
@@ -30,7 +32,6 @@ class BandWidthDetector:
             self.get_line_profile()
             self.smooth_profile()
             band_properties = self.detect_band_edges(gradient_threshold=gradient_threshold)
-
             # Add additional attributes from band_data (hkl, refWidth, etc.)
             band_properties.update(band_data)
             band_properties.update(self.additional_properties)
@@ -106,39 +107,57 @@ class BandWidthDetector:
         }
         return band_properties
 
-    import matplotlib.gridspec as gridspec
-
-    import matplotlib.gridspec as gridspec
-
     def plot_results(self):
         """
         Plot the results for all bands in a customized layout:
-        - Plot 1 (image) spans both rows of the first column.
+        - Plot 1 (image) spans both rows of the first column, with annotated lines showing 'hkl' and band width.
         - Plot 2 (line profiles) and Plot 3 (gradients) span the first and second rows of the second column.
+        - All annotations are in larger white text with black background for contrast.
         """
         fig = plt.figure(figsize=(14, 14))
 
         # Create a gridspec layout with 2 rows and 2 columns
         gs = gridspec.GridSpec(2, 2, width_ratios=[1, 1], height_ratios=[1, 1])
 
+        # Set the line color to red and increase line width by a factor of 4
+        line_color = 'black'
+        line_width = 4  # Increased from 2 to 8 (factor of 4)
+
+        # Set the offset value for the text annotation
+        offset = 5  # 15 pixels offset in both x and y directions
+
         # Plot 1: The image will span both rows in the first column
         ax_img = plt.subplot(gs[:, 0])  # Spanning all rows in the first column
         ax_img.imshow(self.image, cmap='gray')
-        for band_data, band_properties in zip(self.points, self.band_properties_list):
+
+        for i, (band_data, band_properties) in enumerate(zip(self.points, self.band_properties_list)):
             P1, P2 = band_data['P1P2'][0], band_data['P1P2'][1]
             hkl_label = band_data['hkl']
-            ax_img.plot([P1[0], P2[0]], [P1[1], P2[1]], 'y-', linewidth=2, label=f"hkl {hkl_label}")
+
+            # Plot the line between P1 and P2 with the increased line width and red color
+            ax_img.plot([P1[0], P2[0]], [P1[1], P2[1]], color=line_color, linewidth=line_width)
+
+            # Annotate the hkl label and band width at the midpoint of the line, with an offset
+            midpoint_x = (P1[0] + P2[0]) / 2 + offset  # Offset in x
+            midpoint_y = (P1[1] + P2[1]) / 2 + offset  # Offset in y
+            band_width_rounded = round(band_properties['band_width'], 2)
+
+            # Add annotation with larger white text and black background for contrast
+            ax_img.text(midpoint_x, midpoint_y, f"{hkl_label} : {band_width_rounded}",
+                        color='white', fontsize=14,  # Increased font size
+                        bbox=dict(facecolor='black', edgecolor='none', pad=2))  # Black background
+
+            # Plot the start and end points of the band
             ax_img.plot(band_properties['band_start_xy_end_xy'][0][0], band_properties['band_start_xy_end_xy'][0][1],
                         'go', markersize=8)
             ax_img.plot(band_properties['band_start_xy_end_xy'][1][0], band_properties['band_start_xy_end_xy'][1][1],
                         'ro', markersize=8)
 
         ax_img.set_title("Image with Detected Bands")
-        ax_img.legend()
 
         # Plot 2: The smoothed line profiles in the second column, first row
         ax_profile = plt.subplot(gs[0, 1])
-        for band_data, band_properties in zip(self.points, self.band_properties_list):
+        for i, (band_data, band_properties) in enumerate(zip(self.points, self.band_properties_list)):
             hkl_label = band_data['hkl']
             self.P1 = band_data['P1P2'][0]
             self.P2 = band_data['P1P2'][1]
@@ -147,10 +166,10 @@ class BandWidthDetector:
             self.get_line_profile()
             self.smooth_profile()
 
-            # Plot the smoothed line profile
-            ax_profile.plot(self.smoothed_profile, label=f"hkl {hkl_label}", linewidth=2)
+            # Plot the smoothed line profile with red color
+            ax_profile.plot(self.smoothed_profile, label=f"hkl {hkl_label}", linewidth=2, color=line_color)
 
-            # Add dashed vertical lines for band_start and band_end (without adding them to the legend)
+            # Add dashed vertical lines for band_start and band_end
             ax_profile.axvline(band_properties['band_Start_End'][0], color='g', linestyle='--')  # Band start
             ax_profile.axvline(band_properties['band_Start_End'][1], color='r', linestyle='--')  # Band end
 
@@ -161,7 +180,7 @@ class BandWidthDetector:
 
         # Plot 3: The gradients of the profiles in the second column, second row
         ax_gradient = plt.subplot(gs[1, 1])
-        for band_data, band_properties in zip(self.points, self.band_properties_list):
+        for i, (band_data, band_properties) in enumerate(zip(self.points, self.band_properties_list)):
             hkl_label = band_data['hkl']
             self.P1 = band_data['P1P2'][0]
             self.P2 = band_data['P1P2'][1]
@@ -173,10 +192,10 @@ class BandWidthDetector:
             # Calculate the gradient of the smoothed profile
             gradient = np.gradient(self.smoothed_profile)
 
-            # Plot the gradient
-            ax_gradient.plot(gradient, label=f"hkl {hkl_label}", color='orange')
+            # Plot the gradient with red color
+            ax_gradient.plot(gradient, label=f"hkl {hkl_label}", color=line_color)
 
-            # Add dashed vertical lines for band_start and band_end (without adding them to the legend)
+            # Add dashed vertical lines for band_start and band_end
             ax_gradient.axvline(band_properties['band_Start_End'][0], color='g', linestyle='--')  # Band start
             ax_gradient.axvline(band_properties['band_Start_End'][1], color='r', linestyle='--')  # Band end
 
@@ -220,10 +239,10 @@ def create_test_image(size=200, band_width=5, noise_level=10, smoothing_sigma=2)
 bandInputdata = {
     'imagePath': r"../../data/testingData/ML_kikuchi_test_1.png",
     'points': [
-        {'hkl':'110', 'P1P2':[(154, 130), (163, 152)], 'refWidth':100,},
-        {'hkl':'220', 'P1P2':[(81, 63), (90, 48)], 'refWidth':120,},
-        {'hkl':'111', 'P1P2':[(41, 100), (61, 100)], 'refWidth':105,},
-        {'hkl':'420', 'P1P2':[(107, 171), (102, 184)], 'refWidth':105,},
+                {'hkl':'110', 'P1P2':[(154, 130), (163, 152)], 'refWidth':100,},
+                {'hkl':'220', 'P1P2':[(81, 63), (90, 48)], 'refWidth':120,},
+                {'hkl':'111', 'P1P2':[(41, 100), (61, 100)], 'refWidth':105,},
+                {'hkl':'420', 'P1P2':[(107, 171), (102, 184)], 'refWidth':105,},
     ],
     'experimentID': 'EX123',
     'description': 'Detecting bands from Kikuchi pattern'
