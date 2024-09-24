@@ -281,7 +281,11 @@ def export_hkl_band_properties(df, output_folder, base_name):
 
 def process_images_in_folder(folder_path, band_input_data, options):
     """Process all images in the folder and export the results as an Excel file."""
-    image_paths = glob.glob(os.path.join(folder_path, "*.jpg"))
+    image_paths = []
+    extensions = ('*.png', '*.jpg', '*.jpeg', '*.tif', '*.tiff')  # Add other extensions if needed
+    for ext in extensions:
+        image_paths.extend(glob.glob(os.path.join(folder_path, ext)))
+
     all_band_properties = []
 
     logging.info(f"Found {len(image_paths)} images in folder: {folder_path}")

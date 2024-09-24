@@ -3,6 +3,8 @@ gradient_threshold: 3
 smoothing_sigma: 2
 line_thickness: 4
 offset: 10
-output_folder: E:\tmp\pycrystallography\tmp\kikuchi_data\tmp
-input_image_folder: E:\tmp\pycrystallography\tmp\kikuchi_data
+#output_folder: E:\tmp\pycrystallography\tmp\kikuchi_data\tmp
+#input_image_folder: E:\tmp\pycrystallography\tmp\kikuchi_data
+output_folder: C:\Users\kvman\PycharmProjects\pycrystallography\tmp\kikuchiMaps\out
+input_image_folder: C:\Users\kvman\PycharmProjects\pycrystallography\tmp\kikuchiMaps
 plot_results: true
