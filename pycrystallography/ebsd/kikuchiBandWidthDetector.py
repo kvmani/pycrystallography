@@ -1,4 +1,5 @@
 import os
+import json
 import glob
 import numpy as np
 import pandas as pd
@@ -278,77 +279,63 @@ def export_hkl_band_properties(df, output_folder, base_name):
 
         logging.info(f"Saved {hkl_value} band properties to {file_path}")
 
+def load_band_input_data(json_file_path):
+    """Load band input data from a JSON file."""
+    with open(json_file_path, 'r') as f:
+        band_input_data = json.load(f)
+    return band_input_data
 
-def process_images_in_folder(folder_path, band_input_data, options):
-    """Process all images in the folder and export the results as an Excel file."""
-    image_paths = []
-    extensions = ('*.png', '*.jpg', '*.jpeg', '*.tif', '*.tiff')  # Add other extensions if needed
-    for ext in extensions:
-        image_paths.extend(glob.glob(os.path.join(folder_path, ext)))
 
+def process_images_from_json(json_data, options):
+    """Process each image mentioned in the JSON data."""
     all_band_properties = []
+    input_image_folder = options.get('input_image_folder', '../../tmp/')  # Get input folder from options
 
-    logging.info(f"Found {len(image_paths)} images in folder: {folder_path}")
+    logging.info(f"Using input image folder: {input_image_folder}")
 
-    # Get the base name of the image folder for naming output files
-    base_name = get_image_folder_base_name(folder_path)
+    for entry in json_data:
+        pattern_file = entry['patternFileName']
+        image_path = os.path.join(input_image_folder, pattern_file)
 
-    for image_path in image_paths:
-        detector = BandWidthDetector(band_input_data, options)
+        logging.info(f"Processing image: {image_path} for grainId: {entry['grainId']}")
+
+        detector = BandWidthDetector(entry, options)
+
         try:
-            detector.load_image(image_path)
-            band_properties_list = detector.process_all_bands()
+            detector.load_image(image_path)  # Load the specific image mentioned in the JSON file
+            band_properties_list = detector.process_all_bands()  # Process bands for this image
             all_band_properties.extend(band_properties_list)
-            if options['plot_results']:
-                detector.plot_results()  # Optionally plot results for each image
+
+            if options.get('plot_results', False):  # Plot results if enabled in options
+                detector.plot_results()
+
         except Exception as e:
             logging.error(f"Error processing image {image_path}: {e}")
 
-    # Convert to DataFrame
-    df = pd.DataFrame(all_band_properties)
-
-    # Get output folder from options or default to ../../tmp/
-    output_folder = get_output_folder(options)
-
-    # Save the overall DataFrame to Excel with the base name
-    overall_file_path = os.path.join(output_folder, f"{base_name}_band_properties.xlsx")
-    df.to_excel(overall_file_path, index=False)
-    logging.info(f"Results saved to {overall_file_path}")
-
-    # Call the new method to export properties of each hkl band to separate files
-    export_hkl_band_properties(df, output_folder, base_name)
+    # Return the collected band properties
+    return pd.DataFrame(all_band_properties)
 
 
 if __name__ == "__main__":
     # Load the YAML configuration
     options = load_options("bandDetectorOptions.yml")
 
-    # Band input data
-    bandInputdata = {
-        "grainId": 10,
-        'points': [
-            {'hkl': '110', 'P1P2': [(154, 130), (163, 152)], 'refWidth': 100},
-            {'hkl': '220', 'P1P2': [(81, 63), (90, 48)], 'refWidth': 120},
-            {'hkl': '111', 'P1P2': [(41, 100), (61, 100)], 'refWidth': 105},
-            {'hkl': '420', 'P1P2': [(107, 171), (102, 184)], 'refWidth': 105},
-        ],
-        'comment': 'Big grain'
+    # Load band input data from JSON file
+    band_input_data = load_band_input_data(r"banInputData.json")
 
-    }    # Band input data
-    # bandInputdata = {
-    #     "grainId": 10,
-    #     'points': [
-    #         {'hkl': '110', 'P1P2': [(1236,966), (1362, 897)], 'refWidth': 100},
-    #         {'hkl': '220', 'P1P2': [(382, 930), (510, 850)], 'refWidth': 120},
-    #         {'hkl': '111', 'P1P2': [(942, 768), (1056, 768)], 'refWidth': 105},
-    #         #{'hkl': '420', 'P1P2': [(107, 171), (102, 184)], 'refWidth': 105},
-    #     ],
-    #     'comment': 'Big grain'
-    #
-    # }
+    # Process each image from the JSON file
+    df = process_images_from_json(band_input_data, options)
 
-    # Process images in folder and export to Excel
-    folder_path = options["input_image_folder"]
-    logging.info(f"Starting processing for images in folder: {folder_path}")
-    process_images_in_folder(folder_path, bandInputdata, options)
-    logging.info("Processing completed.")
+    # Get output folder from options or default to ../../tmp/
+    output_folder = get_output_folder(options)
+
+    # Get the base name for output files (from the input image folder)
+    base_name = get_image_folder_base_name(options['input_image_folder'])
+
+    # Save the overall DataFrame to Excel with the base name
+    overall_file_path = os.path.join(output_folder, f"{base_name}_band_properties.xlsx")
+    df.to_excel(overall_file_path, index=False)
+    logging.info(f"Results saved to {overall_file_path}")
+
+    # Call the method to export properties of each hkl band to separate files
+    export_hkl_band_properties(df, output_folder, base_name)
