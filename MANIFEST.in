@@ -1,0 +1,7 @@
+include *.rst LICENSE.rst CHANGES.rst requirements*.txt
+recursive-include Pycrystallography *.py *.json *.yaml
+recursive-exclude Pycrystallography tests/*.*
+#prune */*/tests
+#prune */*/*/tests
+#prune */*/*/*/tests
+#prune */*/*/*/*/tests

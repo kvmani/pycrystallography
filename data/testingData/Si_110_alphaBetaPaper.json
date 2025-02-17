@@ -1,0 +1,57 @@
+{
+    "Origin": [
+        323.10774483874786,
+        309.3391623573994
+    ],
+    "Spot1": [
+        345.89225516125214,
+        238.3562112659377
+    ],
+    "Spot2": [
+        385.32654640192635,
+        289.1836339951841
+    ],
+    "imageFileName": "D:/CurrentProjects/python_trials/work_pycrystallography/pycrystallography/data/testingData/Si_110_alphaBetaPaper.tif",
+    "measurementConditions": {
+        "alphaTilt": 0.0,
+        "betaTilt": 0.0,
+        "cameraLength": "40cm",
+        "diffractionRotationAngle": 0.0,
+        "options": {
+            "activeRotation": false,
+            "alphaRotationFirst": true,
+            "fixedAxes": true
+        },
+        "voltage": "200kV"
+    },
+    "patternBounds": [
+        0,
+        0,
+        669,
+        666
+    ],
+    "solutionPlotOptions": {
+        "brightness": 1.0,
+        "contrast": 1.0,
+        "hideSystamticAbsences": true,
+        "histogramEqualize": false,
+        "markKikuchi": false,
+        "markSpots": false,
+        "plotKikuchi": false
+    },
+    "solverOptions": {
+        "allowedAngleError": 5.0,
+        "allowedDError": 10.0,
+        "cameraConstant": 201.0,
+        "dMax": 10,
+        "dMin": 0,
+        "maxHkl": 3
+    },
+    "structureFiles": [
+        "D:\\CurrentProjects\\python_trials\\work_pycrystallography\\pycrystallography\\data\\structureData\\Si.cif"
+    ],
+    "structureNames": [
+        "Si"
+    ],
+    "workingDirectory": "D:/CurrentProjects/python_trials/work_pycrystallography/pycrystallography/data/testingData"
+}

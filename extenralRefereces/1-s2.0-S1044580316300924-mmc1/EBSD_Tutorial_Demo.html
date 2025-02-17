@@ -1,0 +1,912 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>EBSD_Tutorial_Demo</title><meta name="generator" content="MATLAB 8.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-05-02"><meta name="DC.source" content="EBSD_Tutorial_Demo.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Initate Script</a></li><li><a href="#3">Sample Setup</a></li><li><a href="#4">Load Experimental Image and Set Up Detector</a></li><li><a href="#5">Establish detector</a></li><li><a href="#6">Establish the structure matrix</a></li><li><a href="#7">Establish rotation conventions</a></li><li><a href="#8">Generate Cell Vectors</a></li><li><a href="#9">Generate formal rotations &amp; coordinate transforms as used</a></li><li><a href="#10">Convert UVW and HKL into the detector frame</a></li><li><a href="#11">Construct the EBSP</a></li><li><a href="#12">Plot the EBSP</a></li><li><a href="#13">Calculate in the sample coordinate system</a></li><li><a href="#14">Stereographic Calculation</a></li><li><a href="#15">Plot the stereographic projection</a></li><li><a href="#16">Plot a unit cube in the sample frame</a></li></ul></div><pre class="codeinput"><span class="comment">%------------------------------------------------------------------------------</span>
+<span class="comment">% Simple demonstration/simulation of lattice plane traces,</span>
+<span class="comment">% stereographic projection and unit cell creating</span>
+<span class="comment">%------------------------------------------------------------------------------</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%------------------------------------------------------------------------------</span>
+<span class="comment">% MIT License</span>
+<span class="comment">%</span>
+<span class="comment">% Copyright (c) 2015 TBB,</span>
+<span class="comment">% derived in part from work by Aimo Winkelmann (Bruker)</span>
+<span class="comment">%</span>
+<span class="comment">% Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="comment">% of this software and associated documentation files (the "Software"), to deal</span>
+<span class="comment">% in the Software without restriction, including without limitation the rights</span>
+<span class="comment">% to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="comment">% copies of the Software, and to permit persons to whom the Software is</span>
+<span class="comment">% furnished to do so, subject to the following conditions:</span>
+<span class="comment">%</span>
+<span class="comment">% The above copyright notice and this permission notice shall be included in all</span>
+<span class="comment">% copies or substantial portions of the Software.</span>
+<span class="comment">%</span>
+<span class="comment">% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="comment">% IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="comment">% FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="comment">% AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="comment">% LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="comment">% OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="comment">% SOFTWARE.</span>
+<span class="comment">%------------------------------------------------------------------------------</span>
+
+<span class="comment">% This code is follows a similar structure to the sister (python) code</span>
+<span class="comment">% as created by Aimo Winkelmann</span>
+<span class="comment">%</span>
+<span class="comment">% This matlab code also includes sections for:</span>
+<span class="comment">% stereographic projection calculation &amp; unit cell generation</span>
+</pre><h2>Initate Script<a name="2"></a></h2><pre class="codeinput">clear
+close <span class="string">all</span>
+home
+</pre><h2>Sample Setup<a name="3"></a></h2><pre class="codeinput"><span class="comment">% triclinic example</span>
+<span class="comment">%{
+</span><span class="comment">%experimental image
+</span><span class="comment">ExpImage.Filename='Tri_Example.png';
+</span><span class="comment">
+</span><span class="comment">%lattice paramters
+</span><span class="comment">UCell.a =2.0;
+</span><span class="comment">UCell.b =3.0;
+</span><span class="comment">UCell.c =4.0;
+</span><span class="comment">
+</span><span class="comment">UCell.alpha = 70.0; %in degrees
+</span><span class="comment">UCell.beta  = 100.0;
+</span><span class="comment">UCell.gamma = 120.0;
+</span><span class="comment">
+</span><span class="comment">Detector.SampleTilt=70; %in degrees
+</span><span class="comment">Detector.DetectorTilt=-7;
+</span><span class="comment">
+</span><span class="comment">% Euler Angles
+</span><span class="comment">UCell.phi1=22; %in degrees
+</span><span class="comment">UCell.Phi=39;
+</span><span class="comment">UCell.phi2=67;
+</span><span class="comment">
+</span><span class="comment">% Pattern Center
+</span><span class="comment">Detector.DD=0.85; % in units of screen height
+</span><span class="comment">Detector.PCX=0.35; % in units of screen width, from left of exp. pattern
+</span><span class="comment">Detector.PCY=0.15;% in units of screen height, from top of exp. pattern
+</span><span class="comment">%}
+</span>
+
+
+
+
+<span class="comment">%Ni example</span>
+
+ExpImage.Filename=<span class="string">'Ni_Example3.bmp'</span>;
+
+<span class="comment">%lattice paramters</span>
+UCell.a=1; <span class="comment">%(only the ratio matters)!</span>
+UCell.b=1;
+UCell.c=1;
+
+UCell.alpha=90; <span class="comment">%in degrees</span>
+UCell.beta=90;
+UCell.gamma=90;
+
+<span class="comment">%Euler angles</span>
+UCell.phi1=127; <span class="comment">%in degrees</span>
+UCell.Phi=38;
+UCell.phi2=273;
+
+<span class="comment">% Set up detector</span>
+
+<span class="comment">%in degrees</span>
+Detector.SampleTilt=70;
+Detector.DetectorTilt=5;
+
+<span class="comment">%using Bruker coordinate systems</span>
+Detector.DD=0.642; <span class="comment">%in units of screen height</span>
+Detector.PCX=0.483; <span class="comment">%in units of screen width, from left of exp. pattern</span>
+Detector.PCY=0.279; <span class="comment">%in units of screen height, from top of exp. pattern</span>
+
+disp(UCell)
+disp(Detector)
+</pre><pre class="codeoutput">        a: 1
+        b: 1
+        c: 1
+    alpha: 90
+     beta: 90
+    gamma: 90
+     phi1: 127
+      Phi: 38
+     phi2: 273
+
+      SampleTilt: 70
+    DetectorTilt: 5
+              DD: 0.6420
+             PCX: 0.4830
+             PCY: 0.2790
+
+</pre><h2>Load Experimental Image and Set Up Detector<a name="4"></a></h2><pre class="codeinput"><span class="comment">%note that flipud is used as the image is loaded in ij coordinate space and</span>
+<span class="comment">%we are going to use xy for all coordinate systems within the EBSP</span>
+ExpImage.Image=flipud(imread(ExpImage.Filename));
+
+<span class="comment">%in pixels</span>
+Detector.ScreenWidth=320;
+Detector.ScreenHeight=230;
+
+<span class="comment">%use for UVW&amp;HKL generation</span>
+HKL.max=1;
+</pre><h2>Establish detector<a name="5"></a></h2><pre class="codeinput"><span class="comment">%equation 16</span>
+Detector.TotalTilt=(Detector.SampleTilt-90)-Detector.DetectorTilt;
+
+EBSP.ScreenAspect=Detector.ScreenWidth/Detector.ScreenHeight;
+
+EBSP.y_gn_max= Detector.PCY/Detector.DD;
+EBSP.y_gn_min= -(1.0-Detector.PCY)/Detector.DD;
+EBSP.x_gn_max= ((1.0-Detector.PCX)*EBSP.ScreenAspect)/Detector.DD;
+EBSP.x_gn_min= -((Detector.PCX)*EBSP.ScreenAspect)/Detector.DD;
+</pre><h2>Establish the structure matrix<a name="6"></a></h2><pre class="codeinput"><span class="comment">%equation 1</span>
+UCell.f=sqrt(1.0-( cosd(UCell.alpha)*cosd(UCell.alpha)<span class="keyword">...</span>
+                  +cosd(UCell.beta)*cosd(UCell.beta)<span class="keyword">...</span>
+                  +cosd(UCell.gamma)*cosd(UCell.gamma))<span class="keyword">...</span>
+    +2.0*cosd(UCell.alpha)*cosd(UCell.beta)*cosd(UCell.gamma));
+
+<span class="comment">%equation 2</span>
+UCell.ax = UCell.a * UCell.f/sind(UCell.alpha);
+
+UCell.ay = UCell.a * (cosd(UCell.gamma)-cosd(UCell.alpha)*cosd(UCell.beta))<span class="keyword">...</span>
+           /sind(UCell.alpha);
+
+UCell.az = UCell.a * cosd(UCell.beta);
+
+<span class="comment">%equation 3</span>
+UCell.by = UCell.b * sind(UCell.alpha);
+UCell.bz = UCell.b * cosd(UCell.alpha);
+
+<span class="comment">%equation 4</span>
+UCell.cz = UCell.c;
+
+<span class="comment">%equation 5</span>
+UCell.StructureMat=[UCell.ax , 0,  0;
+              UCell.ay , UCell.by, 0;
+              UCell.az , UCell.bz, UCell.cz];
+
+disp(UCell.StructureMat);
+</pre><pre class="codeoutput">     1     0     0
+     0     1     0
+     0     0     1
+
+</pre><h2>Establish rotation conventions<a name="7"></a></h2><pre class="codeinput"><span class="comment">%equation 8</span>
+Rz=@(theta)[cosd(theta) sind(theta) 0;-sind(theta) cosd(theta) 0;0 0 1];
+
+<span class="comment">%equation 9</span>
+Rx=@(theta)[1 0 0;0 cosd(theta) sind(theta);0 -sind(theta) cosd(theta)];
+</pre><h2>Generate Cell Vectors<a name="8"></a></h2><pre class="codeinput"><span class="comment">%populate the reflector list</span>
+<span class="comment">%if this code is to be extended then the list of HKLs must be populated</span>
+<span class="comment">%considering structure factors or a look up list</span>
+<span class="comment">%rather than all allowable indexes - as used here</span>
+
+CVectors.h=-HKL.max:1:HKL.max;
+[CVectors.p,CVectors.q,CVectors.r]=meshgrid(CVectors.h,CVectors.h,CVectors.h);
+CVectors.pqr=[CVectors.p(:),CVectors.q(:),CVectors.r(:)];
+
+<span class="comment">%check for zeros &amp; remove</span>
+CVectors.pqr=CVectors.pqr(dot(CVectors.pqr,CVectors.pqr,2)&gt;1e-6,:);
+
+<span class="comment">%set as indicies for pqr for HKL and UVW (in crystal coords)</span>
+<span class="comment">%this is a slightly different order to the sister python code</span>
+CVectors.HKL=CVectors.pqr;
+CVectors.UVW=CVectors.pqr;
+
+disp(CVectors.HKL)
+</pre><pre class="codeoutput">    -1    -1    -1
+    -1     0    -1
+    -1     1    -1
+     0    -1    -1
+     0     0    -1
+     0     1    -1
+     1    -1    -1
+     1     0    -1
+     1     1    -1
+    -1    -1     0
+    -1     0     0
+    -1     1     0
+     0    -1     0
+     0     1     0
+     1    -1     0
+     1     0     0
+     1     1     0
+    -1    -1     1
+    -1     0     1
+    -1     1     1
+     0    -1     1
+     0     0     1
+     0     1     1
+     1    -1     1
+     1     0     1
+     1     1     1
+
+</pre><h2>Generate formal rotations &amp; coordinate transforms as used<a name="9"></a></h2><pre class="codeinput"><span class="comment">%U.S = rotation for detector &amp; sample conversion</span>
+U.S=Rx(Detector.TotalTilt);
+
+<span class="comment">%equation 10</span>
+<span class="comment">%U.O = orientation of sample</span>
+U.O=Rz(UCell.phi2)*Rx(UCell.Phi)*Rz(UCell.phi1);
+
+<span class="comment">%U.At = transpose of structure matrix as used for UVW conversions</span>
+U.At=transpose(UCell.StructureMat);
+
+<span class="comment">%U.AStar = recriprical structure matrix as used for HKL conversions</span>
+U.Astar=inv(UCell.StructureMat);
+
+<span class="comment">%U.K and U.Kstar = transforming the orientation into the detector plane</span>
+<span class="comment">%K = for UVW; Kstar = for HKL</span>
+U.K         =   U.At*U.O*U.S;
+U.Kstar     =   U.Astar*U.O*U.S;
+
+disp(U.At)
+disp(U.Astar)
+disp(U.K)
+disp(U.Kstar)
+</pre><pre class="codeoutput">     1     0     0
+     0     1     0
+     0     0     1
+
+     1     0     0
+     0     1     0
+     0     0     1
+
+    0.5970    0.2073   -0.7750
+   -0.6339    0.7139   -0.2974
+    0.4917    0.6688    0.5576
+
+    0.5970    0.2073   -0.7750
+   -0.6339    0.7139   -0.2974
+    0.4917    0.6688    0.5576
+
+</pre><h2>Convert UVW and HKL into the detector frame<a name="10"></a></h2><pre class="codeinput"><span class="comment">%equation 13 (with Os included within U.K - making this more like equation 17)</span>
+UVW.D=CVectors.UVW*U.K;
+
+<span class="comment">%equation 14 (with Os included within U.K)</span>
+HKL.D=CVectors.HKL*U.Kstar;
+</pre><h2>Construct the EBSP<a name="11"></a></h2><pre class="codeinput"><span class="comment">%UVW - [X,Y,Z]</span>
+UVW.X=transpose(UVW.D(:,1));
+UVW.Y=transpose(UVW.D(:,2));
+UVW.Z=transpose(UVW.D(:,3));
+
+<span class="comment">%UVW Gn ratios - used for labelling the coords on the EBSP</span>
+UVW.x_gn=UVW.X./UVW.Z;
+UVW.y_gn=UVW.Y./UVW.Z;
+
+<span class="comment">%HKL - [X,Y,Z]</span>
+HKL.X=transpose(HKL.D(:,1));
+HKL.Y=transpose(HKL.D(:,2));
+HKL.Z=transpose(HKL.D(:,3));
+
+<span class="comment">%HKL - needed for hessian calculations</span>
+HKL.r=sqrt(HKL.X.^2+HKL.Y.^2+HKL.Z.^2);
+HKL.kai=atan2(HKL.Y,HKL.X);
+HKL.theta=acos(HKL.Z./HKL.r);
+
+<span class="comment">%Hessian construction</span>
+Hess.R_Hesse=10; <span class="comment">%radius of the Hessian</span>
+Hess.d_Hesse=tan(0.5*pi-HKL.theta);
+Hess.alpha_Hesse=acos(Hess.d_Hesse./Hess.R_Hesse);
+
+Hess.alpha1_hkl=HKL.kai-pi+Hess.alpha_Hesse;
+Hess.alpha2_hkl=HKL.kai-pi-Hess.alpha_Hesse;
+
+<span class="comment">%[C1x,C1y] to [C2x,C2y] are the coords on the screen</span>
+Hess.C1x=Hess.R_Hesse.*cos(Hess.alpha1_hkl);
+Hess.C1y=Hess.R_Hesse.*sin(Hess.alpha1_hkl);
+Hess.C2x=Hess.R_Hesse.*cos(Hess.alpha2_hkl);
+Hess.C2y=Hess.R_Hesse.*sin(Hess.alpha2_hkl);
+</pre><h2>Plot the EBSP<a name="12"></a></h2><pre class="codeinput"><span class="comment">%Plot the example image first</span>
+
+<span class="comment">%establish the coordinate systems</span>
+<span class="comment">%from pixels --&gt; Gnomonic</span>
+EBSP.x_img=1:size(ExpImage.Image,2);
+EBSP.y_img=1:size(ExpImage.Image,1);
+EBSP.x_img=(EBSP.x_gn_max-EBSP.x_gn_min)*(EBSP.x_img-1)/max(EBSP.x_img)+EBSP.x_gn_min;
+EBSP.y_img=(EBSP.y_gn_max-EBSP.y_gn_min)*(EBSP.y_img-1)/max(EBSP.y_img)+EBSP.y_gn_min;
+
+<span class="comment">%plot the figure</span>
+
+<span class="comment">%example EBSP</span>
+figure;
+imagesc(EBSP.x_img,EBSP.y_img,ExpImage.Image);
+xlim([EBSP.x_gn_min,EBSP.x_gn_max]);
+ylim([EBSP.y_gn_min,EBSP.y_gn_max]);
+axis <span class="string">xy</span>;
+colormap(<span class="string">'gray'</span>)
+
+<span class="comment">%plot the bands</span>
+num_HKL=size(Hess.C1x,2);
+<span class="keyword">for</span> n=1:num_HKL
+    <span class="keyword">if</span> HKL.Z(n)&gt;0 <span class="comment">%if upper hemisphere</span>
+        hold <span class="string">on</span>
+        plot([Hess.C1x(n) Hess.C2x(n)],[Hess.C1y(n) Hess.C2y(n)],<span class="string">'-k'</span>,<span class="string">'LineWidth'</span>,2);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">%label the zone axes</span>
+<span class="keyword">for</span> n=1:num_HKL
+   hold <span class="string">on</span>
+   <span class="keyword">if</span> UVW.Z(n)&gt;0
+       temp.Text1=sprintf(<span class="string">'[%02.0f, %02.0f, %02.0f]'</span>,CVectors.HKL(n,:));
+       temp.ah=annotation(<span class="string">'textbox'</span>,<span class="string">'String'</span>,temp.Text1,<span class="string">'Color'</span>,<span class="string">'w'</span>,<span class="string">'EdgeColor'</span>,<span class="string">'none'</span>);
+
+       set(temp.ah,<span class="string">'parent'</span>,gca); <span class="comment">%changes the annotation to belong the the parent axes - required for coords to work</span>
+       set(temp.ah,<span class="string">'position'</span>,[UVW.x_gn(n) UVW.y_gn(n) 0.3 .1]); <span class="comment">%changes the position to the correct position</span>
+       scatter(UVW.x_gn(n), UVW.y_gn(n),30,<span class="string">'w'</span>) <span class="comment">%puts a white circle on the axes locations</span>
+   <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">%Plot the pattern centre</span>
+<span class="comment">% scatter(0,0,'rx');</span>
+scatter(0,0,50,<span class="string">'r*'</span>);
+temp.pc=annotation(<span class="string">'textbox'</span>,<span class="string">'String'</span>,<span class="string">'PC'</span>,<span class="string">'Color'</span>,<span class="string">'w'</span>,<span class="string">'EdgeColor'</span>,<span class="string">'none'</span>);
+
+set(temp.pc,<span class="string">'parent'</span>,gca); <span class="comment">%changes the annotation to belong the the parent axes - required for coords to work</span>
+set(temp.pc,<span class="string">'position'</span>,[0 0 0.3 .1]); <span class="comment">%changes the position to the correct position</span>
+
+<span class="comment">%label the axes</span>
+xlabel(<span class="string">'X / Z'</span>);
+ylabel(<span class="string">'Y / Z'</span>);
+
+
+axis <span class="string">image</span>
+xlim([-1.5 1.5]);
+ylim([-1.5 1.5]);
+<span class="comment">%clean up tempvars</span>
+clear <span class="string">temp</span>
+</pre><img vspace="5" hspace="5" src="EBSD_Tutorial_Demo_01.png" alt=""> <h2>Calculate in the sample coordinate system<a name="13"></a></h2><pre class="codeinput"><span class="comment">%U2.K and U2.Kstar = transforming the orientation into the sample plane</span>
+<span class="comment">%K = for UVW; Kstar = for HKL</span>
+U2.K         =   U.At*U.O;
+U2.Kstar     =   U.Astar*U.O;
+</pre><h2>Stereographic Calculation<a name="14"></a></h2><pre class="codeinput"><span class="comment">% create the plotting family</span>
+HKL_family=[1 1 1;-1 1 1;1 -1 1;1 1 -1;-1 -1 1;-1 1 -1;1 -1 -1;-1 -1 -1];
+
+<span class="comment">% transform to sample coordinate system</span>
+HKL_family_s=HKL_family*U2.Kstar;
+
+<span class="comment">% convert to unit length</span>
+HKL_family_s_unit=HKL_family_s./repmat(sqrt(dot(HKL_family_s,HKL_family_s,2)),1,3);
+
+<span class="comment">% convert to stereo</span>
+stereo.pole_sign=sign(HKL_family_s_unit(:,3));
+<span class="comment">% in the equatorial plane = up</span>
+stereo.pole_sign(stereo.pole_sign==0)=1;
+<span class="comment">% repeat to solve</span>
+stereo.pole_sign=repmat(stereo.pole_sign,1,2);
+
+<span class="comment">%solve for the projections</span>
+stereo.UVW=HKL_family_s_unit(:,1:2).*stereo.pole_sign./(repmat(HKL_family_s_unit(:,3),1,2)+stereo.pole_sign);
+</pre><h2>Plot the stereographic projection<a name="15"></a></h2><pre class="codeinput">figure;
+
+<span class="comment">%generate the circle for the stereogram</span>
+stereo.theta=0:360;
+stereo.c_x=cosd(stereo.theta);
+stereo.c_y=sind(stereo.theta);
+plot(stereo.c_x,stereo.c_y,<span class="string">'k'</span>);
+hold <span class="string">on</span>;
+plot(stereo.c_x([1,181]),stereo.c_y([1,181]),<span class="string">'k'</span>);
+plot(stereo.c_x([91,271]),stereo.c_y([91,271]),<span class="string">'k'</span>);
+
+<span class="comment">%plot the [001] stereogram</span>
+scatter(stereo.UVW(HKL_family_s(:,3)&gt;0,1),stereo.UVW(HKL_family_s(:,3)&gt;0,2),<span class="string">'r'</span>,<span class="string">'filled'</span>);
+scatter(stereo.UVW(HKL_family_s(:,3)&lt;0,1),stereo.UVW(HKL_family_s(:,3)&lt;0,2),<span class="string">'r'</span>);
+
+axis <span class="string">equal</span>;
+</pre><img vspace="5" hspace="5" src="EBSD_Tutorial_Demo_02.png" alt=""> <h2>Plot a unit cube in the sample frame<a name="16"></a></h2><pre class="codeinput"><span class="comment">%define the three basis vectors for the cube</span>
+Cube.poi_cen=[0 0 0];
+Cube.a1=[1 0 0]*U2.K;
+Cube.a2=[0 1 0]*U2.K;
+Cube.a3=[0 0 1]*U2.K;
+
+<span class="comment">% % uncomment if you want to plot in the detector frame</span>
+<span class="comment">% a1=[1 0 0]*U.K;</span>
+<span class="comment">% a2=[0 1 0]*U.K;</span>
+<span class="comment">% a3=[0 0 1]*U.K;</span>
+
+<span class="comment">%create the faces from these vectors</span>
+Cube.face_1a=[Cube.poi_cen;
+    Cube.a1+Cube.poi_cen;
+    Cube.a1+Cube.a2+Cube.poi_cen;
+    Cube.a2+Cube.poi_cen;
+    Cube.poi_cen];
+Cube.face_1b=Cube.face_1a+repmat(Cube.a3,size(Cube.face_1a,1),1);
+
+Cube.face_2a=[Cube.poi_cen;
+    Cube.a1+Cube.poi_cen;
+    Cube.a1+Cube.a3+Cube.poi_cen;
+    Cube.a3+Cube.poi_cen;
+    Cube.poi_cen];
+Cube.face_2b=Cube.face_2a+repmat(Cube.a2,size(Cube.face_2a,1),1);
+
+Cube.face_3a=[Cube.poi_cen;
+    Cube.a2+Cube.poi_cen;
+    Cube.a2+Cube.a3+Cube.poi_cen;
+    Cube.a3+Cube.poi_cen;
+    Cube.poi_cen];
+Cube.face_3b=Cube.face_3a+repmat(Cube.a1,size(Cube.face_3a,1),1);
+
+figure;
+patch(Cube.face_1a(:,1),Cube.face_1a(:,2),Cube.face_1a(:,3),[1 0 0],<span class="string">'EdgeColor'</span>,<span class="string">'k'</span>,<span class="string">'FaceColor'</span>,<span class="string">'r'</span>);
+axis <span class="string">equal</span>;
+hold <span class="string">on</span>
+patch(Cube.face_1b(:,1),Cube.face_1b(:,2),Cube.face_1b(:,3),[1 0 0],<span class="string">'EdgeColor'</span>,<span class="string">'k'</span>,<span class="string">'FaceColor'</span>,<span class="string">'r'</span>);
+patch(Cube.face_2a(:,1),Cube.face_2a(:,2),Cube.face_2a(:,3),[1 0 0],<span class="string">'EdgeColor'</span>,<span class="string">'k'</span>,<span class="string">'FaceColor'</span>,<span class="string">'g'</span>);
+patch(Cube.face_2b(:,1),Cube.face_2b(:,2),Cube.face_2b(:,3),[1 0 0],<span class="string">'EdgeColor'</span>,<span class="string">'k'</span>,<span class="string">'FaceColor'</span>,<span class="string">'g'</span>);
+patch(Cube.face_3a(:,1),Cube.face_3a(:,2),Cube.face_3a(:,3),[1 0 0],<span class="string">'EdgeColor'</span>,<span class="string">'k'</span>,<span class="string">'FaceColor'</span>,<span class="string">'b'</span>);
+patch(Cube.face_3b(:,1),Cube.face_3b(:,2),Cube.face_3b(:,3),[1 0 0],<span class="string">'EdgeColor'</span>,<span class="string">'k'</span>,<span class="string">'FaceColor'</span>,<span class="string">'b'</span>);
+</pre><img vspace="5" hspace="5" src="EBSD_Tutorial_Demo_03.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+% Simple demonstration/simulation of lattice plane traces,
+% stereographic projection and unit cell creating
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+%
+%
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+% MIT License
+%
+% Copyright (c) 2015 TBB, 
+% derived in part from work by Aimo Winkelmann (Bruker)
+%
+% Permission is hereby granted, free of charge, to any person obtaining a copy
+% of this software and associated documentation files (the "Software"), to deal
+% in the Software without restriction, including without limitation the rights
+% to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+% copies of the Software, and to permit persons to whom the Software is
+% furnished to do so, subject to the following conditions:
+%
+% The above copyright notice and this permission notice shall be included in all
+% copies or substantial portions of the Software.
+%
+% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+% IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+% FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+% AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+% LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+% OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+% SOFTWARE.
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+
+% This code is follows a similar structure to the sister (python) code
+% as created by Aimo Winkelmann
+%
+% This matlab code also includes sections for:
+% stereographic projection calculation & unit cell generation
+
+%% Initate Script
+clear
+close all
+home
+
+%% Sample Setup
+
+% triclinic example
+%{
+%experimental image
+ExpImage.Filename='Tri_Example.png';
+
+%lattice paramters
+UCell.a =2.0;
+UCell.b =3.0;
+UCell.c =4.0;
+
+UCell.alpha = 70.0; %in degrees
+UCell.beta  = 100.0;
+UCell.gamma = 120.0;
+
+Detector.SampleTilt=70; %in degrees
+Detector.DetectorTilt=-7;
+
+% Euler Angles
+UCell.phi1=22; %in degrees
+UCell.Phi=39;
+UCell.phi2=67;
+
+% Pattern Center
+Detector.DD=0.85; % in units of screen height
+Detector.PCX=0.35; % in units of screen width, from left of exp. pattern
+Detector.PCY=0.15;% in units of screen height, from top of exp. pattern
+%}
+
+
+
+
+
+%Ni example
+
+ExpImage.Filename='Ni_Example3.bmp';
+
+%lattice paramters
+UCell.a=1; %(only the ratio matters)!
+UCell.b=1;
+UCell.c=1;
+
+UCell.alpha=90; %in degrees
+UCell.beta=90;
+UCell.gamma=90;
+
+%Euler angles
+UCell.phi1=127; %in degrees
+UCell.Phi=38;
+UCell.phi2=273;
+
+% Set up detector
+
+%in degrees
+Detector.SampleTilt=70;
+Detector.DetectorTilt=5;
+
+%using Bruker coordinate systems
+Detector.DD=0.642; %in units of screen height
+Detector.PCX=0.483; %in units of screen width, from left of exp. pattern
+Detector.PCY=0.279; %in units of screen height, from top of exp. pattern
+
+disp(UCell)
+disp(Detector)
+%% Load Experimental Image and Set Up Detector
+%note that flipud is used as the image is loaded in ij coordinate space and
+%we are going to use xy for all coordinate systems within the EBSP
+ExpImage.Image=flipud(imread(ExpImage.Filename));
+
+%in pixels
+Detector.ScreenWidth=320;
+Detector.ScreenHeight=230;
+
+%use for UVW&HKL generation
+HKL.max=1;
+
+%% Establish detector
+%equation 16
+Detector.TotalTilt=(Detector.SampleTilt-90)-Detector.DetectorTilt;
+
+EBSP.ScreenAspect=Detector.ScreenWidth/Detector.ScreenHeight;
+
+EBSP.y_gn_max= Detector.PCY/Detector.DD;
+EBSP.y_gn_min= -(1.0-Detector.PCY)/Detector.DD;
+EBSP.x_gn_max= ((1.0-Detector.PCX)*EBSP.ScreenAspect)/Detector.DD;
+EBSP.x_gn_min= -((Detector.PCX)*EBSP.ScreenAspect)/Detector.DD;
+
+%% Establish the structure matrix
+
+%equation 1
+UCell.f=sqrt(1.0-( cosd(UCell.alpha)*cosd(UCell.alpha)...
+                  +cosd(UCell.beta)*cosd(UCell.beta)...
+                  +cosd(UCell.gamma)*cosd(UCell.gamma))...
+    +2.0*cosd(UCell.alpha)*cosd(UCell.beta)*cosd(UCell.gamma)); 
+
+%equation 2
+UCell.ax = UCell.a * UCell.f/sind(UCell.alpha);
+
+UCell.ay = UCell.a * (cosd(UCell.gamma)-cosd(UCell.alpha)*cosd(UCell.beta))...
+           /sind(UCell.alpha);
+       
+UCell.az = UCell.a * cosd(UCell.beta);
+
+%equation 3
+UCell.by = UCell.b * sind(UCell.alpha);
+UCell.bz = UCell.b * cosd(UCell.alpha);
+
+%equation 4
+UCell.cz = UCell.c;
+
+%equation 5
+UCell.StructureMat=[UCell.ax , 0,  0;
+              UCell.ay , UCell.by, 0;
+              UCell.az , UCell.bz, UCell.cz];
+
+disp(UCell.StructureMat);
+%% Establish rotation conventions
+
+%equation 8
+Rz=@(theta)[cosd(theta) sind(theta) 0;-sind(theta) cosd(theta) 0;0 0 1];
+
+%equation 9
+Rx=@(theta)[1 0 0;0 cosd(theta) sind(theta);0 -sind(theta) cosd(theta)];
+
+%% Generate Cell Vectors
+
+%populate the reflector list
+%if this code is to be extended then the list of HKLs must be populated
+%considering structure factors or a look up list
+%rather than all allowable indexes - as used here
+
+CVectors.h=-HKL.max:1:HKL.max;
+[CVectors.p,CVectors.q,CVectors.r]=meshgrid(CVectors.h,CVectors.h,CVectors.h);
+CVectors.pqr=[CVectors.p(:),CVectors.q(:),CVectors.r(:)];
+
+%check for zeros & remove
+CVectors.pqr=CVectors.pqr(dot(CVectors.pqr,CVectors.pqr,2)>1e-6,:);
+
+%set as indicies for pqr for HKL and UVW (in crystal coords)
+%this is a slightly different order to the sister python code
+CVectors.HKL=CVectors.pqr;
+CVectors.UVW=CVectors.pqr;
+
+disp(CVectors.HKL)
+
+%% Generate formal rotations & coordinate transforms as used
+
+%U.S = rotation for detector & sample conversion
+U.S=Rx(Detector.TotalTilt);
+
+%equation 10
+%U.O = orientation of sample
+U.O=Rz(UCell.phi2)*Rx(UCell.Phi)*Rz(UCell.phi1);
+
+%U.At = transpose of structure matrix as used for UVW conversions
+U.At=transpose(UCell.StructureMat);
+
+%U.AStar = recriprical structure matrix as used for HKL conversions
+U.Astar=inv(UCell.StructureMat);
+
+%U.K and U.Kstar = transforming the orientation into the detector plane
+%K = for UVW; Kstar = for HKL
+U.K         =   U.At*U.O*U.S;
+U.Kstar     =   U.Astar*U.O*U.S;
+
+disp(U.At)
+disp(U.Astar)
+disp(U.K)
+disp(U.Kstar)
+
+%% Convert UVW and HKL into the detector frame
+%equation 13 (with Os included within U.K - making this more like equation 17)
+UVW.D=CVectors.UVW*U.K;
+
+%equation 14 (with Os included within U.K)
+HKL.D=CVectors.HKL*U.Kstar;
+
+%% Construct the EBSP
+
+%UVW - [X,Y,Z]
+UVW.X=transpose(UVW.D(:,1));
+UVW.Y=transpose(UVW.D(:,2));
+UVW.Z=transpose(UVW.D(:,3));
+
+%UVW Gn ratios - used for labelling the coords on the EBSP
+UVW.x_gn=UVW.X./UVW.Z;
+UVW.y_gn=UVW.Y./UVW.Z;
+
+%HKL - [X,Y,Z]
+HKL.X=transpose(HKL.D(:,1));
+HKL.Y=transpose(HKL.D(:,2));
+HKL.Z=transpose(HKL.D(:,3));
+
+%HKL - needed for hessian calculations
+HKL.r=sqrt(HKL.X.^2+HKL.Y.^2+HKL.Z.^2);
+HKL.kai=atan2(HKL.Y,HKL.X);
+HKL.theta=acos(HKL.Z./HKL.r);
+
+%Hessian construction
+Hess.R_Hesse=10; %radius of the Hessian
+Hess.d_Hesse=tan(0.5*pi-HKL.theta);
+Hess.alpha_Hesse=acos(Hess.d_Hesse./Hess.R_Hesse);
+
+Hess.alpha1_hkl=HKL.kai-pi+Hess.alpha_Hesse;
+Hess.alpha2_hkl=HKL.kai-pi-Hess.alpha_Hesse;
+
+%[C1x,C1y] to [C2x,C2y] are the coords on the screen
+Hess.C1x=Hess.R_Hesse.*cos(Hess.alpha1_hkl);
+Hess.C1y=Hess.R_Hesse.*sin(Hess.alpha1_hkl);
+Hess.C2x=Hess.R_Hesse.*cos(Hess.alpha2_hkl);
+Hess.C2y=Hess.R_Hesse.*sin(Hess.alpha2_hkl);
+
+%% Plot the EBSP
+
+%Plot the example image first
+
+%establish the coordinate systems
+%from pixels REPLACE_WITH_DASH_DASH> Gnomonic
+EBSP.x_img=1:size(ExpImage.Image,2);
+EBSP.y_img=1:size(ExpImage.Image,1);
+EBSP.x_img=(EBSP.x_gn_max-EBSP.x_gn_min)*(EBSP.x_img-1)/max(EBSP.x_img)+EBSP.x_gn_min;
+EBSP.y_img=(EBSP.y_gn_max-EBSP.y_gn_min)*(EBSP.y_img-1)/max(EBSP.y_img)+EBSP.y_gn_min;
+
+%plot the figure
+
+%example EBSP
+figure;
+imagesc(EBSP.x_img,EBSP.y_img,ExpImage.Image);
+xlim([EBSP.x_gn_min,EBSP.x_gn_max]);
+ylim([EBSP.y_gn_min,EBSP.y_gn_max]);
+axis xy;
+colormap('gray')
+
+%plot the bands
+num_HKL=size(Hess.C1x,2);
+for n=1:num_HKL
+    if HKL.Z(n)>0 %if upper hemisphere
+        hold on
+        plot([Hess.C1x(n) Hess.C2x(n)],[Hess.C1y(n) Hess.C2y(n)],'-k','LineWidth',2);
+    end
+end
+
+%label the zone axes
+for n=1:num_HKL
+   hold on
+   if UVW.Z(n)>0
+       temp.Text1=sprintf('[%02.0f, %02.0f, %02.0f]',CVectors.HKL(n,:));
+       temp.ah=annotation('textbox','String',temp.Text1,'Color','w','EdgeColor','none');
+       
+       set(temp.ah,'parent',gca); %changes the annotation to belong the the parent axes - required for coords to work
+       set(temp.ah,'position',[UVW.x_gn(n) UVW.y_gn(n) 0.3 .1]); %changes the position to the correct position
+       scatter(UVW.x_gn(n), UVW.y_gn(n),30,'w') %puts a white circle on the axes locations
+   end
+end
+
+%Plot the pattern centre
+% scatter(0,0,'rx');
+scatter(0,0,50,'r*');
+temp.pc=annotation('textbox','String','PC','Color','w','EdgeColor','none');
+       
+set(temp.pc,'parent',gca); %changes the annotation to belong the the parent axes - required for coords to work
+set(temp.pc,'position',[0 0 0.3 .1]); %changes the position to the correct position
+
+%label the axes
+xlabel('X / Z');
+ylabel('Y / Z');
+
+
+axis image
+xlim([-1.5 1.5]);
+ylim([-1.5 1.5]);
+%clean up tempvars
+clear temp
+
+%% Calculate in the sample coordinate system
+%U2.K and U2.Kstar = transforming the orientation into the sample plane
+%K = for UVW; Kstar = for HKL
+U2.K         =   U.At*U.O;
+U2.Kstar     =   U.Astar*U.O;
+
+%% Stereographic Calculation
+
+% create the plotting family
+HKL_family=[1 1 1;-1 1 1;1 -1 1;1 1 -1;-1 -1 1;-1 1 -1;1 -1 -1;-1 -1 -1];
+
+% transform to sample coordinate system
+HKL_family_s=HKL_family*U2.Kstar;
+
+% convert to unit length
+HKL_family_s_unit=HKL_family_s./repmat(sqrt(dot(HKL_family_s,HKL_family_s,2)),1,3);
+
+% convert to stereo
+stereo.pole_sign=sign(HKL_family_s_unit(:,3));
+% in the equatorial plane = up
+stereo.pole_sign(stereo.pole_sign==0)=1;
+% repeat to solve
+stereo.pole_sign=repmat(stereo.pole_sign,1,2);
+
+%solve for the projections
+stereo.UVW=HKL_family_s_unit(:,1:2).*stereo.pole_sign./(repmat(HKL_family_s_unit(:,3),1,2)+stereo.pole_sign);
+
+%% Plot the stereographic projection
+figure;
+
+%generate the circle for the stereogram
+stereo.theta=0:360;
+stereo.c_x=cosd(stereo.theta);
+stereo.c_y=sind(stereo.theta);
+plot(stereo.c_x,stereo.c_y,'k');
+hold on;
+plot(stereo.c_x([1,181]),stereo.c_y([1,181]),'k');
+plot(stereo.c_x([91,271]),stereo.c_y([91,271]),'k');
+
+%plot the [001] stereogram
+scatter(stereo.UVW(HKL_family_s(:,3)>0,1),stereo.UVW(HKL_family_s(:,3)>0,2),'r','filled');
+scatter(stereo.UVW(HKL_family_s(:,3)<0,1),stereo.UVW(HKL_family_s(:,3)<0,2),'r');
+
+axis equal;
+
+%% Plot a unit cube in the sample frame
+
+%define the three basis vectors for the cube
+Cube.poi_cen=[0 0 0];
+Cube.a1=[1 0 0]*U2.K;
+Cube.a2=[0 1 0]*U2.K;
+Cube.a3=[0 0 1]*U2.K;
+
+% % uncomment if you want to plot in the detector frame
+% a1=[1 0 0]*U.K;
+% a2=[0 1 0]*U.K;
+% a3=[0 0 1]*U.K;
+
+%create the faces from these vectors
+Cube.face_1a=[Cube.poi_cen;
+    Cube.a1+Cube.poi_cen;
+    Cube.a1+Cube.a2+Cube.poi_cen;
+    Cube.a2+Cube.poi_cen;
+    Cube.poi_cen];
+Cube.face_1b=Cube.face_1a+repmat(Cube.a3,size(Cube.face_1a,1),1);
+
+Cube.face_2a=[Cube.poi_cen;
+    Cube.a1+Cube.poi_cen;
+    Cube.a1+Cube.a3+Cube.poi_cen;
+    Cube.a3+Cube.poi_cen;
+    Cube.poi_cen];
+Cube.face_2b=Cube.face_2a+repmat(Cube.a2,size(Cube.face_2a,1),1);
+
+Cube.face_3a=[Cube.poi_cen;
+    Cube.a2+Cube.poi_cen;
+    Cube.a2+Cube.a3+Cube.poi_cen;
+    Cube.a3+Cube.poi_cen;
+    Cube.poi_cen];
+Cube.face_3b=Cube.face_3a+repmat(Cube.a1,size(Cube.face_3a,1),1);
+
+figure;
+patch(Cube.face_1a(:,1),Cube.face_1a(:,2),Cube.face_1a(:,3),[1 0 0],'EdgeColor','k','FaceColor','r');
+axis equal;
+hold on
+patch(Cube.face_1b(:,1),Cube.face_1b(:,2),Cube.face_1b(:,3),[1 0 0],'EdgeColor','k','FaceColor','r');
+patch(Cube.face_2a(:,1),Cube.face_2a(:,2),Cube.face_2a(:,3),[1 0 0],'EdgeColor','k','FaceColor','g');
+patch(Cube.face_2b(:,1),Cube.face_2b(:,2),Cube.face_2b(:,3),[1 0 0],'EdgeColor','k','FaceColor','g');
+patch(Cube.face_3a(:,1),Cube.face_3a(:,2),Cube.face_3a(:,3),[1 0 0],'EdgeColor','k','FaceColor','b');
+patch(Cube.face_3b(:,1),Cube.face_3b(:,2),Cube.face_3b(:,3),[1 0 0],'EdgeColor','k','FaceColor','b');
+
+
+##### SOURCE END #####
+--></body></html>

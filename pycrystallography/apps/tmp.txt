@@ -1,0 +1,245 @@
+total 11162732
+-rw-r--r-- 1 kvmani pusers   11178704 Jan 21 16:45 301.ctf
+-rw-r--r-- 1 kvmani pusers   11456252 Jan 21 16:45 302.ctf
+-rw-r--r-- 1 kvmani pusers   11330636 Jan 21 16:45 303.ctf
+-rw-r--r-- 1 kvmani pusers   21050416 Jan 21 16:45 3251.ctf
+-rw-r--r-- 1 kvmani pusers    3360421 Jan 21 16:45 3252.ctf
+-rw-r--r-- 1 kvmani pusers    2126960 Jan 21 16:45 3253.ctf
+-rw-r--r-- 1 kvmani pusers    2309239 Jan 21 16:45 325.ctf
+-rw-r--r-- 1 kvmani pusers   16259728 Jan 21 16:45 AlNiCo-8H DED-400W-Area 4-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers  101443429 Jan 21 16:46 AlNiCo-8H DED-400W-Area 5-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers   16230687 Jan 21 16:46 AlNiCo-8H DED-400W-Area 8-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers   36674332 Jan 21 16:46 AlNiCo-8H DED-400W-Area 9-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers   85513946 Jan 21 16:46 Arc-M.A EBSD-New Sample-Area-1-OIM Map-1.ang
+-rw-r--r-- 1 kvmani pusers   89496246 Jan 21 16:46 Cr-Mo-V RPV 1200H Site 1 Map Data 4.ctf
+-rw-r--r-- 1 kvmani pusers   87931386 Jan 21 16:46 Cr-Mo-V RPV 1800H Site 1 Map Data 5.ctf
+-rw-r--r-- 1 kvmani pusers    7640311 Jan 21 16:46 Cr-Mo-V RPV As Fabricated Site 1 Map Data 2.ctf
+-rw-r--r-- 1 kvmani pusers    3189288 Jan 21 16:46 Cr-Mo-V RPV As Fabricated Site 2 Map Data 3.ctf
+-rw-r--r-- 1 kvmani pusers    1112918 Jan 21 16:46 d9-ss laser weld Tarapur Specimen1-200Hz Site 1-500x-200x200micron Map Data 25.ctf
+-rw-r--r-- 1 kvmani pusers    2538588 Jan 21 16:46 d9-ss laser weld Tarapur Specimen1-50Hz interface-2-500x-450x200micron Map Data 24.ctf
+-rw-r--r-- 1 kvmani pusers    5048684 Jan 21 16:46 d9-ss laser weld Tarapur Specimen1-50Hz interface-500x-400x200microns Map Data 23.ctf
+-rw-r--r-- 1 kvmani pusers   15807083 Jan 21 16:46 d9-ss laser weld Tarapur Specimen1-50Hz pool-300X-500x500micron Map Data 20.ctf
+-rw-r--r-- 1 kvmani pusers   24212009 Jan 21 16:46 d9-ss laser weld Tarapur Specimen1-50Hz Site 2-3000X-50x50 microns Map Data 22.ctf
+-rw-r--r-- 1 kvmani pusers    5515046 Jan 21 16:46 d9-ss laser weld Tarapur Specimen4-50Hz Site 1-1000x-150x150micron Map Data 15.ctf
+-rw-r--r-- 1 kvmani pusers    6792008 Jan 21 16:46 d9-ss laser weld Tarapur Specimen4-50Hz Site 2-300x-500x500micron Map Data 16.ctf
+-rw-r--r-- 1 kvmani pusers   22654064 Jan 21 16:46 d9-ss laser weld Tarapur Specimen4-50Hz Site 3-1000x-150x150micron Map Data 18.ctf
+-rw-r--r-- 1 kvmani pusers    2242132 Jan 21 16:46 d9-ss laser weld Tarapur Specimen4-50Hz Site 4-500x-400x200micron Map Data 26.ctf
+-rw-r--r-- 1 kvmani pusers    2238204 Jan 21 16:46 d9-ss laser weld Tarapur Specimen4-50Hz Site 5-500x-400x200micron Map Data 27.ctf
+-rw-r--r-- 1 kvmani pusers    9450170 Jan 21 16:46 d9-ss laser weld Tarapur Specimen4-50Hz Site 6-300x-500x300micron Map Data 28.ctf
+-rw-r--r-- 1 kvmani pusers    8941971 Jan 21 16:46 dilatometry IBT 400 bulk 7oclok Stie1 Map Data 5.ctf
+-rw-r--r-- 1 kvmani pusers    3603614 Jan 21 16:46 dilatometry IBT 400 bulk ahead of site 8 Map Data 14.ctf
+-rw-r--r-- 1 kvmani pusers   19049641 Jan 21 16:46 dilatometry IBT 400 bulk site1 5 oc clock  Map Data 6.ctf
+-rw-r--r-- 1 kvmani pusers   65325790 Jan 21 16:46 dilatometry IBT 400 bulk Site 1 Map Data 4.ctf
+-rw-r--r-- 1 kvmani pusers   10477831 Jan 21 16:46 dilatometry IBT 400 bulk Site 8 Map Data 13.ctf
+-rw-r--r-- 1 kvmani pusers   35125040 Jan 21 16:46 dilatometry IBT 400 Site 1 1250X Map Data 1.ctf
+-rw-r--r-- 1 kvmani pusers    4978479 Jan 21 16:46 dilatometry IBT 400 Site 7 Map Data 54.ctf
+-rw-r--r-- 1 kvmani pusers   54012671 Jan 21 16:46 dilatometry IBT 425 Site 1 Map Data 15.ctf
+-rw-r--r-- 1 kvmani pusers    9257489 Jan 21 16:46 dilatometry IBT 425 Site 5 Map Data 48.ctf
+-rw-r--r-- 1 kvmani pusers   15338449 Jan 21 16:46 dilatometry IBT 425 Site 7 Map Data 50.ctf
+-rw-r--r-- 1 kvmani pusers    5507288 Jan 21 16:46 dilatometry IBT 425 Site 8 Map Data 51.ctf
+-rw-r--r-- 1 kvmani pusers    9845034 Jan 21 16:47 dilatometry IBT 450 Site 11 Map Data 41.ctf
+-rw-r--r-- 1 kvmani pusers   10818406 Jan 21 16:47 dilatometry IBT 450 Site 13 Map Data 43.ctf
+-rw-r--r-- 1 kvmani pusers   52907432 Jan 21 16:47 dilatometry IBT 450 Site 3 Map Data 32.ctf
+-rw-r--r-- 1 kvmani pusers   39069619 Jan 21 16:47 dilatometry IBT 450 Site 4 Map Data 33.ctf
+-rw-r--r-- 1 kvmani pusers   10681390 Jan 21 16:47 Dilatometry samples S11-IBT 400 mag regionPrev site Map Data 41.ctf
+-rw-r--r-- 1 kvmani pusers    4932474 Jan 21 16:47 Dilatometry samples S11-IBT 400 Site 10 Map Data 11.ctf
+-rw-r--r-- 1 kvmani pusers    4893404 Jan 21 16:47 Dilatometry samples S11-IBT 400 Site 11 Map Data 12.ctf
+-rw-r--r-- 1 kvmani pusers    4272738 Jan 21 16:47 Dilatometry samples S11-IBT 400 Site 1 Map Data 1.ctf
+-rw-r--r-- 1 kvmani pusers    4272536 Jan 21 16:47 Dilatometry samples S11-IBT 400 Site 1 Map Data 1_reconstructied.ctf
+-rw-r--r-- 1 kvmani pusers    4280427 Jan 21 16:47 Dilatometry samples S11-IBT 400 Site 1 Map Data 1_reconstructied-ParentGrains.ctf
+-rw-r--r-- 1 kvmani pusers    4200235 Jan 21 16:47 Dilatometry samples S11-IBT 400 Site 2 Map Data 2.ctf
+-rw-r--r-- 1 kvmani pusers    1868306 Jan 21 16:47 Dilatometry samples S11-IBT 400 Site 3 Map Data 3.ctf
+-rw-r--r-- 1 kvmani pusers     554953 Jan 21 16:47 Dilatometry samples S11-IBT 400 Site 4 Map Data 4.ctf
+-rw-r--r-- 1 kvmani pusers    4117755 Jan 21 16:47 Dilatometry samples S18-IBT 375 Site 11 Map Data 28.ctf
+-rw-r--r-- 1 kvmani pusers   19119125 Jan 21 16:47 Dilatometry samples S18-IBT 375 Site 1 Map Data 18.ctf
+-rw-r--r-- 1 kvmani pusers   16874545 Jan 21 16:47 Dilatometry samples S18-IBT 375 Site 3 Map Data 20.ctf
+-rw-r--r-- 1 kvmani pusers    3688057 Jan 21 16:47 Dilatometry samples S18-IBT 375 Site 4 Map Data 21.ctf
+-rw-r--r-- 1 kvmani pusers    2015995 Jan 21 16:47 dm-220-or-ar.ctf
+-rw-r--r-- 1 kvmani pusers   13937360 Jan 21 16:47 EBSD H 3 Map Data 21.ctf
+-rw-r--r-- 1 kvmani pusers       6896 Jan 21 16:47 exportedAssymetricExample.ang
+-rw-r--r-- 1 kvmani pusers   13192283 Jan 21 16:47 Fe6.5Si-New Sample-Area 17-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers   12466564 Jan 21 16:47 FeCrCo-1300 FeCrCo-1300 Site 2 Map Data 2.ctf
+-rw-r--r-- 1 kvmani pusers   12888723 Jan 21 16:47 FeCrCo-1300 FeCrCo1350 Site 1 Map Data 3.ctf
+-rw-r--r-- 1 kvmani pusers    1011510 Jan 21 16:47 FeCrCo1350 Specimen 1 Site 1 Map Data 2.ctf
+-rw-r--r-- 1 kvmani pusers    8704747 Jan 21 16:47 HFRR Zr-4 hfrr Zr4 ID Map Data 2.ctf
+-rw-r--r-- 1 kvmani pusers    8859291 Jan 21 16:47 HFRR Zr-4 hfrr Zr4 MID Map Data 3.ctf
+-rw-r--r-- 1 kvmani pusers    5555962 Jan 21 16:47 HFRR Zr-4 hfrr Zr4 OD Map Data 4.ctf
+-rw-r--r-- 1 kvmani pusers    3603614 Jan 21 16:47 IBT 400 bulk ahead of site 8 Map Data 14.ctf
+-rw-r--r-- 1 kvmani pusers   94320454 Jan 21 16:47 LPBF 1100C Prev Sire mag Map Data 2.ctf
+-rw-r--r-- 1 kvmani pusers   17042858 Jan 21 16:47 LPBF 1100C Site 1 Map Data 1.ctf
+-rw-r--r-- 1 kvmani pusers   21050416 Jan 21 16:47 m1.ctf
+-rw-r--r-- 1 kvmani pusers  255156148 Jan 21 16:47 Meld IN625 6L-Sample 1-2-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers  255155904 Jan 21 16:48 Meld IN625 6L-Sample 1-3-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers  255156315 Jan 21 16:48 Meld IN625 6L-Sample 1-4-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers   63777532 Jan 21 16:48 Meld IN625 6L-Sample 1--5_center-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers  255195745 Jan 21 16:49 Meld IN625 6L-Sample 1-Area 10-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers  255578602 Jan 21 16:49 Meld IN625 6L-Sample 1-Area 1-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers  255528277 Jan 21 16:49 Meld IN625 6L-Sample 1-Area 2-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers   63816495 Jan 21 16:49 Meld IN625 6L-Sample 1-Area 3-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers  255163653 Jan 21 16:50 Meld IN625 6L-Sample 1-L1-1 towards top-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers  255255346 Jan 21 16:50 Meld IN625 6L-Sample 1-L1_center-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers   78928794 Jan 21 16:50 Meld IN625 6L-Sample 1-L1-L2_interface_3000x-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers   64013062 Jan 21 16:50 Meld IN625 6L-Sample 1-L1_top-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers   63982171 Jan 21 16:50 Meld IN625 6L-Sample 1-L2_bottom-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers   63978820 Jan 21 16:51 Meld IN625 6L-Sample 1-L2_top-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers   63777846 Jan 21 16:51 Meld IN625 6L-Sample 1-L3_center-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers   28375615 Jan 21 16:51 Meld IN625 6L-Sample 1-L3-L4_interface_3000x-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers   63777524 Jan 21 16:51 Meld IN625 6L-Sample 1-L3-L4_interface-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers   63778380 Jan 21 16:51 Meld IN625 6L-Sample 1-L4_center-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers   28375509 Jan 21 16:51 Meld IN625 6L-Sample 1-L4-L5_interface_3000x-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers  255168218 Jan 21 16:51 Meld IN625 6L-Sample 1-L4-L5_interface-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers   63776863 Jan 21 16:51 Meld IN625 6L-Sample 1-L5-L6_interface-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers   63777574 Jan 21 16:51 Meld IN625 6L-Sample 1-Towards L5-L6_interface_L6-OIM Map 2.ang
+-rw-r--r-- 1 kvmani pusers   38396601 Jan 21 16:52 Meld IN625 YZ Right-Sample 1-11-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers   30701542 Jan 21 16:52 Meld IN625 YZ Right-Sample 1-12-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers   38432723 Jan 21 16:52 Meld IN625 YZ Right-Sample 1-4-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers   38453306 Jan 21 16:52 Meld IN625 YZ Right-Sample 1-5-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers   38455135 Jan 21 16:52 Meld IN625 YZ Right-Sample 1-9-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers  213778618 Jan 21 16:52 MHEA-17Cr-Area 2-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers  214197143 Jan 21 16:52 MHEA-17Cr-Area 3-OIM Map 1.ang
+-rw-r--r-- 1 kvmani pusers  296448845 Jan 21 16:53 MHEA-17Cr-Area 4-OIM Map 2.ang
+-rw-r--r-- 1 kvmani pusers    9309223 Jan 21 16:53 phd review 42cr-pptTex-miniTens-forStrnPart deformed Map Data 4.ctf
+-rw-r--r-- 1 kvmani pusers    9692288 Jan 21 16:53 phd review 42cr-pptTex-miniTens-forStrnPart undef Map Data 1.ctf
+-rw-r--r-- 1 kvmani pusers   17379194 Jan 21 16:53 phd review gq-800-6hr Site 7 Map Data 19.ctf
+-rw-r--r-- 1 kvmani pusers   18330681 Jan 21 16:53 Project 1 1100C Parrallel2Buildplane Map Data 5.ctf
+-rw-r--r-- 1 kvmani pusers   31822605 Jan 21 16:53 Project 1 1100C perpendicular Cleaned Map Data 7.ctf
+-rw-r--r-- 1 kvmani pusers   31589114 Jan 21 16:53 Project 1 1100C perpendicular Map Data 6.ctf
+-rw-r--r-- 1 kvmani pusers    2100164 Jan 21 16:53 Project 1 250_0dot1_35 Site 2 Map Data 56.ctf
+-rw-r--r-- 1 kvmani pusers     778336 Jan 21 16:53 Project 1 250_10_38 Site 3 Map Data 43.ctf
+-rw-r--r-- 1 kvmani pusers     867682 Jan 21 16:53 Project 1 250_1_36 Site 2 Map Data 106.ctf
+-rw-r--r-- 1 kvmani pusers    4275824 Jan 21 16:53 Project 1 250_5_37 Site 3 Map Data 40.ctf
+-rw-r--r-- 1 kvmani pusers     548357 Jan 21 16:53 Project 1 300_0dot1_R19 Site 3 Map Data 27.ctf
+-rw-r--r-- 1 kvmani pusers    1175951 Jan 21 16:53 Project 1 300_10 Site 1 Map Data 14.ctf
+-rw-r--r-- 1 kvmani pusers    1663488 Jan 21 16:53 Project 1 300_1_20 Site 1 Map Data 59.ctf
+-rw-r--r-- 1 kvmani pusers     876950 Jan 21 16:53 Project 1 300_5_21 Site 2 Map Data 24.ctf
+-rw-r--r-- 1 kvmani pusers    1255227 Jan 21 16:53 Project 1 350_0dot1_23 Site 1 Map Data 33.ctf
+-rw-r--r-- 1 kvmani pusers     684178 Jan 21 16:53 Project 1 350_10_26 Site 1 Map Data 76.ctf
+-rw-r--r-- 1 kvmani pusers    3684108 Jan 21 16:53 Project 1 350_1_24 Site 1 Map Data 63.ctf
+-rw-r--r-- 1 kvmani pusers     414217 Jan 21 16:53 Project 1 350_1_24 Site 4 Map Data 92.ctf
+-rw-r--r-- 1 kvmani pusers    1210156 Jan 21 16:53 Project 1 350_1point0_24 Site 1 Map Data 31_cleaned.ctf
+-rw-r--r-- 1 kvmani pusers    1188518 Jan 21 16:53 Project 1 350_1point0_24 Site 1 Map Data 31.ctf
+-rw-r--r-- 1 kvmani pusers    1012937 Jan 21 16:53 Project 1 350_5_25 Site 3 Map Data 97.ctf
+-rw-r--r-- 1 kvmani pusers     986459 Jan 21 16:53 Project 1 350_5point0_25 Site 2 Map Data 36.ctf
+-rw-r--r-- 1 kvmani pusers     930714 Jan 21 16:53 Project 1 38 250_10(38) Map Data 22.ctf
+-rw-r--r-- 1 kvmani pusers    1141671 Jan 21 16:53 Project 1 400_0dot1_27 Site 1 Map Data 39.ctf
+-rw-r--r-- 1 kvmani pusers     729603 Jan 21 16:53 Project 1 400_10_30 Site 1 Map Data 79.ctf
+-rw-r--r-- 1 kvmani pusers     977193 Jan 21 16:53 Project 1 400_1_28 Site 2 Map Data 78.ctf
+-rw-r--r-- 1 kvmani pusers     552710 Jan 21 16:53 Project 1 400_5_29 Site 2 Map Data 89.ctf
+-rw-r--r-- 1 kvmani pusers     551188 Jan 21 16:53 Project 1 450_0dot1_31 Site 1 Map Data 26.ctf
+-rw-r--r-- 1 kvmani pusers     746288 Jan 21 16:53 Project 1 450_10_34 Site 2 Map Data 48.ctf
+-rw-r--r-- 1 kvmani pusers    1880786 Jan 21 16:53 Project 1 450_1_32 Site 1 Map Data 45.ctf
+-rw-r--r-- 1 kvmani pusers     758616 Jan 21 16:53 Project 1 450_5_33 Site 4 Map Data 100.ctf
+-rw-r--r-- 1 kvmani pusers    1995357 Jan 21 16:53 Project 1 650_40mins Site 2 Map Data 43.ctf
+-rw-r--r-- 1 kvmani pusers     889527 Jan 21 16:53 Project 1 650_40mins Site 3 Map Data 45.ctf
+-rw-r--r-- 1 kvmani pusers   13950175 Jan 21 16:53 Project 1 AsBuilt_etched-BD Site 1 Map Data 12.ctf
+-rw-r--r-- 1 kvmani pusers   12650445 Jan 21 16:53 Project 1 as received at OD Map Data 1.ctf
+-rw-r--r-- 1 kvmani pusers   13129022 Jan 21 16:53 Project 1 as received bulk-vertRadialDir Map Data 2.ctf
+-rw-r--r-- 1 kvmani pusers    9506537 Jan 21 16:53 Project 1 as received Horz Axial Map Data 4.ctf
+-rw-r--r-- 1 kvmani pusers   57566898 Jan 21 16:53 Project 1 as-Received Site 1 Map Data 109.ctf
+-rw-r--r-- 1 kvmani pusers    5482465 Jan 21 16:53 Project 1 long Finer StructureMOntage2 Map Data 22.ctf
+-rw-r--r-- 1 kvmani pusers    7246921 Jan 21 16:53 Project 1 long Magnified Montage2 Map Data 21.ctf
+-rw-r--r-- 1 kvmani pusers   10621287 Jan 21 16:53 Project 1 long Montage2 Map Data 20.ctf
+-rw-r--r-- 1 kvmani pusers   37559406 Jan 21 16:53 Project 1 LPBF_HT_1100C Site 1 Map Data 13_copy.ctf
+-rw-r--r-- 1 kvmani pusers   37559406 Jan 21 16:53 Project 1 LPBF_HT_1100C Site 1 Map Data 13.ctf
+-rw-r--r-- 1 kvmani pusers   93868764 Jan 21 16:53 Project 1 S1 awayfrmPin Map Data 19.ctf
+-rw-r--r-- 1 kvmani pusers   95009962 Jan 21 16:54 Project 1 S1 nearPin_Centre Map Data 16.ctf
+-rw-r--r-- 1 kvmani pusers   93183084 Jan 21 16:54 Project 1 S2 awaypin Map Data 36.ctf
+-rw-r--r-- 1 kvmani pusers   23225105 Jan 21 16:54 Project 1 S2 nearpin Map Data 46.ctf
+-rw-r--r-- 1 kvmani pusers   93350007 Jan 21 16:54 Project 1 S3 awaypin Map Data 41.ctf
+-rw-r--r-- 1 kvmani pusers   92223900 Jan 21 16:54 Project 1 S3 nearpin Map Data 40.ctf
+-rw-r--r-- 1 kvmani pusers   91740003 Jan 21 16:54 Project 1 S4 awaypin Map Data 15.ctf
+-rw-r--r-- 1 kvmani pusers   92468868 Jan 21 16:54 Project 1 S4 mid Cleaned Map Data 43.ctf
+-rw-r--r-- 1 kvmani pusers   90987760 Jan 21 16:55 Project 1 S4 nearPin2 Map Data 14.ctf
+-rw-r--r-- 1 kvmani pusers   92137857 Jan 21 16:54 Project 1 S4 nearpin Cleaned Map Data 44.ctf
+-rw-r--r-- 1 kvmani pusers   94055595 Jan 21 16:55 Project 1 S5 awayfrmPin Map Data 26.ctf
+-rw-r--r-- 1 kvmani pusers   93008597 Jan 21 16:55 Project 1 S5 Mid Map Data 23.ctf
+-rw-r--r-- 1 kvmani pusers   92366708 Jan 21 16:55 Project 1 S5 NearPin Map Data 20.ctf
+-rw-r--r-- 1 kvmani pusers   91235099 Jan 21 16:55 Project 1 S6 last2 Map Data 11.ctf
+-rw-r--r-- 1 kvmani pusers   91176886 Jan 21 16:55 Project 1 S6 lastsample Map Data 10.ctf
+-rw-r--r-- 1 kvmani pusers   90576041 Jan 21 16:55 Project 1 S6 midsample2 Map Data 5.ctf
+-rw-r--r-- 1 kvmani pusers   91087431 Jan 21 16:55 Project 1 S6 midsample Map Data 4.ctf
+-rw-r--r-- 1 kvmani pusers   91541822 Jan 21 16:56 Project 1 S6 nearPin1 Map Data 1.ctf
+-rw-r--r-- 1 kvmani pusers   90214142 Jan 21 16:56 Project 1 S6 nearPin2 Map Data 2.ctf
+-rw-r--r-- 1 kvmani pusers   91153219 Jan 21 16:56 Project 1 S6 nearPin3 Map Data 3.ctf
+-rw-r--r-- 1 kvmani pusers   91839804 Jan 21 16:56 Project 1 S7 awaypin Map Data 33.ctf
+-rw-r--r-- 1 kvmani pusers   93280860 Jan 21 16:56 Project 1 S7 nearPin Map Data 29.ctf
+-rw-r--r-- 1 kvmani pusers     628265 Jan 21 16:56 Project 1 Specimen 1 Site 1 Map Data 1.ctf
+-rw-r--r-- 1 kvmani pusers    1428001 Jan 21 16:56 Project 1 Specimen 1 Site 2 Map Data 2.ctf
+-rw-r--r-- 1 kvmani pusers    7058710 Jan 21 16:56 Project 1 Specimen 1 Site 2 Map Data 3.ctf
+-rw-r--r-- 1 kvmani pusers    1876517 Jan 21 16:56 Project 1 Specimen 1 Site 3 Map Data 3.ctf
+-rw-r--r-- 1 kvmani pusers   19984610 Jan 21 16:56 Project 1 Specimen 1 Site 4 Map Data 4.ctf
+-rw-r--r-- 1 kvmani pusers    2217320 Jan 21 16:56 Project 1 Specimen 1 Site 4 Map Data 7.ctf
+-rw-r--r-- 1 kvmani pusers    5453194 Jan 21 16:56 Project 1 Specimen 1 Site 5 Map Data 7.ctf
+-rw-r--r-- 1 kvmani pusers     922405 Jan 21 16:56 Project 1 Specimen 1 Site 6 Map Data 9.ctf
+-rw-r--r-- 1 kvmani pusers   11660630 Jan 21 16:56 Project 1 Specimen 2 Site 1 Map Data 2.ctf
+-rw-r--r-- 1 kvmani pusers    3950869 Jan 21 16:56 Project 2 F1 Site 13 Cleaned Map Data 41.ctf
+-rw-r--r-- 1 kvmani pusers    3963893 Jan 21 16:56 Project 2 F1 Site 15 Map Data 42.ctf
+-rw-r--r-- 1 kvmani pusers    1001282 Jan 21 16:56 Project 3 1hrsColloidal Site 3 Cleaned Map Data 279.ctf
+-rw-r--r-- 1 kvmani pusers    2467101 Jan 21 16:56 Project 3 Specimen 1 Site 11 Map Data 8.ctf
+-rw-r--r-- 1 kvmani pusers    2548171 Jan 21 16:56 Project 3 Specimen 1 Site 12 Map Data 9.ctf
+-rw-r--r-- 1 kvmani pusers    2513757 Jan 21 16:56 Project 3 Specimen 1 Site 14 Map Data 10.ctf
+-rw-r--r-- 1 kvmani pusers    2475719 Jan 21 16:56 Project 3 Specimen 1 Site 15 Map Data 11.ctf
+-rw-r--r-- 1 kvmani pusers    2551931 Jan 21 16:56 Project 3 Specimen 1 Site 16 Map Data 12.ctf
+-rw-r--r-- 1 kvmani pusers    2532594 Jan 21 16:56 Project 3 Specimen 1 Site 3 Map Data 1.ctf
+-rw-r--r-- 1 kvmani pusers     670241 Jan 21 16:56 Project 3 Specimen 1 Site 4 Map Data 2.ctf
+-rw-r--r-- 1 kvmani pusers    2588806 Jan 21 16:56 Project 3 Specimen 1 Site 9 Map Data 7.ctf
+-rw-r--r-- 1 kvmani pusers   38197326 Jan 21 16:57 pt-3B rex-600-6hrs.ctf
+-rw-r--r-- 1 kvmani pusers   37962179 Jan 21 16:57 pt-3B rex-650-6hrs .ctf
+-rw-r--r-- 1 kvmani pusers   58504677 Jan 21 16:57 pt-3B rex-700-6hrs .ctf
+-rw-r--r-- 1 kvmani pusers   62171932 Jan 21 16:57 pt-3B rex-750-6hrs.ctf
+-rw-r--r-- 1 kvmani pusers   49681665 Jan 21 16:57 pt-3B rex-850-3hrs.ctf
+-rw-r--r-- 1 kvmani pusers   55795472 Jan 21 16:57 pt-3B rex-850-6hrs.ctf
+-rw-r--r-- 1 kvmani pusers   48357791 Jan 21 16:57 pt-3B rex-900-3hrs.ctf
+-rw-r--r-- 1 kvmani pusers   54187394 Jan 21 16:57 pt-3B rex-900-6hr.ctf
+-rw-r--r-- 1 kvmani pusers   49703934 Jan 21 16:57 pt-3B rex-950-3hrs.ctf
+-rw-r--r-- 1 kvmani pusers   55294773 Jan 21 16:57 pt-3B rex-950-6hrs .ctf
+-rw-r--r-- 1 kvmani pusers   11053792 Jan 21 16:56 pt database dm-220-or-ar Site 1 Map Data 23.ctf
+-rw-r--r-- 1 kvmani pusers   11065456 Jan 21 16:56 pt database dm-220-or-rc Site 1 Map Data 7.ctf
+-rw-r--r-- 1 kvmani pusers   11115953 Jan 21 16:56 pt database qm-220-nr-back-ar Site 1 Map Data 22.ctf
+-rw-r--r-- 1 kvmani pusers   14689138 Jan 21 16:56 pt database qm-220-nr-back-rc Site 1 Map Data 5.ctf
+-rw-r--r-- 1 kvmani pusers    9485828 Jan 21 16:56 pt database qm-220-nr-front-ar Site 1 Map Data 17.ctf
+-rw-r--r-- 1 kvmani pusers   14418405 Jan 21 16:56 pt database qm-220-nr-front-rc Site 1 Map Data 4.ctf
+-rw-r--r-- 1 kvmani pusers   11143518 Jan 21 16:56 pt database qm-220-or-ar Site 1 Map Data 16.ctf
+-rw-r--r-- 1 kvmani pusers   11170807 Jan 21 16:56 pt database Qm-220-or-rc Site 1 Map Data 9.ctf
+-rw-r--r-- 1 kvmani pusers   39115268 Jan 21 16:56 pt database Ti-asHX-RC Site 1 Map Data 28.ctf
+-rw-r--r-- 1 kvmani pusers   38061910 Jan 21 16:57 pt database Ti-asPilgered-stage1-AR Site 1 Map Data 30.ctf
+-rw-r--r-- 1 kvmani pusers   39095180 Jan 21 16:57 pt database Ti-asPilgered-stage1-RC Site 1 Map Data 29.ctf
+-rw-r--r-- 1 kvmani pusers   27423257 Jan 21 16:57 pt database Ti-HX-Ann-ST-RC Site 1 Map Data 26.ctf
+-rw-r--r-- 1 kvmani pusers   11115953 Jan 21 16:57 qm-220-nr-back-ar.ctf
+-rw-r--r-- 1 kvmani pusers   14689138 Jan 21 16:57 qm-220-nr-back-rc.ctf
+-rw-r--r-- 1 kvmani pusers   11143518 Jan 21 16:57 qm-220-or-ar.ctf
+-rw-r--r-- 1 kvmani pusers   11170807 Jan 21 16:57 Qm-220-or-rc.ctf
+-rw-r--r-- 1 kvmani pusers   69264210 Jan 21 16:58 RPV_tensile_fractured RPV_tensile15_2_2023 Z21 Map Data 15.ctf
+-rw-r--r-- 1 kvmani pusers   68949488 Jan 21 16:58 RPV_tensile_fractured RPV_tensile15_2_2023 Z22 Map Data 16.ctf
+-rw-r--r-- 1 kvmani pusers   68724091 Jan 21 16:58 RPV_tensile_fractured RPV_tensile15_2_2023 Z23 Map Data 17.ctf
+-rw-r--r-- 1 kvmani pusers   70132827 Jan 21 16:58 RPV_tensile_fractured RPV_tensile15_2_2023 Z31 Map Data 11.ctf
+-rw-r--r-- 1 kvmani pusers   69865000 Jan 21 16:58 RPV_tensile_fractured RPV_tensile15_2_2023 Z32 Map Data 7.ctf
+-rw-r--r-- 1 kvmani pusers   69262473 Jan 21 16:58 RPV_tensile_fractured RPV_tensile15_2_2023 Z33 Map Data 13.ctf
+-rw-r--r-- 1 kvmani pusers   70224609 Jan 21 16:58 RPV_tensile_fractured RPV_tensile15_2_2023 Z41 Map Data 10.ctf
+-rw-r--r-- 1 kvmani pusers   70074104 Jan 21 16:59 RPV_tensile_fractured RPV_tensile15_2_2023 Z42 Map Data 6.ctf
+-rw-r--r-- 1 kvmani pusers   33598089 Jan 21 16:59 RPV_tensile_fractured RPV_tensile15_2_2023 Z43 Map Data 14.ctf
+-rw-r--r-- 1 kvmani pusers   69992750 Jan 21 16:59 RPV_tensile_fractured RPV_tensile15_2_2023 Z51 Map Data 8.ctf
+-rw-r--r-- 1 kvmani pusers   69598698 Jan 21 16:59 RPV_tensile_fractured RPV_tensile15_2_2023 Z52 Map Data 5.ctf
+-rw-r--r-- 1 kvmani pusers   68637547 Jan 21 16:59 RPV_tensile_fractured RPV_tensile15_2_2023 Z53 Map Data 9.ctf
+-rw-r--r-- 1 kvmani pusers   69711123 Jan 21 16:58 RPV_tensile_fractured RPV_tensile Z11 Map Data 1.ctf
+-rw-r--r-- 1 kvmani pusers   70208210 Jan 21 16:58 RPV_tensile_fractured RPV_tensile Z12 Map Data 2.ctf
+-rw-r--r-- 1 kvmani pusers   70004487 Jan 21 16:58 RPV_tensile_fractured RPV_tensile Z13 Map Data 3.ctf
+-rw-r--r-- 1 kvmani pusers 1179083093 Jan 21 17:01 shahshank_10-400-interfaceLargeArea-100X.ang
+-rw-r--r-- 1 kvmani pusers   47276841 Jan 21 17:01 shahshank_10-400rpm-10-300 3rd dot near interface.ang
+-rw-r--r-- 1 kvmani pusers   47277422 Jan 21 17:01 shahshank_10-400rpm-10-300rpm-top dot.ang
+-rw-r--r-- 1 kvmani pusers   23744303 Jan 21 17:01 shahshank_10-400rpm-1 mm from top.ang
+-rw-r--r-- 1 kvmani pusers   94774450 Jan 21 17:01 shahshank_10-400rpm-3mm from top.ang
+-rw-r--r-- 1 kvmani pusers   47276112 Jan 21 17:01 shahshank_10-400rpm-Area 12-meld-C-3rd dot near interface.ang
+-rw-r--r-- 1 kvmani pusers   47301268 Jan 21 17:01 shahshank_10-400rpm-Area 13-10-400-top dot.ang
+-rw-r--r-- 1 kvmani pusers   47277500 Jan 21 17:01 shahshank_10-400rpm-Area 14-10-400 3rd dot near interface.ang
+-rw-r--r-- 1 kvmani pusers   47277500 Jan 21 17:01 shahshank_10-400rpm-Area 14-10-400-3rd dot near interface.ang
+-rw-r--r-- 1 kvmani pusers   47277062 Jan 21 17:01 shahshank_10-400rpm-meld B boom dot near interface.ang
+-rw-r--r-- 1 kvmani pusers   47277918 Jan 21 17:01 shahshank_10-400rpm-Meld-C-top.ang
+-rw-r--r-- 1 kvmani pusers   47275215 Jan 21 17:01 shahshank_12-300rpm-3rd dot near interface.ang
+-rw-r--r-- 1 kvmani pusers   47658653 Jan 21 17:01 shahshank_meld-A-1st dot near top of deposit.ang
+-rw-r--r-- 1 kvmani pusers  524272730 Jan 21 17:02 shahshank_meld-A-large area deposit.ang
+-rw-r--r-- 1 kvmani pusers   35125040 Jan 21 17:02 Site11250XMapData1.ctf
+-rw-r--r-- 1 kvmani pusers    1108570 Jan 21 17:02 site4_29_06_17.ctf
+-rw-r--r-- 1 kvmani pusers   18610160 Jan 21 17:02 SuperNi-42.ctf
+-rw-r--r-- 1 kvmani pusers    1087134 Jan 21 17:02 SuperNi-42_ptterns.ctf
+-rw-r--r-- 1 kvmani pusers  112533487 Jan 21 17:02 Ti1023_New Sample_Area 2_OIM Map 1.ang

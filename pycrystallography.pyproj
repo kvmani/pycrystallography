@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{24c6ce59-91cb-4d89-8fbc-0057f7aaf1db}</ProjectGuid>
+    <ProjectHome />
+    <StartupFile>pycrystallography\core\plane.py</StartupFile>
+    <SearchPath>.;..\..\..\..\..\Softwares\VTK-7.1.1\build_try\bin\Release\;..\..\..\..\..\Softwares\VTK-7.1.1\build_try\lib\Release\</SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId>{84e4d087-dbc8-4963-ad46-ab54e30e879f}</InterpreterId>
+    <InterpreterVersion>3.5</InterpreterVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+    <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="requirements-optional.txt" />
+    <Content Include="requirements.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="pycrystallography\core\orientation.py" />
+    <Compile Include="pycrystallography\core\plane.py" />
+    <Compile Include="pycrystallography\core\quaternion.py" />
+    <Compile Include="pycrystallography\core\tests\test_orientation.py" />
+    <Compile Include="pycrystallography\core\tests\test_plane.py" />
+    <Compile Include="pycrystallography\core\tests\test_quaternion.py" />
+    <Compile Include="pycrystallography\core\tests\__init__.py" />
+    <Compile Include="pycrystallography\core\__init__.py" />
+    <Compile Include="pycrystallography\io\tests\__init__.py" />
+    <Compile Include="pycrystallography\io\__init__.py" />
+    <Compile Include="pycrystallography\utilities\pytransformations.py" />
+    <Compile Include="pycrystallography\utilities\__init__.py" />
+    <Compile Include="pycrystallography\visualization\tests\__init__.py" />
+    <Compile Include="pycrystallography\visualization\__init__.py" />
+    <Compile Include="pycrystallography\__init__.py" />
+    <Compile Include="setup.py" />
+    <Compile Include="tasks.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="pycrystallography" />
+    <Folder Include="pycrystallography\core" />
+    <Folder Include="pycrystallography\core\tests" />
+    <Folder Include="pycrystallography\io" />
+    <Folder Include="pycrystallography\io\tests" />
+    <Folder Include="pycrystallography\utilities\" />
+    <Folder Include="pycrystallography\visualization" />
+    <Folder Include="pycrystallography\visualization\tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="{84e4d087-dbc8-4963-ad46-ab54e30e879f}\3.5" />
+  </ItemGroup>
+  <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />
+</Project>

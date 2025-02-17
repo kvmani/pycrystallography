@@ -1,0 +1,22 @@
+2025-01-27 15:27:48,059 - EBSD_Logger - INFO - Initialized logger. Writing logs to: logs/11AlNiCo-8H DED-400W-Area 4-OIM Map 1.ang_20250127_152748.log
+2025-01-27 15:27:48,060 - EBSD_Logger - WARNING - pycrystallography.ebsd module not found. Attempting to add parent directories to sys.path.
+2025-01-27 15:27:48,060 - EBSD_Logger - INFO - Added /home/kvmani/pycrystallography/pycrystallography and /home/kvmani/pycrystallography to sys.path.
+2025-01-27 15:27:49,721 - EBSD_Logger - INFO - Ensured existence of directory: output/npy/B
+2025-01-27 15:27:49,721 - EBSD_Logger - INFO - Ensured existence of directory: output/ang/B
+2025-01-27 15:27:49,721 - EBSD_Logger - INFO - Ensured existence of directory: output/tiff/B
+2025-01-27 15:27:49,721 - EBSD_Logger - INFO - Ensured existence of directory: output/npy/A
+2025-01-27 15:27:49,721 - EBSD_Logger - INFO - Ensured existence of directory: output/ang/A
+2025-01-27 15:27:49,721 - EBSD_Logger - INFO - Ensured existence of directory: output/tiff/A
+2025-01-27 15:27:49,721 - EBSD_Logger - INFO - running in debug mode = False
+2025-01-27 15:27:49,721 - EBSD_Logger - INFO - Loading file: /home/kvmani/pycrystallography/data/sampleTestData/11AlNiCo-8H DED-400W-Area 4-OIM Map 1.ang
+2025-01-27 15:27:53,139 - EBSD_Logger - INFO - [using] file '11AlNiCo-8H DED-400W-Area 4-OIM Map 1.ang' because 75.00% of rows satisfied the [CI] criterion (0.3) vs. threshold 50.0%
+2025-01-27 15:27:53,239 - EBSD_Logger - INFO - Generated 2 crops from file 11AlNiCo-8H DED-400W-Area 4-OIM Map 1.ang
+2025-01-27 15:27:53,240 - EBSD_Logger - INFO - [skipping] subcrop 0 because 73.47% of rows satisfied the [CI] criterion (0.3) vs. threshold 75.0%
+2025-01-27 15:27:59,190 - EBSD_Logger - INFO - Subcrop 0 => Unmasked SOURCE files written
+2025-01-27 15:27:59,191 - EBSD_Logger - INFO - [using] subcrop 1 because 75.28% of rows satisfied the [CI] criterion (0.3) vs. threshold 75.0%
+2025-01-27 15:27:59,191 - EBSD_Logger - INFO - For subcrop 1: rotation=90, flip=v, mask=12
+2025-01-27 15:27:59,201 - EBSD_Logger - INFO - Applied rotation/flip on subcrop 1
+2025-01-27 15:28:05,171 - EBSD_Logger - INFO - Subcrop 1 => TARGET files written
+2025-01-27 15:28:05,191 - EBSD_Logger - INFO - Subcrop 1 => mask applied
+2025-01-27 15:28:11,194 - EBSD_Logger - INFO - Subcrop 1 => SOURCE (masked) files written
+2025-01-27 15:28:11,194 - EBSD_Logger - INFO - Single file processing complete.
