@@ -21,4 +21,9 @@ installation by running::
 
 which prints a table of angles between different directions using data from ``data/structureData``.
 
+The ``tran_texture`` directory provides utilities for working with texture data.
+The script ``generate_simulated_odf.py`` can create a random orientation
+distribution function grid and save it as ``CSV`` for testing algorithms.
+See the script's docstring for usage details.
+
 For installation and detailed documentation see the ``docs`` folder or the project website.
