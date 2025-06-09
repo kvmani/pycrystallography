@@ -8,7 +8,7 @@ angle is derived from the symmetry limits provided by
 Example
 -------
     params = {
-        "crystal_symmetry": "cubic",
+        "crystal_symmetry": "hexagonal",
         "odf_grid_spacing": 5,
         "angle_units": "degree",
         "output_file": "simulated_odf.csv",
@@ -67,7 +67,7 @@ def generate_simulated_odf(params: Dict[str, object]) -> str:
         Dictionary with the following optional keys::
 
             {
-                "crystal_symmetry": "cubic",        # one of cubic, tetragonal...
+                "crystal_symmetry": "hexagonal",    # one of cubic, tetragonal...
                 "odf_grid_spacing": 5,              # spacing of Euler grid
                 "angle_units": "degree",            # 'degree' or 'radian'
                 "output_file": "simulated_odf.csv",  # file name for CSV
@@ -82,7 +82,7 @@ def generate_simulated_odf(params: Dict[str, object]) -> str:
     str
         Path to the generated CSV file.
     """
-    symmetry = params.get("crystal_symmetry", "cubic")
+    symmetry = params.get("crystal_symmetry", "hexagonal")
     spacing = float(params.get("odf_grid_spacing", 5))
     units = params.get("angle_units", "degree").lower()
     output_file = params.get("output_file", "simulated_odf.csv")
@@ -153,6 +153,8 @@ def generate_simulated_odf(params: Dict[str, object]) -> str:
         np.column_stack([grid, weights]),
         columns=["phi1", "phi", "phi2", "volume fraction"],
     )
+    max_angles = df[["phi1", "phi", "phi2"]].max().to_numpy()
+    assert np.all(max_angles <= limits + 1e-6), "Angles exceed limits"
     df.to_csv(output_file, index=False)
     logger.info("ODF written to %s", output_file)
     return output_file
@@ -160,7 +162,7 @@ def generate_simulated_odf(params: Dict[str, object]) -> str:
 
 if __name__ == "__main__":
     example = {
-        "crystal_symmetry": "cubic",
+        "crystal_symmetry": "hexagonal",
         "odf_grid_spacing": 5,
         "angle_units": "degree",
         "output_file": "simulated_odf.csv",
