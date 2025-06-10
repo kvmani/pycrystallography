@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from pycrystallography.tran_texture.generate_simulated_odf import generate_simulated_odf
+from tran_texture.generate_simulated_odf import generate_simulated_odf
 
 
 def test_generate_odf(tmpdir):
