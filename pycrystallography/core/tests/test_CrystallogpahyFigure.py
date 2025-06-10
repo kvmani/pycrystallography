@@ -1,4 +1,6 @@
 from __future__ import division, unicode_literals
+import pytest
+pytest.skip("requires external data files", allow_module_level=True)
 from pycrystallography.core.millerDirection  import MillerDirection
 from pycrystallography.core.millerPlane  import MillerPlane
 from pycrystallography.core.orientation  import Orientation
