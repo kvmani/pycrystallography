@@ -81,6 +81,36 @@ class CompositePattern:
         )
 
 
+@dataclass(frozen=True, slots=True)
+class PowderPattern:
+    """Powder X-ray diffraction pattern for a single phase."""
+
+    phase: Phase
+    two_theta: np.ndarray
+    intensities: np.ndarray
+    d_spacings: np.ndarray
+    hkls: Sequence[Sequence[int]]
+    metadata: Mapping[str, Any] = field(default_factory=dict)
+
+    def to_table(self) -> np.ndarray:
+        """Return a structured array of peak data."""
+
+        dtype = [
+            ("two_theta", float),
+            ("intensity", float),
+            ("d_spacing", float),
+            ("hkl", "U32"),
+        ]
+        hkl_strings = [
+            " ".join(str(part) for part in hkl) if hkl else ""
+            for hkl in self.hkls
+        ]
+        return np.array(
+            list(zip(self.two_theta, self.intensities, self.d_spacings, hkl_strings)),
+            dtype=dtype,
+        )
+
+
 def ensure_variants_unique(variants: Iterable[Variant]) -> Sequence[Variant]:
     """Ensure that variant labels are unique and deterministic."""
 

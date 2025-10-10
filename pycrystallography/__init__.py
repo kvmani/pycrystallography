@@ -11,13 +11,14 @@ from importlib import metadata
 from .analysis.registry import calculator_registry, get_calculator
 from .config.loader import load_config, resolve_config
 from .config.models import AppConfig
-from .core.models import CompositePattern, OrientationRelation, Phase, Variant
+from .core.models import CompositePattern, OrientationRelation, Phase, PowderPattern, Variant
 
 __all__ = [
     "AppConfig",
     "CompositePattern",
     "OrientationRelation",
     "Phase",
+    "PowderPattern",
     "Variant",
     "calculator_registry",
     "get_calculator",
