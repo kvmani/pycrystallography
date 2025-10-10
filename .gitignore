@@ -1,1 +1,57 @@
-*.pyc
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual environments
+.env
+.venv/
+venv/
+ENV/
+env/
+
+# Testing and coverage
+.coverage
+.coverage.*
+.cache/
+.pytest_cache/
+.tox/
+.nox/
+
+# Type checker caches
+.mypy_cache/
+.pyre/
+.pytype/
+.dmypy.json
+
+# Linting caches
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE and editor settings
+.vscode/
+.idea/
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln.iml
+
+# Logs and local data
+*.log
+*.tmp
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
