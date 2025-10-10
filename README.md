@@ -31,5 +31,17 @@ Quick start
 
        pcg composite tem --relation burgers-zr --config examples/burgers_zr.yaml --dry-run
 
-Outputs (CSV + PNG) are written to ``./output`` by default. Use ``--out`` to change the destination.
-See ``docs/`` for tutorials on extending the calculator registry and building plug-ins.
+4. Compute a powder XRD pattern for the α-Zr phase using the built-in
+   registry::
+
+       pcg powder xrd --phase alpha-zr --config examples/burgers_zr.yaml --dry-run
+
+   Drop the ``--dry-run`` flag to write a ``CSV`` of the peak list and a
+   ``PNG`` plot under ``./output``. Switch ``--phase`` to ``beta-zr`` to
+   produce the body-centred cubic pattern.
+
+Outputs (CSV + PNG) are written to ``./output`` by default. Use ``--out`` to
+change the destination. See ``docs/`` for tutorials on extending the calculator
+registry and building plug-ins. For an end-to-end walkthrough, including a
+Jupyter notebook that compares the α/β zirconium patterns, browse the
+``examples/`` directory.
