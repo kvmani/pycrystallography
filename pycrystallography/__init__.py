@@ -1,23 +1,31 @@
-from __future__ import unicode_literals
+"""Public package interface for :mod:`pycrystallography`.
 
-import os
+This module exposes the supported public API and wires together
+configuration loading utilities, core domain models and the plug-in
+registry for diffraction calculators.
+"""
+from __future__ import annotations
 
-__author__ = "Pycrystallography Development Team"
-__email__ ="kvmani@barc.gov.in"
-__maintainer__ = "K V Mani Krishna"
-__maintainer_email__ ="kvmani@barc.gov.in"
-__date__ = "July 14 2017"
-__version__ = "1.0.0"
+from importlib import metadata
 
-#os.environ['QT_API'] = 'pyqt'
-#from qtpy import QT_VERSION
+from .analysis.registry import calculator_registry, get_calculator
+from .config.loader import load_config, resolve_config
+from .config.models import AppConfig
+from .core.models import CompositePattern, OrientationRelation, Phase, Variant
 
+__all__ = [
+    "AppConfig",
+    "CompositePattern",
+    "OrientationRelation",
+    "Phase",
+    "Variant",
+    "calculator_registry",
+    "get_calculator",
+    "load_config",
+    "resolve_config",
+]
 
-__appname__ = 'pycrystallography'
-
-
-from pycrystallography.core import *
-from pycrystallography.utilities import *
-from pycrystallography.apps import *
-
-
+try:
+    __version__ = metadata.version("pycrystallography")
+except metadata.PackageNotFoundError:  # pragma: no cover - local dev
+    __version__ = "0.0.0"
