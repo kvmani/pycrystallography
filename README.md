@@ -1,24 +1,35 @@
 PyCrystallography
 =================
 
-PyCrystallography is a Python toolkit for crystallographic analysis and visualization. It provides
-object-oriented utilities for common tasks such as handling Miller indices, computing angles between
-directions or planes and generating diffraction patterns. The package builds on well known
-libraries such as `numpy` and `pymatgen` and is aimed at materials scientists working with
-orientation relationships and phase transformations.
+PyCrystallography is a modern orchestration layer for composite diffraction analysis. The library
+delegates crystallographic maths to `orix <https://orix.readthedocs.io>`_ and structure handling to
+`pymatgen <https://pymatgen.org>`_, focusing on configuration management, plug-in extensibility and
+user experience.
 
-Key features
-------------
-* Tools to create and manipulate crystallographic directions and planes.
-* Orientation utilities with quaternion support for easy rotation handling.
-* Functions to calculate stereographic projections, diffraction patterns and interplanar spacings.
-* Example scripts demonstrating TEM SAED simulation and angle calculations.
+Highlights
+----------
 
-The `examples` directory contains runnable scripts. After installing the requirements you can test the
-installation by running::
+* Strict configuration schema powered by Pydantic with support for environment and CLI overrides.
+* Adapters that bridge pycrystallography's domain models to orix (orientations, variants) and
+  pymatgen (structure loading, TEM diffraction calculators).
+* Plug-in architecture for diffraction calculators discoverable through entry points. A composite
+  TEM/SAED implementation is included by default.
+* Typer-based CLI (``pcg``) with dry-run mode, logging controls and multi-format outputs.
 
-    python examples/angleBetweenDirections.py
+Quick start
+-----------
 
-which prints a table of angles between different directions using data from ``data/structureData``.
+1. Install the project in a virtual environment::
 
-For installation and detailed documentation see the ``docs`` folder or the project website.
+       pip install -e .[dev]
+
+2. Validate a configuration::
+
+       pcg config validate --config examples/burgers_zr.yaml --print
+
+3. Generate a composite Burgers OR pattern for Zr (dry run)::
+
+       pcg composite tem --relation burgers-zr --config examples/burgers_zr.yaml --dry-run
+
+Outputs (CSV + PNG) are written to ``./output`` by default. Use ``--out`` to change the destination.
+See ``docs/`` for tutorials on extending the calculator registry and building plug-ins.

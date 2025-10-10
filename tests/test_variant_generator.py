@@ -1,0 +1,51 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+import numpy as np
+
+from pycrystallography.adapters.orix_adapter import OrientationFactory, VariantGenerator
+from pycrystallography.adapters.pymatgen_adapter import StructureLoader
+from pycrystallography.config import load_config
+from pycrystallography.core.models import OrientationRelation, Phase
+
+
+def test_variant_generation_deterministic(sample_config):
+    cfg = load_config(sample_config)
+    registry_path = Path(__file__).resolve().parents[1] / "data" / "registry.yaml"
+    loader = StructureLoader.from_yaml(registry_path)
+    phases = {
+        phase_cfg.name: Phase(
+            name=phase_cfg.name,
+            structure=loader.get(phase_cfg.structure),
+            metadata=phase_cfg.metadata,
+        )
+        for phase_cfg in cfg.phases
+    }
+    relation_cfg = cfg.find_orientation("burgers-zr")
+    factory = OrientationFactory()
+    parent_vectors = [
+        phases[relation_cfg.parent_phase].structure.lattice.matrix.T
+        @ np.asarray(direction, dtype=float)
+        for direction in relation_cfg.parent_directions
+    ]
+    child_vectors = [
+        phases[relation_cfg.child_phase].structure.lattice.matrix.T
+        @ np.asarray(direction, dtype=float)
+        for direction in relation_cfg.child_directions
+    ]
+    orientation = factory.from_direction_pairs(parent_vectors, child_vectors)
+    relation = OrientationRelation(
+        name=relation_cfg.name,
+        parent_phase=phases[relation_cfg.parent_phase],
+        child_phase=phases[relation_cfg.child_phase],
+        orientation=orientation,
+    )
+    generator = VariantGenerator.from_space_groups(
+        cfg.find_phase(relation_cfg.parent_phase).space_group,
+        cfg.find_phase(relation_cfg.child_phase).space_group,
+    )
+    first = generator.generate(relation)
+    second = generator.generate(relation)
+    assert [v.label for v in first] == [v.label for v in second]
+    assert len({v.label for v in first}) == len(first)
