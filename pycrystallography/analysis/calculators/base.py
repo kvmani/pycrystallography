@@ -13,6 +13,10 @@ class DiffractionCalculator(ABC):
 
     slug: str
 
+    def __init__(self, *args, **kwargs) -> None:  # noqa: D401 - trivial initialiser
+        """Allow subclasses to define their own constructor signatures."""
+        super().__init__()
+
     @abstractmethod
     def compute(
         self,

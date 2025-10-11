@@ -1,9 +1,57 @@
 """Pydantic models describing pycrystallography configuration."""
 from __future__ import annotations
 
-from typing import Any, Dict, List, Sequence, Tuple
+from typing import Any, Dict, List, Mapping, Sequence, Tuple
 
 from pydantic import BaseModel, Field, model_validator
+
+from ..core.indexing import validate_miller_bravais
+
+
+class IndexSpec(BaseModel):
+    """Specification of a crystallographic direction or plane."""
+
+    kind: str = Field(default="direction")
+    indices: Tuple[float, ...]
+    label: str | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def _coerce(cls, value: Any) -> Mapping[str, Any]:
+        if isinstance(value, IndexSpec):
+            return value.model_dump()
+        if isinstance(value, Mapping):
+            if "direction" in value:
+                return {
+                    "kind": "direction",
+                    "indices": tuple(value["direction"]),
+                    "label": value.get("label"),
+                }
+            if "plane" in value:
+                return {
+                    "kind": "plane",
+                    "indices": tuple(value["plane"]),
+                    "label": value.get("label"),
+                }
+            if "kind" in value and "indices" in value:
+                return {
+                    "kind": value["kind"],
+                    "indices": tuple(value["indices"]),
+                    "label": value.get("label"),
+                }
+        if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+            return {"kind": "direction", "indices": tuple(value)}
+        raise TypeError(f"Cannot construct IndexSpec from {value!r}")
+
+    @model_validator(mode="after")
+    def _validate(self) -> "IndexSpec":
+        if self.kind not in {"direction", "plane"}:
+            raise ValueError(f"Invalid index kind '{self.kind}'")
+        if len(self.indices) not in {3, 4}:
+            raise ValueError("Indices must have three or four components")
+        if len(self.indices) == 4:
+            validate_miller_bravais(self.indices)
+        return self
 
 
 class LoggingConfig(BaseModel):
@@ -21,8 +69,8 @@ class OrientationRelationConfig(BaseModel):
     name: str
     parent_phase: str
     child_phase: str
-    parent_directions: List[Sequence[float]]
-    child_directions: List[Sequence[float]]
+    parent_directions: List[IndexSpec]
+    child_directions: List[IndexSpec]
 
     @model_validator(mode="after")
     def _check_lengths(self) -> "OrientationRelationConfig":

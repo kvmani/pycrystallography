@@ -4,6 +4,8 @@ from __future__ import annotations
 import inspect
 from importlib import metadata
 
+from typing import cast
+
 from .calculators.base import CalculatorRegistry, DiffractionCalculator
 from .calculators.composite import CompositeTEMCalculator
 from ..adapters.pymatgen_adapter import DiffractionData
@@ -13,7 +15,11 @@ calculator_registry = CalculatorRegistry(calculators={})
 
 
 def _register_builtins() -> None:
-    calculator_registry.register(CompositeTEMCalculator(diffraction=DiffractionData()))
+    calculator = cast(
+        DiffractionCalculator,
+        CompositeTEMCalculator(DiffractionData()),  # type: ignore[call-arg]
+    )
+    calculator_registry.register(calculator)
 
 
 def _load_entry_points() -> None:

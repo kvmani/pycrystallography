@@ -7,6 +7,11 @@ Unreleased
 * Added a powder XRD workflow (CLI + plotting) leveraging pymatgen's peak calculator.
 * Documented orientation relationships, the Burgers OR example, and powder workflows in
   the Sphinx docs and README. Added a tutorial notebook comparing α/β zirconium phases.
+* Validated Miller–Bravais indices, added plane-normal handling in the orientation builder,
+  and refactored ``OrientationFactory`` to fit rotations from all supplied pairs while
+  rejecting colinear inputs.
+* Preserved TEM camera-length precision in ``DiffractionData`` and introduced parent→child
+  feature mapping utilities with a ``pcg or map`` CLI command and comprehensive tests.
 
 v1.0.0
 ------

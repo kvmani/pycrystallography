@@ -2,10 +2,18 @@
 from __future__ import annotations
 
 from .loader import load_config, resolve_config
-from .models import AppConfig, LoggingConfig, OrientationRelationConfig, PhaseConfig, TEMOptions
+from .models import (
+    AppConfig,
+    IndexSpec,
+    LoggingConfig,
+    OrientationRelationConfig,
+    PhaseConfig,
+    TEMOptions,
+)
 
 __all__ = [
     "AppConfig",
+    "IndexSpec",
     "LoggingConfig",
     "OrientationRelationConfig",
     "PhaseConfig",

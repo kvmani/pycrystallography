@@ -2,12 +2,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import numpy as np
-
 from pycrystallography.adapters.orix_adapter import OrientationFactory, VariantGenerator
 from pycrystallography.adapters.pymatgen_adapter import StructureLoader
 from pycrystallography.config import load_config
 from pycrystallography.core.models import OrientationRelation, Phase
+from pycrystallography.core.indexing import indices_to_cartesian
 
 
 def test_variant_generation_deterministic(sample_config):
@@ -24,15 +23,15 @@ def test_variant_generation_deterministic(sample_config):
     }
     relation_cfg = cfg.find_orientation("burgers-zr")
     factory = OrientationFactory()
+    parent_structure = phases[relation_cfg.parent_phase].structure
+    child_structure = phases[relation_cfg.child_phase].structure
     parent_vectors = [
-        phases[relation_cfg.parent_phase].structure.lattice.matrix.T
-        @ np.asarray(direction, dtype=float)
-        for direction in relation_cfg.parent_directions
+        indices_to_cartesian(parent_structure, kind=spec.kind, indices=spec.indices)
+        for spec in relation_cfg.parent_directions
     ]
     child_vectors = [
-        phases[relation_cfg.child_phase].structure.lattice.matrix.T
-        @ np.asarray(direction, dtype=float)
-        for direction in relation_cfg.child_directions
+        indices_to_cartesian(child_structure, kind=spec.kind, indices=spec.indices)
+        for spec in relation_cfg.child_directions
     ]
     orientation = factory.from_direction_pairs(parent_vectors, child_vectors)
     relation = OrientationRelation(
