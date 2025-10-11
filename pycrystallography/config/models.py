@@ -1,6 +1,7 @@
 """Pydantic models describing pycrystallography configuration."""
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any, Dict, List, Mapping, Sequence, Tuple
 
 from pydantic import BaseModel, Field, model_validator
@@ -69,13 +70,19 @@ class OrientationRelationConfig(BaseModel):
     name: str
     parent_phase: str
     child_phase: str
-    parent_directions: List[IndexSpec]
-    child_directions: List[IndexSpec]
+    parent_directions: List[IndexSpec] = Field(default_factory=list)
+    child_directions: List[IndexSpec] = Field(default_factory=list)
+    or_document: Path | None = Field(default=None, description="YAML file describing the OR")
+    or_name: str | None = Field(default=None, description="Identifier within the OR YAML document")
 
     @model_validator(mode="after")
     def _check_lengths(self) -> "OrientationRelationConfig":
+        if self.or_document:
+            if not self.or_name:
+                raise ValueError("or_name must be provided when or_document is set")
+            return self
         if len(self.parent_directions) < 2 or len(self.child_directions) < 2:
-            raise ValueError("At least two direction pairs are required for an OR")
+            raise ValueError("At least two direction pairs are required for an OR when YAML is not supplied")
         if len(self.parent_directions) != len(self.child_directions):
             raise ValueError("Parent and child direction counts must match")
         return self

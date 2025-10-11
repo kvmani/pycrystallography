@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import json
 import os
 import tomllib
 from pathlib import Path
@@ -69,7 +70,11 @@ def load_config(
     data = _merge_dicts(data, env_data)
     if overrides:
         data = _merge_dicts(data, overrides)
-    return AppConfig.model_validate(data)
+    cfg = AppConfig.model_validate(data)
+    base = path.parent.resolve() if path else Path.cwd()
+    cfg.__dict__["_config_path"] = path.resolve() if path else None
+    cfg.__dict__["_config_dir"] = base
+    return cfg
 
 
 def resolve_config(

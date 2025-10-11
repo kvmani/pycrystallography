@@ -1,5 +1,8 @@
 Unreleased
 ----------
+* Restored composite diffraction UX from ``main`` with CIF-backed structures, OR YAML
+  schema validation, interactive plotting improvements (variant toggles, annotation
+  avoidance) and HTML reporting driven by ``orix``/``pymatgen`` integrations.
 * Rebuilt the package around a modular architecture with configuration, adapters, plug-in
   diffraction calculators and a Typer-based CLI.
 * Added configuration schema with environment overrides and new tests covering loaders,

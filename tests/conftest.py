@@ -5,10 +5,18 @@ import textwrap
 from pathlib import Path
 
 import pytest
+import numpy as np
+
+from pycrystallography.adapters.pymatgen_adapter import StructureLoader
+from pycrystallography.cli.composite import build_orientation_relation, build_phases
+from pycrystallography.config import load_config
+from pycrystallography.core.models import CompositePattern
+from pycrystallography.core.variant_manager import MarkerPalette, VariantManager
+from pycrystallography.plotting import CrystallographicFigure, PlotSettings
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-CONFIG_YAML = textwrap.dedent(
+CONFIG_TEMPLATE = textwrap.dedent(
     """
     phases:
       - name: beta-zr
@@ -21,14 +29,8 @@ CONFIG_YAML = textwrap.dedent(
       - name: burgers-zr
         parent_phase: beta-zr
         child_phase: alpha-zr
-        parent_directions:
-          - direction: [1, 1, 0]
-          - direction: [1, -1, 1]
-          - plane: [1, 1, 0]
-        child_directions:
-          - direction: [0, 0, 1]
-          - direction: [1, 0, 0]
-          - plane: [0, 0, 0, 1]
+        or_document: {or_doc}
+        or_name: burgers-zr
     tem:
       zone_axis: [1, 1, 0]
       voltage: 200.0
@@ -40,6 +42,44 @@ CONFIG_YAML = textwrap.dedent(
 
 @pytest.fixture()
 def sample_config(tmp_path: Path) -> Path:
+    or_doc = Path(__file__).resolve().parents[1] / "examples" / "or_zr.yaml"
+    config_yaml = CONFIG_TEMPLATE.format(or_doc=or_doc.as_posix())
     path = tmp_path / "config.yaml"
-    path.write_text(CONFIG_YAML)
+    path.write_text(config_yaml)
     return path
+
+
+@pytest.fixture()
+def orientation_bundle(sample_config: Path):
+    cfg = load_config(sample_config)
+    registry = Path(__file__).resolve().parents[1] / "data" / "registry.yaml"
+    loader = StructureLoader.from_yaml(registry)
+    phases = build_phases(cfg, loader)
+    relation, variants, spec = build_orientation_relation(cfg, phases, "burgers-zr")
+    q_values = []
+    intensities = []
+    labels = []
+    hkls = []
+    for index, variant in enumerate(variants):
+        base_q = 0.9 + 0.12 * index
+        q_values.extend([base_q, base_q + 0.02])
+        intensities.extend([0.3 + 0.1 * index, 0.32 + 0.1 * index])
+        labels.extend([variant.label, variant.label])
+        hkls.extend([(1, 0, 0), (1, 1, 0)])
+    pattern = CompositePattern(
+        identifier="test-pattern",
+        variants=tuple(variants),
+        q_values=np.array(q_values, dtype=float),
+        intensities=np.array(intensities, dtype=float),
+        variant_labels=np.array(labels, dtype="U32"),
+        hkls=tuple(hkls),
+        metadata={"zone_axis": cfg.tem.zone_axis},
+    )
+    settings = PlotSettings.from_mapping({})
+    palette = MarkerPalette(
+        shapes=settings.markers.get("shapes", ("o",)),
+        colors=settings.markers.get("colors", ("#1f77b4",)),
+    )
+    manager = VariantManager(variants, palette=palette)
+    figure = CrystallographicFigure(pattern, manager, settings=settings, backend="Agg")
+    return cfg, relation, variants, spec, manager, pattern, figure

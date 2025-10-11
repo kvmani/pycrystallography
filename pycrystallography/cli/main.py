@@ -20,11 +20,15 @@ config_app = typer.Typer(help="Configuration helpers")
 composite_app = typer.Typer(help="Composite diffraction workflows")
 powder_app = typer.Typer(help="Powder diffraction utilities")
 orientation_app = typer.Typer(help="Orientation relationship utilities")
+plot_app = typer.Typer(help="Plotting helpers")
+report_app = typer.Typer(help="Reporting helpers")
 
 app.add_typer(config_app, name="config")
 app.add_typer(composite_app, name="composite")
 app.add_typer(powder_app, name="powder")
 app.add_typer(orientation_app, name="or")
+app.add_typer(plot_app, name="plot")
+app.add_typer(report_app, name="report")
 
 
 def _parse_indices_option(values: Sequence[str], kind: str) -> List[IndexSpec]:
@@ -88,14 +92,15 @@ def composite_tem(
     calculator: Optional[str] = typer.Option(None, "--calculator", help="Override calculator slug"),
 ) -> None:
     cfg = resolve_config(config_path=config)
-    image_path = run_tem_composite(
+    artifacts = run_tem_composite(
         cfg,
         relation_name=relation,
         output=out,
         dry_run=dry_run,
         calculator_slug=calculator,
     )
-    typer.echo(f"Composite pattern ready at {image_path}")
+    if not dry_run:
+        typer.echo(f"Composite pattern ready at {artifacts.image_path}")
 
 
 @powder_app.command("xrd")
@@ -126,6 +131,52 @@ def powder_xrd(
         typer.echo(f"Artifacts saved to: {result.csv_path.parent}")
 
 
+@plot_app.command("composite")
+def plot_composite(
+    relation: str = typer.Option(..., "--relation", help="Orientation relation name"),
+    config: Optional[Path] = typer.Option(None, "--config", exists=True),
+    out: Path = typer.Option(Path("output"), "--out", help="Output directory"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Skip writing files"),
+    calculator: Optional[str] = typer.Option(None, "--calculator", help="Override calculator slug"),
+) -> None:
+    cfg = resolve_config(config_path=config)
+    artifacts = run_tem_composite(
+        cfg,
+        relation_name=relation,
+        output=out,
+        dry_run=dry_run,
+        calculator_slug=calculator,
+    )
+    if dry_run:
+        typer.echo("Dry run: no figure written")
+    else:
+        typer.echo(f"Interactive figure saved to {artifacts.image_path}")
+
+
+@report_app.command("phase")
+def report_phase(
+    relation: str = typer.Option(..., "--relation", help="Orientation relation name"),
+    config: Optional[Path] = typer.Option(None, "--config", exists=True),
+    out: Path = typer.Option(Path("output"), "--out", help="Output directory"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Skip writing files"),
+    calculator: Optional[str] = typer.Option(None, "--calculator", help="Override calculator slug"),
+) -> None:
+    cfg = resolve_config(config_path=config)
+    artifacts = run_tem_composite(
+        cfg,
+        relation_name=relation,
+        output=out,
+        dry_run=dry_run,
+        calculator_slug=calculator,
+    )
+    if dry_run:
+        typer.echo("Dry run: report generation skipped")
+    elif artifacts.report_path:
+        typer.echo(f"HTML report available at {artifacts.report_path}")
+    else:
+        typer.echo("No HTML report generated (missing OR metadata)")
+
+
 @orientation_app.command("map")
 def map_or_features(
     relation: str = typer.Option(..., "--relation", help="Orientation relation name"),
@@ -137,7 +188,7 @@ def map_or_features(
     relation_cfg = cfg.find_orientation(relation)
     loader = StructureLoader.from_yaml(DEFAULT_REGISTRY)
     phases = build_phases(cfg, loader)
-    orientation_relation, variants = build_orientation_relation(cfg, phases, relation)
+    orientation_relation, variants, spec = build_orientation_relation(cfg, phases, relation)
     if not variants:
         typer.echo("No child variants were generated for this relation")
         raise typer.Exit(code=1)
@@ -148,6 +199,11 @@ def map_or_features(
         features.extend(_parse_indices_option(plane, "plane"))
     else:
         features = list(relation_cfg.parent_directions)
+        if not features and spec is not None:
+            features = [
+                IndexSpec(kind="direction", indices=spec.uvw_parent),
+                IndexSpec(kind="plane", indices=spec.hkl_parent),
+            ]
 
     if not features:
         typer.echo("No parent features supplied to map")
