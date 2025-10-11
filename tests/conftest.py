@@ -22,11 +22,13 @@ CONFIG_YAML = textwrap.dedent(
         parent_phase: beta-zr
         child_phase: alpha-zr
         parent_directions:
-          - [1, 1, 0]
-          - [1, -1, 1]
+          - direction: [1, 1, 0]
+          - direction: [1, -1, 1]
+          - plane: [1, 1, 0]
         child_directions:
-          - [0, 0, 1]
-          - [1, 0, 0]
+          - direction: [0, 0, 1]
+          - direction: [1, 0, 0]
+          - plane: [0, 0, 0, 1]
     tem:
       zone_axis: [1, 1, 0]
       voltage: 200.0

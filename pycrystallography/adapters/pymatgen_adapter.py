@@ -62,7 +62,7 @@ class DiffractionData:
             symprec=self.symprec,
             voltage=self.voltage,
             beam_direction=axis,  # type: ignore[arg-type]
-            camera_length=int(self.camera_length),
+            camera_length=float(self.camera_length),  # type: ignore[arg-type]
         )
         pattern = calculator.get_pattern(structure)
         d_spacings = np.asarray(pattern["Interplanar Spacing"], dtype=float)
@@ -101,7 +101,7 @@ class DiffractionData:
 
         calculator = XRDCalculator(
             wavelength=wavelength if wavelength is not None else self.wavelength,
-            symprec=self.symprec,
+            symprec=self.symprec,  # type: ignore[arg-type]
             debye_waller_factors=debye_waller_factors,
         )
         pattern = calculator.get_pattern(structure, two_theta_range=two_theta_range)

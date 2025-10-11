@@ -9,20 +9,14 @@ from orix.quaternion.orientation import Orientation
 from orix.quaternion.symmetry import Symmetry, get_point_group
 
 from ..core.models import OrientationRelation, Variant, ensure_variants_unique
-
-
-def _orthonormal_basis(vectors: Sequence[np.ndarray]) -> np.ndarray:
-    first, second = vectors[:2]
-    b1 = first / np.linalg.norm(first)
-    v2 = second - np.dot(second, b1) * b1
-    b2 = v2 / np.linalg.norm(v2)
-    b3 = np.cross(b1, b2)
-    return np.column_stack([b1, b2, b3 / np.linalg.norm(b3)])
+from ..core.indexing import ensure_column_vector
 
 
 @dataclass(slots=True)
 class OrientationFactory:
     """Create :class:`~orix.quaternion.orientation.Orientation` instances."""
+
+    singular_value_tol: float = 1e-8
 
     def from_direction_pairs(
         self,
@@ -31,9 +25,30 @@ class OrientationFactory:
     ) -> Orientation:
         if len(parent_vectors) < 2 or len(child_vectors) < 2:
             raise ValueError("At least two direction pairs are required")
-        parent_basis = _orthonormal_basis(parent_vectors)
-        child_basis = _orthonormal_basis(child_vectors)
-        rotation = parent_basis @ child_basis.T
+        if len(parent_vectors) != len(child_vectors):
+            raise ValueError("Parent and child vector counts must match")
+
+        parent = np.array([ensure_column_vector(v) for v in parent_vectors], dtype=float)
+        child = np.array([ensure_column_vector(v) for v in child_vectors], dtype=float)
+
+        parent_norm = np.linalg.norm(parent, axis=1)
+        child_norm = np.linalg.norm(child, axis=1)
+        if np.any(parent_norm == 0) or np.any(child_norm == 0):
+            raise ValueError("Direction vectors must be non-zero")
+
+        parent_unit = parent / parent_norm[:, None]
+        child_unit = child / child_norm[:, None]
+
+        covariance = child_unit.T @ parent_unit
+        u, singular_values, vt = np.linalg.svd(covariance)
+
+        if np.count_nonzero(singular_values > self.singular_value_tol) < 2:
+            raise ValueError("Direction pairs must span at least two unique directions")
+
+        rotation = vt.T @ u.T
+        if np.linalg.det(rotation) < 0:
+            vt[-1, :] *= -1
+            rotation = vt.T @ u.T
         return Orientation.from_matrix(rotation)
 
 

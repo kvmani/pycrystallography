@@ -3,26 +3,18 @@ from __future__ import annotations
 
 from pathlib import Path
 import csv
-from typing import List, Sequence
+from typing import List
 
-import numpy as np
 import typer
 from orix.quaternion.orientation import Orientation
 
 from ..adapters.orix_adapter import OrientationFactory, VariantGenerator
 from ..adapters.pymatgen_adapter import StructureLoader
 from ..config import AppConfig
+from ..core.indexing import indices_to_cartesian
 from ..core.models import OrientationRelation, Phase, Variant
 from ..plotting.composite import plot_tem_pattern
 DEFAULT_REGISTRY = Path(__file__).resolve().parents[2] / "data" / "registry.yaml"
-
-
-def _direction_to_cart(structure, direction: Sequence[float]) -> np.ndarray:
-    vec = np.asarray(direction, dtype=float)
-    if vec.size == 4:
-        u, v, t, w = vec
-        vec = np.array([(2 * u - v) / 3, (2 * v - u) / 3, w], dtype=float)
-    return structure.lattice.matrix.T @ vec
 
 
 def _build_phase(loader: StructureLoader, cfg) -> Phase:
@@ -30,7 +22,14 @@ def _build_phase(loader: StructureLoader, cfg) -> Phase:
     return Phase(name=cfg.name, structure=structure, metadata=cfg.metadata)
 
 
-def _build_orientation_relation(
+def build_phases(config: AppConfig, loader: StructureLoader | None = None) -> dict[str, Phase]:
+    """Materialise all phases defined in the configuration."""
+
+    loader = loader or StructureLoader.from_yaml(DEFAULT_REGISTRY)
+    return {cfg.name: _build_phase(loader, cfg) for cfg in config.phases}
+
+
+def build_orientation_relation(
     config: AppConfig,
     phases: dict[str, Phase],
     relation_name: str,
@@ -40,12 +39,16 @@ def _build_orientation_relation(
     child_phase = phases[relation_cfg.child_phase]
     factory = OrientationFactory()
     parent_vectors = [
-        _direction_to_cart(parent_phase.structure, direction)
-        for direction in relation_cfg.parent_directions
+        indices_to_cartesian(
+            parent_phase.structure, kind=spec.kind, indices=spec.indices
+        )
+        for spec in relation_cfg.parent_directions
     ]
     child_vectors = [
-        _direction_to_cart(child_phase.structure, direction)
-        for direction in relation_cfg.child_directions
+        indices_to_cartesian(
+            child_phase.structure, kind=spec.kind, indices=spec.indices
+        )
+        for spec in relation_cfg.child_directions
     ]
     orientation = factory.from_direction_pairs(parent_vectors, child_vectors)
     orientation_relation = OrientationRelation(
@@ -71,8 +74,8 @@ def run_tem_composite(
     calculator_slug: str | None = None,
 ) -> Path:
     loader = StructureLoader.from_yaml(DEFAULT_REGISTRY)
-    phases = {cfg.name: _build_phase(loader, cfg) for cfg in config.phases}
-    orientation_relation, variants = _build_orientation_relation(config, phases, relation_name)
+    phases = build_phases(config, loader)
+    orientation_relation, variants = build_orientation_relation(config, phases, relation_name)
 
     parent_relation = OrientationRelation(
         name=f"{orientation_relation.name}-parent",
