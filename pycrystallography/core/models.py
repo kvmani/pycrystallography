@@ -103,6 +103,49 @@ class CompositePattern:
         return d_values
 
 
+@dataclass(slots=True)
+class StereographicPattern:
+    """Container describing poles for stereographic projection plots."""
+
+    identifier: str
+    variants: Sequence[Variant]
+    polar_angles: np.ndarray
+    variant_labels: np.ndarray
+    hemispheres: np.ndarray
+    labels: Sequence[str]
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        self.polar_angles = np.asarray(self.polar_angles, dtype=float)
+        if self.polar_angles.ndim != 2 or self.polar_angles.shape[1] != 2:
+            raise ValueError("polar_angles must be an (N, 2) array of (theta, phi)")
+        count = int(self.polar_angles.shape[0])
+        self.variant_labels = np.asarray(self.variant_labels, dtype=str)
+        self.hemispheres = np.asarray(self.hemispheres, dtype=bool)
+        if self.variant_labels.shape[0] != count or self.hemispheres.shape[0] != count:
+            raise ValueError("variant_labels and hemispheres must match polar_angles length")
+        if len(self.labels) != count:
+            raise ValueError("labels must match polar_angles length")
+        self.labels = tuple(str(label) for label in self.labels)
+        self.metadata = dict(self.metadata)
+
+    @property
+    def theta(self) -> np.ndarray:
+        return self.polar_angles[:, 0]
+
+    @property
+    def phi(self) -> np.ndarray:
+        return self.polar_angles[:, 1]
+
+    def cartesian_coordinates(self) -> np.ndarray:
+        """Return projected X/Y coordinates for each pole."""
+
+        radii = np.tan(self.theta / 2.0)
+        x = radii * np.cos(self.phi)
+        y = radii * np.sin(self.phi)
+        return np.column_stack((x, y))
+
+
 @dataclass(frozen=True, slots=True)
 class PowderPattern:
     """Powder X-ray diffraction pattern for a single phase."""

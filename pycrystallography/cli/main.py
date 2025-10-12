@@ -1,10 +1,12 @@
 """Typer-based command line interface for pycrystallography."""
 from __future__ import annotations
 
+import math
 import re
 from pathlib import Path
 from typing import List, Optional, Sequence
 
+import numpy as np
 import typer
 
 from .. import __version__
@@ -12,6 +14,9 @@ from .._logging import configure_logging
 from ..config import IndexSpec, resolve_config
 from ..adapters.pymatgen_adapter import StructureLoader
 from ..analysis.orientation_mapping import map_parent_features_to_child_variants
+from ..core.models import StereographicPattern
+from ..core.variant_manager import MarkerPalette, VariantManager
+from ..plotting import PlotSettings, StereographicFigure
 from .composite import DEFAULT_REGISTRY, build_orientation_relation, build_phases, run_tem_composite
 from .powder import run_powder_xrd
 
@@ -64,6 +69,14 @@ def _format_spec(spec: IndexSpec) -> str:
     if spec.label:
         return f"{spec.label} {descriptor}"
     return descriptor
+
+
+def _load_plot_settings(config) -> PlotSettings:
+    config_dir = Path(getattr(config, "_config_dir", Path.cwd()))
+    settings_path = config_dir / "configs" / "plot_settings.yaml"
+    if not settings_path.exists():
+        settings_path = Path(__file__).resolve().parents[2] / "configs" / "plot_settings.yaml"
+    return PlotSettings.from_yaml(settings_path)
 
 
 @app.callback()
@@ -151,6 +164,74 @@ def plot_composite(
         typer.echo("Dry run: no figure written")
     else:
         typer.echo(f"Interactive figure saved to {artifacts.image_path}")
+
+
+@plot_app.command("stereographic")
+def plot_stereographic(
+    relation: str = typer.Option(..., "--relation", help="Orientation relation name"),
+    config: Optional[Path] = typer.Option(None, "--config", exists=True),
+    show: bool = typer.Option(True, "--show/--no-show", help="Display the interactive figure"),
+    backend: Optional[str] = typer.Option(None, "--backend", help="Matplotlib backend override"),
+) -> None:
+    cfg = resolve_config(config_path=config)
+    loader = StructureLoader.from_yaml(DEFAULT_REGISTRY)
+    phases = build_phases(cfg, loader)
+    relation_obj, variants, spec = build_orientation_relation(cfg, phases, relation)
+    relation_cfg = cfg.find_orientation(relation)
+    features: List[IndexSpec] = list(relation_cfg.parent_directions)
+    if not features and spec is not None:
+        features = [
+            IndexSpec(kind="direction", indices=tuple(float(v) for v in spec.uvw_parent), label="parent ⟨uvw⟩"),
+            IndexSpec(kind="plane", indices=tuple(float(v) for v in spec.hkl_parent), label="parent (hkl)"),
+        ]
+    if not features:
+        features = [
+            IndexSpec(kind="direction", indices=(1, 0, 0), label="[100]"),
+            IndexSpec(kind="direction", indices=(0, 1, 0), label="[010]"),
+            IndexSpec(kind="direction", indices=(0, 0, 1), label="[001]"),
+        ]
+    variant_mappings = map_parent_features_to_child_variants(relation_obj, variants, features)
+    polar: List[tuple[float, float]] = []
+    variant_labels: List[str] = []
+    hemispheres: List[bool] = []
+    labels: List[str] = []
+    for mapping in variant_mappings:
+        for feature in mapping.mappings:
+            vector = feature.child_cartesian
+            hemisphere = bool(vector[2] >= 0)
+            hemispheres.append(hemisphere)
+            z_clamped = max(min(abs(float(vector[2])), 1.0), -1.0)
+            theta = math.acos(z_clamped)
+            phi = math.atan2(float(vector[1]), float(vector[0]))
+            polar.append((theta, phi))
+            variant_labels.append(mapping.variant.label)
+            labels.append(feature.spec.label or _format_spec(feature.spec))
+    if not polar:
+        typer.echo("No stereographic poles were generated", err=True)
+        raise typer.Exit(code=1)
+    pattern = StereographicPattern(
+        identifier=f"{relation_obj.name} stereographic",
+        variants=tuple(variants),
+        polar_angles=np.array(polar, dtype=float),
+        variant_labels=np.array(variant_labels, dtype="U32"),
+        hemispheres=np.array(hemispheres, dtype=bool),
+        labels=tuple(labels),
+        metadata={"features": [feature.model_dump() for feature in features]},
+    )
+    settings = _load_plot_settings(cfg)
+    palette = MarkerPalette(
+        shapes=settings.markers.get("shapes", ("o",)),
+        colors=settings.markers.get("colors", ("#1f77b4",)),
+        fallback_shape=settings.markers.get("fallback_shape", "o"),
+        fallback_color=settings.markers.get("fallback_color", "#444444"),
+    )
+    manager = VariantManager(pattern.variants, palette=palette)
+    figure = StereographicFigure(pattern, manager, settings=settings, backend=backend)
+    typer.echo(f"Prepared stereographic pattern with {pattern.polar_angles.shape[0]} poles")
+    if show:
+        figure.show()
+    else:
+        typer.echo("Display suppressed (--no-show)")
 
 
 @report_app.command("phase")

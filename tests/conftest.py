@@ -10,9 +10,9 @@ import numpy as np
 from pycrystallography.adapters.pymatgen_adapter import StructureLoader
 from pycrystallography.cli.composite import build_orientation_relation, build_phases
 from pycrystallography.config import load_config
-from pycrystallography.core.models import CompositePattern
+from pycrystallography.core.models import CompositePattern, StereographicPattern
 from pycrystallography.core.variant_manager import MarkerPalette, VariantManager
-from pycrystallography.plotting import CrystallographicFigure, PlotSettings
+from pycrystallography.plotting import CrystallographicFigure, PlotSettings, StereographicFigure
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -83,3 +83,41 @@ def orientation_bundle(sample_config: Path):
     manager = VariantManager(variants, palette=palette)
     figure = CrystallographicFigure(pattern, manager, settings=settings, backend="Agg")
     return cfg, relation, variants, spec, manager, pattern, figure
+
+
+@pytest.fixture()
+def stereographic_bundle(orientation_bundle):
+    _cfg, relation, variants, _spec, _manager, _pattern, _figure = orientation_bundle
+    polar_angles = np.array(
+        [
+            [np.deg2rad(20.0), 0.0],
+            [np.deg2rad(35.0), np.pi / 2.0],
+            [np.deg2rad(55.0), np.pi],
+        ],
+        dtype=float,
+    )
+    hemispheres = np.array([True, False, True], dtype=bool)
+    labels = ("[100]", "[010]", "[001]")
+    variant_labels = np.array(
+        [variants[0].label, variants[0].label, variants[1].label],
+        dtype="U32",
+    )
+    pattern = StereographicPattern(
+        identifier=f"{relation.name}-stereo",
+        variants=tuple(variants),
+        polar_angles=polar_angles,
+        variant_labels=variant_labels,
+        hemispheres=hemispheres,
+        labels=labels,
+        metadata={"fixture": True},
+    )
+    settings = PlotSettings.from_mapping({})
+    palette = MarkerPalette(
+        shapes=settings.markers.get("shapes", ("o",)),
+        colors=settings.markers.get("colors", ("#1f77b4",)),
+        fallback_shape=settings.markers.get("fallback_shape", "o"),
+        fallback_color=settings.markers.get("fallback_color", "#444444"),
+    )
+    manager = VariantManager(variants, palette=palette)
+    figure = StereographicFigure(pattern, manager, settings=settings, backend="Agg")
+    return variants, pattern, figure
