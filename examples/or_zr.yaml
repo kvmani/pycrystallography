@@ -1,0 +1,27 @@
+phase: alpha-zr
+cif: ../data/structureData/Zr-Alpha.cif
+space_group: 194
+orientation_relations:
+  - name: burgers-zr
+    description: Burgers orientation relation between β-Zr and α-Zr
+    hkl_parent: [1, 1, 0]
+    uvw_parent: [1, -1, 1]
+    hkl_product: [0, 0, 0, 1]
+    uvw_product: [1, -1, 0, 0]
+    Euler_parent: [0.0, 45.0, 0.0]
+    Euler_product: [0.0, 0.0, 0.0]
+    variants:
+      symmetry:
+        parent: 229
+        child: 194
+      defaults:
+        visible: true
+    plot:
+      marker_cycle: ["o", "s", "^", "v"]
+      color_cycle: ["#1f77b4", "#d62728", "#2ca02c", "#ff7f0e"]
+      visibility:
+        burgers-zr-v01: true
+        burgers-zr-v02: true
+plot:
+  marker_cycle: ["o", "s", "^", "v"]
+  color_cycle: ["#1f77b4", "#d62728", "#2ca02c", "#ff7f0e"]

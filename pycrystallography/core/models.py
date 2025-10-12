@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, Iterable, Mapping, MutableMapping, Optional, Sequence
+from typing import Any, Dict, Iterable, Mapping, MutableMapping, Optional, Sequence, Tuple
 
 import numpy as np
 from orix.quaternion.orientation import Orientation
@@ -56,16 +56,31 @@ class CompositePattern:
     q_values: np.ndarray
     intensities: np.ndarray
     variant_labels: np.ndarray
+    hkls: Optional[Sequence[Tuple[int, ...]]] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
 
     def to_table(self) -> np.ndarray:
         """Return a structured array suitable for saving to CSV/NPZ."""
 
-        dtype = [("q", float), ("intensity", float), ("variant", "U32")]
-        return np.array(
-            list(zip(self.q_values, self.intensities, self.variant_labels)),
-            dtype=dtype,
-        )
+        dtype = [("g", float), ("intensity", float), ("variant", "U32"), ("d_spacing", float), ("hkl", "U32")]
+        rows = []
+        d_spacings = self.d_spacings
+        for idx, label in enumerate(self.variant_labels):
+            hkl = ""
+            if self.hkls is not None and idx < len(self.hkls):
+                hkl_tuple = self.hkls[idx]
+                if hkl_tuple:
+                    hkl = "(" + " ".join(str(part) for part in hkl_tuple) + ")"
+            rows.append(
+                (
+                    float(self.q_values[idx]),
+                    float(self.intensities[idx]),
+                    str(label),
+                    float(d_spacings[idx]),
+                    hkl,
+                )
+            )
+        return np.array(rows, dtype=dtype)
 
     def copy_with(self, *, metadata: Optional[Mapping[str, Any]] = None) -> "CompositePattern":
         meta = dict(self.metadata)
@@ -77,8 +92,15 @@ class CompositePattern:
             q_values=np.array(self.q_values, copy=True),
             intensities=np.array(self.intensities, copy=True),
             variant_labels=np.array(self.variant_labels, copy=True),
+            hkls=tuple(self.hkls) if self.hkls is not None else None,
             metadata=meta,
         )
+
+    @property
+    def d_spacings(self) -> np.ndarray:
+        with np.errstate(divide="ignore"):
+            d_values = np.where(self.q_values != 0, 1.0 / self.q_values, 0.0)
+        return d_values
 
 
 @dataclass(frozen=True, slots=True)

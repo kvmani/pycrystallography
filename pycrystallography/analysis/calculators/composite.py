@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Mapping, Sequence
+from typing import Mapping, Sequence, Tuple
 
 import numpy as np
 from pymatgen.core.operations import SymmOp
@@ -56,34 +56,40 @@ class CompositeTEMCalculator(DiffractionCalculator):
         q_values: list[np.ndarray] = []
         intensities: list[np.ndarray] = []
         labels: list[str] = []
+        hkls: list[Tuple[int, ...]] = []
         for variant in variants:
             rotated = self._rotate_structure(
                 variant.orientation_relation.child_phase.structure, variant.orientation
             )
-            g_values, i_values, _hkls = data.tem_pattern(
+            g_values, i_values, variant_hkls = data.tem_pattern(
                 rotated, zone_axis, intensity_threshold=intensity_threshold
             )
             q_values.append(g_values)
             intensities.append(i_values)
             labels.extend([variant.label] * len(g_values))
+            hkls.extend([tuple(int(v) for v in hkl) for hkl in variant_hkls])
         if q_values:
             q_concat = np.concatenate(q_values)
             intensity_concat = np.concatenate(intensities)
             labels_array = np.array(labels, dtype="U32")
+            hkls_array = np.array(hkls, dtype=object)
             order = np.argsort(q_concat)
             q_concat = q_concat[order]
             intensity_concat = intensity_concat[order]
             labels_array = labels_array[order]
+            hkls_ordered = [tuple(hkls_array[idx]) if hkls_array.size else tuple() for idx in order]
         else:
             q_concat = np.array([])
             intensity_concat = np.array([])
             labels_array = np.array([], dtype="U32")
+            hkls_ordered = []
         return CompositePattern(
             identifier=str(metadata.get("identifier", "composite")),
             variants=tuple(variants),
             q_values=q_concat,
             intensities=intensity_concat,
             variant_labels=labels_array,
+            hkls=tuple(hkls_ordered),
             metadata=metadata,
         )
 

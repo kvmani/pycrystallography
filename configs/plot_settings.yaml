@@ -1,0 +1,47 @@
+# Default plotting settings for composite diffraction figures
+figure:
+  dpi: 120
+  figsize: [8.0, 6.0]
+  facecolor: "#ffffff"
+scatter:
+  size: 40
+  alpha: 0.9
+  linewidth: 0.6
+  edgecolor: "#222222"
+markers:
+  shapes: ["o", "s", "^", "v", "D", "P", "X", "*", "h", "<", ">", "p"]
+  colors: [
+    "#1f77b4",
+    "#d62728",
+    "#2ca02c",
+    "#ff7f0e",
+    "#9467bd",
+    "#8c564b",
+    "#17becf",
+    "#e377c2",
+    "#bcbd22",
+    "#7f7f7f",
+    "#aec7e8",
+    "#ff9896"
+  ]
+  fallback_shape: "o"
+  fallback_color: "#444444"
+annotations:
+  max_labels: 50
+  min_distance: 12.0
+  offset_radius: 10.0
+  polar_steps: 24
+  font_size: 9
+  box_facecolor: "#fffff8"
+  box_edgecolor: "#666666"
+  box_alpha: 0.9
+tooltip:
+  background: "#f8f9fa"
+  border: "#1f2933"
+  font_size: 9
+  fields: ["variant", "hkl", "d_spacing", "g", "intensity"]
+widgets:
+  checkbox_columns: 2
+  width: 0.18
+  height: 0.25
+  anchor: [0.82, 0.6]

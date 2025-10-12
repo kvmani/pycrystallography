@@ -1,0 +1,18 @@
+phases:
+  - name: beta-zr
+    structure: zr_beta
+    space_group: 229
+  - name: alpha-zr
+    structure: zr_alpha
+    space_group: 194
+orientation_relations:
+  - name: burgers-zr
+    parent_phase: beta-zr
+    child_phase: alpha-zr
+    or_document: or_zr.yaml
+    or_name: burgers-zr
+tem:
+  zone_axis: [1, 1, 0]
+  voltage: 200.0
+  camera_length: 160.0
+  intensity_threshold: 0.001

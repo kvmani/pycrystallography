@@ -65,4 +65,4 @@ def test_cli_or_map(sample_config):
     )
     assert result.exit_code == 0
     assert "Variant burgers-zr-v01" in result.stdout
-    assert "Direction [1 1 0] -> [0 0 1]" in result.stdout
+    assert "Direction [1 -1 1] -> [1 -1 0]" in result.stdout

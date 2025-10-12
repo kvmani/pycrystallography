@@ -1,0 +1,114 @@
+%YAML 1.2
+---
+$title: Orientation relation document
+$type: object
+$schema: "http://json-schema.org/draft-07/schema#"
+required: [phase, cif, orientation_relations]
+properties:
+  phase:
+    type: string
+    description: Phase identifier (matches configuration)
+  cif:
+    type: string
+    description: Relative or absolute path to the CIF defining the crystal structure
+  space_group:
+    type: integer
+    description: Optional space group number to validate against the CIF contents
+  lattice_parameters:
+    type: object
+    additionalProperties: false
+    properties:
+      a: {type: number}
+      b: {type: number}
+      c: {type: number}
+      alpha: {type: number}
+      beta: {type: number}
+      gamma: {type: number}
+  orientation_relations:
+    type: array
+    minItems: 1
+    items:
+      type: object
+      required: [name, hkl_parent, uvw_parent, hkl_product, uvw_product]
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          description: Orientation relation label (must be unique per document)
+        description:
+          type: string
+        hkl_parent:
+          type: array
+          items: {type: integer}
+          minItems: 3
+          maxItems: 4
+        uvw_parent:
+          type: array
+          items: {type: integer}
+          minItems: 3
+          maxItems: 4
+        hkl_product:
+          type: array
+          items: {type: integer}
+          minItems: 3
+          maxItems: 4
+        uvw_product:
+          type: array
+          items: {type: integer}
+          minItems: 3
+          maxItems: 4
+        Euler_parent:
+          type: array
+          description: Parent phase Euler angles (Bunge ZXZ, degrees)
+          items: {type: number}
+          minItems: 3
+          maxItems: 3
+        Euler_product:
+          type: array
+          description: Product phase Euler angles (Bunge ZXZ, degrees)
+          items: {type: number}
+          minItems: 3
+          maxItems: 3
+        variants:
+          type: object
+          additionalProperties: false
+          properties:
+            symmetry:
+              type: object
+              additionalProperties: false
+              properties:
+                parent: {type: integer}
+                child: {type: integer}
+            defaults:
+              type: object
+              additionalProperties: false
+              properties:
+                visible: {type: boolean}
+                marker: {type: string}
+                color: {type: string}
+        plot:
+          type: object
+          additionalProperties: false
+          properties:
+            marker_cycle:
+              type: array
+              items: {type: string}
+            color_cycle:
+              type: array
+              items: {type: string}
+            visibility:
+              type: object
+              additionalProperties: {type: boolean}
+  plot:
+    type: object
+    additionalProperties: false
+    properties:
+      marker_cycle:
+        type: array
+        items: {type: string}
+      color_cycle:
+        type: array
+        items: {type: string}
+      visibility:
+        type: object
+        additionalProperties: {type: boolean}
