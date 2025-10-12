@@ -66,3 +66,22 @@ def test_cli_or_map(sample_config):
     assert result.exit_code == 0
     assert "Variant burgers-zr-v01" in result.stdout
     assert "Direction [1 -1 1] -> [1 -1 0]" in result.stdout
+
+
+def test_cli_plot_stereographic(sample_config):
+    runner = CliRunner()
+    result = runner.invoke(
+        app,
+        [
+            "plot",
+            "stereographic",
+            "--relation",
+            "burgers-zr",
+            "--config",
+            str(sample_config),
+            "--no-show",
+        ],
+    )
+    assert result.exit_code == 0
+    assert "Prepared stereographic pattern" in result.stdout
+    assert "Display suppressed" in result.stdout
