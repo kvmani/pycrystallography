@@ -26,6 +26,23 @@ markers:
   ]
   fallback_shape: "o"
   fallback_color: "#444444"
+  toggles:
+    primary:
+      enabled: false
+      marker: "o"
+      color: "#1f77b4"
+      flag: "is_primary"
+    absent:
+      enabled: false
+      marker: "X"
+      color: "#d62728"
+      flag: "is_absent"
+    kikuchi:
+      enabled: false
+      marker: "+"
+      color: "#17becf"
+      flag: "is_kikuchi"
+  variants: {}
 annotations:
   max_labels: 50
   min_distance: 12.0
