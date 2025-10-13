@@ -350,6 +350,8 @@ class CrystallographicFigure:
             self._rotation_textbox.eventson = False
             self._rotation_textbox.set_val(f"{self._rotation_angle:.3f}")
             self._rotation_textbox.eventson = True
+        self.ax.relim()
+        self.ax.autoscale_view()
         self.figure.canvas.draw_idle()
 
     def _update_point_records(
