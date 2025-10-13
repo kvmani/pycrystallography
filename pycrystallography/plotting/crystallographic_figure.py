@@ -4,14 +4,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 from io import BytesIO
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.collections import PathCollection
 from matplotlib.figure import Figure
-from matplotlib.widgets import CheckButtons
+from matplotlib.widgets import CheckButtons, TextBox
 
 from ..core.models import CompositePattern
 from ..core.variant_manager import VariantManager, VariantState
@@ -106,6 +106,26 @@ class CrystallographicFigure:
         self._scatter_by_label: Dict[str, PathCollection] = {}
         self._point_records: Dict[str, Dict[str, object]] = {}
         self._check_buttons: Optional[CheckButtons] = None
+        self._rotation_textbox: Optional[TextBox] = None
+        self._rotation_angle: float = 0.0
+        self._rotation_factory: Optional[Callable[[float], CompositePattern]] = (
+            self._resolve_rotation_factory(pattern.metadata)
+        )
+        self._base_rotation_vectors: Optional[np.ndarray] = self._extract_rotation_vectors(
+            pattern.metadata
+        )
+        if (
+            self._base_rotation_vectors is not None
+            and self._base_rotation_vectors.shape[0] != len(self.pattern.q_values)
+        ):
+            raise ValueError(
+                "rotation_vectors must have the same number of rows as pattern points"
+            )
+        self._base_rotation_norms: Optional[np.ndarray] = None
+        if self._base_rotation_vectors is not None:
+            self._base_rotation_norms = np.linalg.norm(
+                self._base_rotation_vectors, axis=1
+            )
         self._legend = None
         self._prepare_points()
         self._init_widgets()
@@ -173,6 +193,17 @@ class CrystallographicFigure:
         self._check_buttons = CheckButtons(checkbox_ax, labels, states)
         self._check_buttons.on_clicked(self._handle_toggle)
         checkbox_ax.set_title("Variants")
+        rotation_cfg = widget_cfg.get("rotation", {})
+        rot_anchor = rotation_cfg.get(
+            "anchor", (anchor[0], min(anchor[1] + height + 0.02, 0.95))
+        )
+        rot_width = float(rotation_cfg.get("width", width))
+        rot_height = float(rotation_cfg.get("height", 0.05))
+        rotation_ax = self.figure.add_axes([rot_anchor[0], rot_anchor[1], rot_width, rot_height])
+        label = str(rotation_cfg.get("label", "Rotation (°)"))
+        initial = str(rotation_cfg.get("initial", f"{self._rotation_angle:.1f}"))
+        self._rotation_textbox = TextBox(rotation_ax, label, initial=initial)
+        self._rotation_textbox.on_submit(self._handle_rotation_submit)
 
     def _connect_events(self) -> None:
         self.figure.canvas.mpl_connect("motion_notify_event", self._on_hover)
@@ -187,6 +218,17 @@ class CrystallographicFigure:
                 if handle.get_label() == label:
                     handle.set_alpha(1.0 if visible else 0.2)
         self.figure.canvas.draw_idle()
+
+    def _handle_rotation_submit(self, text: str) -> None:
+        try:
+            angle = float(text)
+        except (TypeError, ValueError):
+            if self._rotation_textbox is not None:
+                self._rotation_textbox.eventson = False
+                self._rotation_textbox.set_val(f"{self._rotation_angle:.3f}")
+                self._rotation_textbox.eventson = True
+            return
+        self._apply_rotation(angle)
 
     def _nearest_point(self, event) -> Optional[HoverPayload]:  # type: ignore[no-untyped-def]
         if event.inaxes != self.ax or event.xdata is None or event.ydata is None:
@@ -262,6 +304,120 @@ class CrystallographicFigure:
         dpi = int(self.settings.figure.get("dpi", 120))
         self.figure.savefig(buffer, format=format, dpi=dpi, bbox_inches="tight")
         return buffer.getvalue()
+
+    def _apply_rotation(self, angle: float) -> None:
+        if np.isclose(angle, self._rotation_angle):
+            return
+        magnitudes: Optional[np.ndarray] = None
+        if self._rotation_factory is not None:
+            rotated = self._rotation_factory(angle)
+            if not isinstance(rotated, CompositePattern):
+                raise TypeError("Rotation factory must return a CompositePattern")
+            self.pattern = rotated
+            self._base_rotation_vectors = self._extract_rotation_vectors(rotated.metadata)
+            if self._base_rotation_vectors is not None:
+                self._base_rotation_norms = np.linalg.norm(
+                    self._base_rotation_vectors, axis=1
+                )
+            else:
+                self._base_rotation_norms = None
+            q_values = np.asarray(rotated.q_values, dtype=float)
+            intensities = np.asarray(rotated.intensities, dtype=float)
+            hkls = rotated.hkls
+            variant_labels = np.asarray(rotated.variant_labels)
+        else:
+            q_values = self._rotated_q_values(angle)
+            if q_values is None:
+                if self._rotation_textbox is not None:
+                    self._rotation_textbox.eventson = False
+                    self._rotation_textbox.set_val(f"{self._rotation_angle:.3f}")
+                    self._rotation_textbox.eventson = True
+                return
+            intensities = np.asarray(self.pattern.intensities, dtype=float)
+            hkls = self.pattern.hkls
+            variant_labels = np.asarray(self.pattern.variant_labels)
+            self.pattern.q_values = q_values
+            magnitudes = self._base_rotation_norms
+        self._update_point_records(
+            q_values,
+            intensities,
+            hkls,
+            variant_labels,
+            magnitudes=magnitudes,
+        )
+        self._rotation_angle = angle
+        if self._rotation_textbox is not None:
+            self._rotation_textbox.eventson = False
+            self._rotation_textbox.set_val(f"{self._rotation_angle:.3f}")
+            self._rotation_textbox.eventson = True
+        self.ax.relim()
+        self.ax.autoscale_view()
+        self.figure.canvas.draw_idle()
+
+    def _update_point_records(
+        self,
+        q_values: np.ndarray,
+        intensities: np.ndarray,
+        hkls: Optional[Sequence[Tuple[int, ...]]],
+        variant_labels: np.ndarray,
+        *,
+        magnitudes: Optional[np.ndarray] = None,
+    ) -> None:
+        if magnitudes is not None:
+            d_spacings = np.zeros_like(magnitudes, dtype=float)
+            mask = magnitudes != 0
+            d_spacings[mask] = 1.0 / magnitudes[mask]
+        else:
+            absolute_q = np.abs(q_values)
+            d_spacings = np.zeros_like(absolute_q, dtype=float)
+            mask = absolute_q != 0
+            d_spacings[mask] = 1.0 / absolute_q[mask]
+        hkls_list: Optional[List[Tuple[int, ...]]] = None
+        if hkls is not None:
+            hkls_list = [tuple(hkl) for hkl in hkls]
+        for label, record in self._point_records.items():
+            indices = np.nonzero(variant_labels == label)[0]
+            record["indices"] = indices
+            record["g"] = q_values[indices]
+            record["intensity"] = intensities[indices]
+            record["d"] = d_spacings[indices]
+            if hkls_list is not None:
+                record["hkls"] = [hkls_list[idx] for idx in indices]
+            artist: PathCollection = record["artist"]  # type: ignore[assignment]
+            offsets = np.column_stack((record["g"], record["intensity"]))
+            artist.set_offsets(offsets)
+
+    def _rotated_q_values(self, angle: float) -> Optional[np.ndarray]:
+        if self._base_rotation_vectors is None:
+            return None
+        vectors = self._base_rotation_vectors
+        if vectors.ndim != 2 or vectors.shape[1] < 2:
+            return None
+        radians = np.deg2rad(angle)
+        rotation = np.array(
+            [[np.cos(radians), -np.sin(radians)], [np.sin(radians), np.cos(radians)]]
+        )
+        rotated_xy = vectors[:, :2] @ rotation.T
+        return rotated_xy[:, 0]
+
+    @staticmethod
+    def _resolve_rotation_factory(
+        metadata: Mapping[str, object]
+    ) -> Optional[Callable[[float], CompositePattern]]:
+        factory = metadata.get("rotation_factory") if isinstance(metadata, Mapping) else None
+        return factory if callable(factory) else None
+
+    @staticmethod
+    def _extract_rotation_vectors(metadata: Mapping[str, object]) -> Optional[np.ndarray]:
+        if not isinstance(metadata, Mapping):
+            return None
+        vectors = metadata.get("rotation_vectors")
+        if vectors is None:
+            return None
+        array = np.asarray(vectors, dtype=float)
+        if array.ndim != 2:
+            raise ValueError("rotation_vectors must be a 2D array")
+        return np.array(array, copy=True)
 
 
 __all__ = ["CrystallographicFigure"]

@@ -66,14 +66,22 @@ def orientation_bundle(sample_config: Path):
         intensities.extend([0.3 + 0.1 * index, 0.32 + 0.1 * index])
         labels.extend([variant.label, variant.label])
         hkls.extend([(1, 0, 0), (1, 1, 0)])
+    q_array = np.array(q_values, dtype=float)
+    intensity_array = np.array(intensities, dtype=float)
+    label_array = np.array(labels, dtype="U32")
+    rotation_vectors = np.column_stack((q_array, np.linspace(0.05, 0.05 * len(q_array), len(q_array))))
+    metadata = {
+        "zone_axis": cfg.tem.zone_axis,
+        "rotation_vectors": rotation_vectors,
+    }
     pattern = CompositePattern(
         identifier="test-pattern",
         variants=tuple(variants),
-        q_values=np.array(q_values, dtype=float),
-        intensities=np.array(intensities, dtype=float),
-        variant_labels=np.array(labels, dtype="U32"),
+        q_values=q_array,
+        intensities=intensity_array,
+        variant_labels=label_array,
         hkls=tuple(hkls),
-        metadata={"zone_axis": cfg.tem.zone_axis},
+        metadata=metadata,
     )
     settings = PlotSettings.from_mapping({})
     palette = MarkerPalette(
