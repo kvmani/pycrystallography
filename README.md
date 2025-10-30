@@ -54,3 +54,46 @@ See ``docs/`` for tutorials on extending the calculator registry, authoring
 orientation YAML documents and building plug-ins. The ``examples/`` directory
 contains the reference Burgers OR YAML, a pre-wired configuration, and Jupyter
 notebooks demonstrating the interactive plotting and variant toggling APIs.
+
+Interactive web diffraction app
+--------------------------------
+
+PyCrystallography now ships with a rich React front-end for single-phase
+diffraction exploration. The app combines a CIF/manual structure editor,
+high-fidelity 3D unit-cell visualisation, and instant XRD/TEM diffraction
+plots. Heavy crystallographic workloads remain on the FastAPI backend so the
+browser can focus on smooth interactivity.
+
+**1. Start the backend** (served by FastAPI/uvicorn)::
+
+    pcg web run --host 0.0.0.0 --port 8000
+
+The service exposes ``/ui/config`` for viewer defaults,
+``/structures/from-cif`` for uploads, and ``/diffraction/*`` endpoints for
+powder/TEM calculations.
+
+**2. Launch the React front-end** (Vite dev server)::
+
+    cd webapp
+    npm install
+    npm run dev -- --host
+
+By default the UI expects the API at ``http://localhost:8000``. Set
+``VITE_API_BASE_URL`` if you proxy the backend elsewhere.
+
+**3. Load Fe/Zr examples** by dragging ``data/structureData/Fe.cif`` or
+``data/structureData/Zr-Alpha.cif`` into the “CIF upload” panel. The form
+autofills lattice parameters, space group and atomic sites so you can tweak
+values before generating results.
+
+**4. Generate results**: configure the desired 2θ window, TEM zone axis, and
+visual settings, then click **Generate all**. The UI will simultaneously
+refresh the 3D cell viewer (with configurable supercell replication, bonds,
+colours and background), the powder XRD bar chart, and the TEM diffraction
+scatter plot. Subsequent “Regenerate XRD/TEM” actions only recompute the
+affected panel for near-instant updates when sweeping zone axes such as ``Fe``
+\[001]/\[110] or ``Zr`` \[0001]/\[11-20].
+
+UI defaults (background colour, atom radii scale, bond thickness, preset
+palette) are stored in ``configs/diffraction_web_ui.yaml`` and can be
+overridden via ``pcg web run --ui-config``.

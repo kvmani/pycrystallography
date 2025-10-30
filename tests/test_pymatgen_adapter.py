@@ -33,10 +33,11 @@ def test_tem_camera_length_precision(monkeypatch):
     )
 
     data = DiffractionData(voltage=200.0, camera_length=157.25)
-    g_values, intensities, hkls = data.tem_pattern(structure, (0, 0, 1))
+    g_values, intensities, hkls, positions = data.tem_pattern(structure, (0, 0, 1))
 
     assert captured["camera_length"] == pytest.approx(157.25)
     assert captured["beam_direction"] == (0, 0, 1)
     assert np.allclose(g_values, [1.0])
     assert np.allclose(intensities, [1.0])
     assert hkls == [(0, 0, 0)]
+    assert positions.shape == (1, 2)

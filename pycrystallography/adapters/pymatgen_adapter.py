@@ -52,8 +52,11 @@ class DiffractionData:
         zone_axis: Sequence[int],
         *,
         intensity_threshold: float = 1e-6,
-    ) -> Tuple[np.ndarray, np.ndarray, Sequence[Tuple[int, int, int]]]:
-        """Return scattering vector magnitudes ``g`` and intensities."""
+    ) -> Tuple[np.ndarray, np.ndarray, Sequence[Tuple[int, int, int]], np.ndarray]:
+        """Return scattering vector magnitudes ``g`` and intensities.
+
+        Also returns the planar positions on the detector plane in Å (two columns).
+        """
 
         axis = tuple(int(v) for v in zone_axis)
         if len(axis) != 3:
@@ -69,9 +72,29 @@ class DiffractionData:
         g_values = 1.0 / d_spacings
         intensities = np.asarray(pattern["Intensity (norm)"], dtype=float)
         hkls = [tuple(int(part) for part in str(hkl).strip("() ").split(",")) for hkl in pattern["(hkl)"]]
+        positions_raw = pattern.get("Position")
+        if positions_raw is not None:
+            rows = []
+            for position in positions_raw:
+                array = np.asarray(position, dtype=float).ravel()
+                if array.size == 1:
+                    array = np.array([array[0], 0.0], dtype=float)
+                elif array.size >= 2:
+                    array = array[:2]
+                else:
+                    array = np.array([0.0, 0.0], dtype=float)
+                rows.append(array)
+            positions = np.vstack(rows) if rows else np.zeros((0, 2), dtype=float)
+        else:
+            film_radius = pattern.get("Film radius")
+            if film_radius is not None:
+                radial = np.asarray(film_radius, dtype=float)
+                positions = np.column_stack((radial, np.zeros_like(radial)))
+            else:
+                positions = np.zeros((intensities.shape[0], 2), dtype=float)
         mask = intensities >= intensity_threshold
         filtered_hkls = [hkls[i] for i in np.nonzero(mask)[0]]
-        return g_values[mask], intensities[mask], filtered_hkls
+        return g_values[mask], intensities[mask], filtered_hkls, positions[mask]
 
     def powder_pattern(
         self,

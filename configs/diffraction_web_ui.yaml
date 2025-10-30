@@ -1,0 +1,15 @@
+# Default configuration for the web diffraction viewer
+background_color: "#101418"
+atom_scale: 0.9
+bond_thickness: 0.05
+show_bonds: true
+default_supercell: [1, 1, 1]
+element_colors:
+  - element: Fe
+    color: "#d35400"
+  - element: Zr
+    color: "#95a5a6"
+  - element: C
+    color: "#2ecc71"
+  - element: H
+    color: "#f1c40f"

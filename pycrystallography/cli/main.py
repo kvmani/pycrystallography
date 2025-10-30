@@ -17,6 +17,7 @@ from ..analysis.orientation_mapping import map_parent_features_to_child_variants
 from ..core.models import StereographicPattern
 from ..core.variant_manager import MarkerPalette, VariantManager
 from ..plotting import PlotSettings, StereographicFigure
+from ..web.server import cli as web_cli
 from .composite import DEFAULT_REGISTRY, build_orientation_relation, build_phases, run_tem_composite
 from .powder import run_powder_xrd
 
@@ -34,6 +35,7 @@ app.add_typer(powder_app, name="powder")
 app.add_typer(orientation_app, name="or")
 app.add_typer(plot_app, name="plot")
 app.add_typer(report_app, name="report")
+app.add_typer(web_cli, name="web")
 
 
 def _parse_indices_option(values: Sequence[str], kind: str) -> List[IndexSpec]:

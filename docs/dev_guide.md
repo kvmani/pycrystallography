@@ -77,3 +77,10 @@ Key modules:
   to regenerate reports after tweaking plot settings.
 * Set `MPLBACKEND=Agg` in CI or headless environments when running scripts that
   construct `CrystallographicFigure` instances interactively.
+
+## Web application
+
+The single-phase diffraction workbench lives under `webapp/` (React/Vite). Run
+`pcg web run` to start the FastAPI backend, then `npm run dev` from `webapp/` to
+launch the UI. See `docs/web_app.md` for deployment, configuration, and user
+workflow guidance.
