@@ -61,7 +61,7 @@ class CompositeTEMCalculator(DiffractionCalculator):
             rotated = self._rotate_structure(
                 variant.orientation_relation.child_phase.structure, variant.orientation
             )
-            g_values, i_values, variant_hkls = data.tem_pattern(
+            g_values, i_values, variant_hkls, _ = data.tem_pattern(
                 rotated, zone_axis, intensity_threshold=intensity_threshold
             )
             q_values.append(g_values)
