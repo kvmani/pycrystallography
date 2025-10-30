@@ -9,6 +9,7 @@ export function XrdChart() {
   if (!xrdPattern || !structure) {
     return (
       <div
+        data-testid="xrd-pattern"
         style={{
           height: '360px',
           borderRadius: '16px',
@@ -30,7 +31,10 @@ export function XrdChart() {
   const texts = xrdPattern.peaks.map((peak) => `(${peak.hkl.join(' ')})`);
 
   return (
-    <div style={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(148, 163, 184, 0.15)' }}>
+    <div
+      data-testid="xrd-pattern"
+      style={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(148, 163, 184, 0.15)' }}
+    >
       <Plot
         data={[
           {

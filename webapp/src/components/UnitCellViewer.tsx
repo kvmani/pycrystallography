@@ -195,7 +195,10 @@ export function UnitCellViewer({
   const atomScale = uiConfig?.atom_scale ?? 0.8;
 
   return (
-    <div style={{ height, borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(148, 163, 184, 0.15)' }}>
+    <div
+      data-testid="unit-cell-viewer"
+      style={{ height, borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(148, 163, 184, 0.15)' }}
+    >
       <Canvas style={{ background }} shadows>
         <PerspectiveCamera makeDefault position={[6, 6, 6]} fov={45} near={0.1} far={200} />
         <ambientLight intensity={0.8} />

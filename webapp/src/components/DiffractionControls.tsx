@@ -193,6 +193,7 @@ export function DiffractionControls() {
                   style={{ ...inputStyle, width: '100%' }}
                   value={component}
                   onChange={updateZoneAxis(index)}
+                  aria-label={`Zone axis ${index === 0 ? 'h' : index === 1 ? 'k' : 'l'}`}
                 />
               ))}
             </div>
