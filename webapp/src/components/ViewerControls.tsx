@@ -108,10 +108,22 @@ export function ViewerControls() {
               color: '#0f172a',
               cursor: 'pointer'
             }}
+            data-testid="viewer-background-toggle"
           >
             Background
           </button>
         </div>
+        <input
+          type="text"
+          aria-label="Background color hex"
+          data-testid="viewer-background-hex"
+          value={uiConfig.background_color}
+          onChange={(event) => updateUiConfig({ background_color: event.target.value })}
+          style={{
+            ...inputStyle,
+            width: '140px'
+          }}
+        />
         <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <input
             type="checkbox"
@@ -134,6 +146,7 @@ export function ViewerControls() {
         {uniqueElements.map((element) => (
           <div
             key={element}
+            data-testid={`element-palette-${element.toLowerCase()}`}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -146,20 +159,28 @@ export function ViewerControls() {
           >
             <span style={{ fontWeight: 600 }}>{element}</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div
-                style={{
-                  width: '28px',
-                  height: '28px',
-                  borderRadius: '50%',
-                  border: '2px solid rgba(148, 163, 184, 0.25)',
-                  background: elementColors[element] ?? '#94a3b8'
-                }}
-              />
-              <HexColorPicker
-                color={elementColors[element] ?? '#94a3b8'}
-                onChange={(value) => setElementColor(element, value)}
-              />
-            </div>
+            <div
+              style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: '50%',
+                border: '2px solid rgba(148, 163, 184, 0.25)',
+                background: elementColors[element] ?? '#94a3b8'
+              }}
+            />
+            <input
+              type="text"
+              aria-label={`${element} color hex`}
+              data-testid={`element-color-input-${element.toLowerCase()}`}
+              value={elementColors[element] ?? '#94a3b8'}
+              onChange={(event) => setElementColor(element, event.target.value)}
+              style={{ ...inputStyle, width: '120px' }}
+            />
+            <HexColorPicker
+              color={elementColors[element] ?? '#94a3b8'}
+              onChange={(value) => setElementColor(element, value)}
+            />
+          </div>
           </div>
         ))}
       </div>

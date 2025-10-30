@@ -9,6 +9,7 @@ export function TemPattern() {
   if (!temPattern) {
     return (
       <div
+        data-testid="tem-pattern"
         style={{
           height: '360px',
           borderRadius: '16px',
@@ -39,7 +40,10 @@ export function TemPattern() {
   const markerSizes = intensities.map((intensity) => 6 + intensity * 40);
 
   return (
-    <div style={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(148, 163, 184, 0.15)' }}>
+    <div
+      data-testid="tem-pattern"
+      style={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(148, 163, 184, 0.15)' }}
+    >
       <Plot
         data={[
           {
