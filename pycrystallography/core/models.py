@@ -58,6 +58,28 @@ class CompositePattern:
     variant_labels: np.ndarray
     hkls: Optional[Sequence[Tuple[int, ...]]] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
+    flags: Dict[str, np.ndarray] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        self.q_values = np.asarray(self.q_values, dtype=float)
+        self.intensities = np.asarray(self.intensities, dtype=float)
+        self.variant_labels = np.asarray(self.variant_labels, dtype="U32")
+        if self.q_values.shape != self.intensities.shape:
+            raise ValueError("q_values and intensities must have the same shape")
+        if self.variant_labels.shape[0] != self.q_values.shape[0]:
+            raise ValueError("variant_labels must align with q_values")
+        if self.hkls is not None and len(self.hkls) not in (0, len(self.q_values)):
+            raise ValueError("hkls must be empty or match the number of q_values")
+        normalised_flags: Dict[str, np.ndarray] = {}
+        for name, values in self.flags.items():
+            array = np.asarray(values, dtype=bool)
+            if array.shape[0] != self.q_values.shape[0]:
+                raise ValueError(
+                    f"Flag '{name}' must contain {self.q_values.shape[0]} elements"
+                )
+            normalised_flags[name] = array
+        self.flags = normalised_flags
+        self.metadata = dict(self.metadata)
 
     def to_table(self) -> np.ndarray:
         """Return a structured array suitable for saving to CSV/NPZ."""
@@ -82,10 +104,22 @@ class CompositePattern:
             )
         return np.array(rows, dtype=dtype)
 
-    def copy_with(self, *, metadata: Optional[Mapping[str, Any]] = None) -> "CompositePattern":
+    def copy_with(
+        self,
+        *,
+        metadata: Optional[Mapping[str, Any]] = None,
+        flags: Optional[Mapping[str, Sequence[bool]]] = None,
+    ) -> "CompositePattern":
         meta = dict(self.metadata)
         if metadata:
             meta.update(metadata)
+        flag_map: Dict[str, np.ndarray] = {
+            name: np.array(values, copy=True)
+            for name, values in self.flags.items()
+        }
+        if flags:
+            for name, values in flags.items():
+                flag_map[str(name)] = np.asarray(values, dtype=bool)
         return CompositePattern(
             identifier=self.identifier,
             variants=self.variants,
@@ -94,6 +128,7 @@ class CompositePattern:
             variant_labels=np.array(self.variant_labels, copy=True),
             hkls=tuple(self.hkls) if self.hkls is not None else None,
             metadata=meta,
+            flags=flag_map,
         )
 
     @property
@@ -101,6 +136,14 @@ class CompositePattern:
         with np.errstate(divide="ignore"):
             d_values = np.where(self.q_values != 0, 1.0 / self.q_values, 0.0)
         return d_values
+
+    def get_flag(self, name: str) -> Optional[np.ndarray]:
+        """Return a boolean mask for the requested flag if present."""
+
+        value = self.flags.get(name)
+        if value is None:
+            return None
+        return np.asarray(value, dtype=bool)
 
 
 @dataclass(slots=True)

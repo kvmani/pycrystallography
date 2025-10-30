@@ -70,6 +70,19 @@ def orientation_bundle(sample_config: Path):
     intensity_array = np.array(intensities, dtype=float)
     label_array = np.array(labels, dtype="U32")
     rotation_vectors = np.column_stack((q_array, np.linspace(0.05, 0.05 * len(q_array), len(q_array))))
+    is_primary = np.zeros_like(q_array, dtype=bool)
+    is_primary[0] = True
+    is_absent = np.zeros_like(q_array, dtype=bool)
+    if len(q_array) > 1:
+        is_absent[1] = True
+    is_kikuchi = np.zeros_like(q_array, dtype=bool)
+    if len(q_array) > 2:
+        is_kikuchi[2] = True
+    flags = {
+        "is_primary": is_primary,
+        "is_absent": is_absent,
+        "is_kikuchi": is_kikuchi,
+    }
     metadata = {
         "zone_axis": cfg.tem.zone_axis,
         "rotation_vectors": rotation_vectors,
@@ -82,6 +95,7 @@ def orientation_bundle(sample_config: Path):
         variant_labels=label_array,
         hkls=tuple(hkls),
         metadata=metadata,
+        flags=flags,
     )
     settings = PlotSettings.from_mapping({})
     palette = MarkerPalette(

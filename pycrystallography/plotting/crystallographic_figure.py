@@ -89,6 +89,10 @@ class CrystallographicFigure:
         if backend:
             plt.switch_backend(backend)
         self.settings = settings or PlotSettings.from_mapping({})
+        if self.settings.marker_variant_overrides:
+            self.variant_manager.update_overrides(
+                self.settings.marker_variant_overrides
+            )
         self.figure, self.ax = self._create_figure()
         self._tooltip = Tooltip(self.ax, self.settings.tooltip)
         annotation_cfg = AnnotationConfig(
@@ -103,7 +107,7 @@ class CrystallographicFigure:
         )
         self._annotation_manager = AnnotationManager(self.ax, annotation_cfg)
         self._hover_threshold_sq = annotation_cfg.min_distance ** 2
-        self._scatter_by_label: Dict[str, PathCollection] = {}
+        self._scatter_by_label: Dict[str, List[PathCollection]] = {}
         self._point_records: Dict[str, Dict[str, object]] = {}
         self._check_buttons: Optional[CheckButtons] = None
         self._rotation_textbox: Optional[TextBox] = None
@@ -146,41 +150,112 @@ class CrystallographicFigure:
 
     def _prepare_points(self) -> None:
         scatter_kwargs = dict(self.settings.scatter)
+        toggles = self.settings.marker_toggles
+        toggle_order = list(toggles.keys())
+        handles: List[PathCollection] = []
+        legend_labels: List[str] = []
         for state in self.variant_manager:
             indices = np.nonzero(self.pattern.variant_labels == state.variant.label)[0]
+            if not len(indices):
+                self._scatter_by_label[state.variant.label] = []
+                self._point_records[state.variant.label] = {
+                    "state": state,
+                    "indices": indices,
+                    "g": np.array([], dtype=float),
+                    "intensity": np.array([], dtype=float),
+                    "d": np.array([], dtype=float),
+                    "hkls": [] if self.pattern.hkls is not None else None,
+                    "subsets": [],
+                }
+                continue
             g_values = self.pattern.q_values[indices]
             intensities = self.pattern.intensities[indices]
             d_spacings = self.pattern.d_spacings[indices]
             hkls = None
             if self.pattern.hkls is not None:
                 hkls = [self.pattern.hkls[idx] for idx in indices]
-            artist = self.ax.scatter(
-                g_values,
-                intensities,
-                marker=state.style.marker,
-                c=state.style.color,
-                label=state.variant.label,
-                visible=state.visible,
-                s=scatter_kwargs.get("size", 40),
-                alpha=scatter_kwargs.get("alpha", 0.9),
-                linewidths=scatter_kwargs.get("linewidth", 0.6),
-                edgecolors=scatter_kwargs.get("edgecolor", "#222222"),
-            )
-            self._scatter_by_label[state.variant.label] = artist
+            assignments = np.full(indices.shape, "__default__", dtype=object)
+            assigned = np.zeros(indices.shape, dtype=bool)
+            for name in toggle_order:
+                config = toggles.get(name, {})
+                if not bool(config.get("enabled", False)):
+                    continue
+                flag_name = str(config.get("flag", name))
+                flag_array = self.pattern.get_flag(flag_name)
+                if flag_array is None:
+                    continue
+                slice_mask = np.asarray(flag_array[indices], dtype=bool)
+                if slice_mask.shape != assignments.shape:
+                    continue
+                category_mask = np.logical_and(slice_mask, ~assigned)
+                if not np.any(category_mask):
+                    continue
+                assignments[category_mask] = name
+                assigned |= category_mask
+            subsets: List[Dict[str, object]] = []
+            artists: List[PathCollection] = []
+            categories: List[str] = []
+            if np.any(assignments == "__default__"):
+                categories.append("__default__")
+            for name in toggle_order:
+                if np.any(assignments == name):
+                    categories.append(name)
+            for category in categories:
+                mask = assignments == category
+                subset_indices = indices[mask]
+                subset_g = g_values[mask]
+                subset_intensity = intensities[mask]
+                subset_d = d_spacings[mask]
+                subset_hkls = None
+                if hkls is not None:
+                    subset_hkls = [hkls[i] for i, selected in enumerate(mask) if selected]
+                marker = state.style.marker
+                color = state.style.color
+                if category != "__default__":
+                    config = toggles.get(category, {})
+                    marker = str(config.get("marker", marker))
+                    color = str(config.get("color", color))
+                label = state.variant.label if not subsets else None
+                artist = self.ax.scatter(
+                    subset_g,
+                    subset_intensity,
+                    marker=marker,
+                    c=color,
+                    label=label,
+                    visible=state.visible,
+                    s=scatter_kwargs.get("size", 40),
+                    alpha=scatter_kwargs.get("alpha", 0.9),
+                    linewidths=scatter_kwargs.get("linewidth", 0.6),
+                    edgecolors=scatter_kwargs.get("edgecolor", "#222222"),
+                )
+                artists.append(artist)
+                subsets.append(
+                    {
+                        "indices": subset_indices,
+                        "g": subset_g,
+                        "intensity": subset_intensity,
+                        "d": subset_d,
+                        "hkls": subset_hkls,
+                        "category": category,
+                        "artist": artist,
+                    }
+                )
+            self._scatter_by_label[state.variant.label] = artists
             record = {
                 "state": state,
+                "indices": indices,
                 "g": g_values,
                 "intensity": intensities,
                 "d": d_spacings,
                 "hkls": hkls,
-                "artist": artist,
-                "indices": indices,
+                "subsets": subsets,
             }
             self._point_records[state.variant.label] = record
-        handles = list(self._scatter_by_label.values())
-        labels = [state.variant.label for state in self.variant_manager]
+            if artists:
+                handles.append(artists[0])
+                legend_labels.append(state.variant.label)
         if handles:
-            self._legend = self.ax.legend(handles, labels, title="Variant", loc="best")
+            self._legend = self.ax.legend(handles, legend_labels, title="Variant", loc="best")
 
     def _init_widgets(self) -> None:
         widget_cfg = self.settings.widgets
@@ -211,8 +286,9 @@ class CrystallographicFigure:
 
     def _handle_toggle(self, label: str) -> None:
         visible = self.variant_manager.toggle(label)
-        artist = self._scatter_by_label[label]
-        artist.set_visible(visible)
+        artists = self._scatter_by_label.get(label, [])
+        for artist in artists:
+            artist.set_visible(visible)
         if self._legend is not None:
             for handle in self._legend.legend_handles:
                 if handle.get_label() == label:
@@ -375,17 +451,84 @@ class CrystallographicFigure:
         hkls_list: Optional[List[Tuple[int, ...]]] = None
         if hkls is not None:
             hkls_list = [tuple(hkl) for hkl in hkls]
+        toggles = self.settings.marker_toggles
+        toggle_order = list(toggles.keys())
         for label, record in self._point_records.items():
             indices = np.nonzero(variant_labels == label)[0]
             record["indices"] = indices
-            record["g"] = q_values[indices]
-            record["intensity"] = intensities[indices]
-            record["d"] = d_spacings[indices]
+            g_slice = q_values[indices]
+            intensity_slice = intensities[indices]
+            d_slice = d_spacings[indices]
+            record["g"] = g_slice
+            record["intensity"] = intensity_slice
+            record["d"] = d_slice
             if hkls_list is not None:
                 record["hkls"] = [hkls_list[idx] for idx in indices]
-            artist: PathCollection = record["artist"]  # type: ignore[assignment]
-            offsets = np.column_stack((record["g"], record["intensity"]))
-            artist.set_offsets(offsets)
+            assignments = np.full(indices.shape, "__default__", dtype=object)
+            assigned = np.zeros(indices.shape, dtype=bool)
+            for name in toggle_order:
+                config = toggles.get(name, {})
+                if not bool(config.get("enabled", False)):
+                    continue
+                flag_name = str(config.get("flag", name))
+                flag_array = self.pattern.get_flag(flag_name)
+                if flag_array is None:
+                    continue
+                slice_mask = np.asarray(flag_array[indices], dtype=bool)
+                if slice_mask.shape != assignments.shape:
+                    continue
+                category_mask = np.logical_and(slice_mask, ~assigned)
+                if not np.any(category_mask):
+                    continue
+                assignments[category_mask] = name
+                assigned |= category_mask
+            subsets = record.get("subsets")
+            if not isinstance(subsets, list):
+                subsets = []
+                record["subsets"] = subsets
+            category_order: List[str] = []
+            if np.any(assignments == "__default__"):
+                category_order.append("__default__")
+            for name in toggle_order:
+                if np.any(assignments == name):
+                    category_order.append(name)
+            subset_map: Dict[str, Dict[str, object]] = {
+                str(subset.get("category")): subset
+                for subset in subsets
+                if isinstance(subset, dict) and "category" in subset
+            }
+            for category in category_order:
+                mask = assignments == category
+                subset_indices = indices[mask]
+                subset_g = g_slice[mask]
+                subset_intensity = intensity_slice[mask]
+                subset_d = d_slice[mask]
+                subset_hkls = None
+                if hkls_list is not None:
+                    subset_hkls = [hkls_list[idx] for idx in subset_indices]
+                subset = subset_map.get(category)
+                if subset is None:
+                    continue
+                subset["indices"] = subset_indices
+                subset["g"] = subset_g
+                subset["intensity"] = subset_intensity
+                subset["d"] = subset_d
+                subset["hkls"] = subset_hkls
+                artist = subset.get("artist")
+                if isinstance(artist, PathCollection):
+                    offsets = np.column_stack((subset_g, subset_intensity))
+                    artist.set_offsets(offsets)
+            for category, subset in subset_map.items():
+                if category in category_order:
+                    continue
+                subset["indices"] = np.array([], dtype=int)
+                subset["g"] = np.array([], dtype=float)
+                subset["intensity"] = np.array([], dtype=float)
+                subset["d"] = np.array([], dtype=float)
+                subset["hkls"] = [] if hkls_list is not None else None
+                artist = subset.get("artist")
+                if isinstance(artist, PathCollection):
+                    artist.set_offsets(np.empty((0, 2)))
 
     def _rotated_q_values(self, angle: float) -> Optional[np.ndarray]:
         if self._base_rotation_vectors is None:
