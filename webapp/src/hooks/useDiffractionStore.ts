@@ -40,6 +40,11 @@ type DiffractionState = {
   setSpaceGroup: (spaceGroup: string | null) => void;
 };
 
+function clampSupercell([a, b, c]: [number, number, number]): [number, number, number] {
+  const clamp = (value: number) => Math.max(1, Math.min(3, Math.round(value)));
+  return [clamp(a), clamp(b), clamp(c)];
+}
+
 const defaultXrd: XrdSettings = {
   wavelength: 1.5406,
   two_theta_min: 10,
@@ -81,7 +86,7 @@ export const useDiffractionStore = create<DiffractionState>((set) => ({
   xrdPattern: null,
   temPattern: null,
   uiConfig: null,
-  supercell: defaultSupercell,
+  supercell: clampSupercell(defaultSupercell),
   elementColors: {},
   setStructure: (structure, summary = null) =>
     set((state) => ({
@@ -140,7 +145,7 @@ export const useDiffractionStore = create<DiffractionState>((set) => ({
   setUiConfig: (config) =>
     set(() => ({
       uiConfig: config,
-      supercell: config.default_supercell,
+      supercell: clampSupercell(config.default_supercell),
       elementColors: Object.fromEntries(config.element_colors.map((item) => [item.element, item.color]))
     })),
   updateUiConfig: (updates) =>
@@ -151,7 +156,7 @@ export const useDiffractionStore = create<DiffractionState>((set) => ({
           }
         : {}
     ),
-  setSupercell: (supercell) => set({ supercell }),
+  setSupercell: (supercell) => set({ supercell: clampSupercell(supercell) }),
   setElementColor: (element, color) =>
     set((state) => {
       const nextColors = { ...state.elementColors, [element]: color };

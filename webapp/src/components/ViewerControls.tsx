@@ -34,8 +34,9 @@ export function ViewerControls() {
 
   const handleSupercellChange = (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
     const next = [...supercell] as [number, number, number];
-    const value = Math.max(1, Math.min(6, Number(event.target.value) || 1));
-    next[index] = value;
+    const raw = Number(event.target.value);
+    const clamped = Math.max(1, Math.min(3, Number.isNaN(raw) ? 1 : Math.round(raw)));
+    next[index] = clamped;
     setSupercell(next);
   };
 
@@ -86,7 +87,7 @@ export function ViewerControls() {
                 style={{ ...inputStyle, width: '100%' }}
                 type="number"
                 min={1}
-                max={6}
+                max={3}
                 value={value}
                 onChange={handleSupercellChange(index)}
               />
