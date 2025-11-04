@@ -7,6 +7,7 @@ import { useDiffractionStore } from '../hooks/useDiffractionStore';
 import type { LatticeParameters, StructureModel } from '../types/structure';
 
 const defaultColor = '#94a3b8';
+const boundaryTolerance = 1e-5;
 
 const covalentRadii: Record<string, number> = {
   H: 0.31,
@@ -52,17 +53,69 @@ interface AtomInstance {
   element: string;
 }
 
+function expandCoordinate(value: number): number[] {
+  const coords = new Set<number>();
+  const nearZero = Math.abs(value) < boundaryTolerance;
+  const nearOne = Math.abs(value - 1) < boundaryTolerance || 1 - value < boundaryTolerance;
+
+  if (nearZero) {
+    coords.add(0);
+    coords.add(1);
+  } else if (nearOne) {
+    coords.add(1);
+    coords.add(0);
+  } else {
+    coords.add(value);
+  }
+
+  // Always include the original value to preserve internal positions that lie strictly inside the cell
+  coords.add(value);
+
+  return Array.from(coords);
+}
+
+function generateBoundaryImages(site: StructureModel['atom_sites'][number]): [number, number, number][] {
+  const xImages = expandCoordinate(site.x);
+  const yImages = expandCoordinate(site.y);
+  const zImages = expandCoordinate(site.z);
+  const combinations: [number, number, number][] = [];
+  const seen = new Set<string>();
+
+  xImages.forEach((x) => {
+    yImages.forEach((y) => {
+      zImages.forEach((z) => {
+        const key = `${x.toFixed(6)}|${y.toFixed(6)}|${z.toFixed(6)}`;
+        if (!seen.has(key)) {
+          combinations.push([x, y, z]);
+          seen.add(key);
+        }
+      });
+    });
+  });
+
+  return combinations;
+}
+
 function generateSupercell(structure: StructureModel, supercell: [number, number, number]): AtomInstance[] {
   const matrix = latticeToMatrix(structure.lattice);
   const atoms: AtomInstance[] = [];
   const [nx, ny, nz] = supercell;
+  const seen = new Set<string>();
   structure.atom_sites.forEach((site) => {
+    const boundaryImages = generateBoundaryImages(site);
     for (let i = 0; i < nx; i += 1) {
       for (let j = 0; j < ny; j += 1) {
         for (let k = 0; k < nz; k += 1) {
-          const fractional = new THREE.Vector3(site.x + i, site.y + j, site.z + k);
-          const cartesian = fractional.applyMatrix3(matrix);
-          atoms.push({ element: site.element, position: cartesian });
+          boundaryImages.forEach(([x, y, z]) => {
+            const fractional = new THREE.Vector3(x + i, y + j, z + k);
+            const key = `${site.element}:${fractional.x.toFixed(6)}:${fractional.y.toFixed(6)}:${fractional.z.toFixed(6)}`;
+            if (seen.has(key)) {
+              return;
+            }
+            seen.add(key);
+            const cartesian = fractional.clone().applyMatrix3(matrix);
+            atoms.push({ element: site.element, position: cartesian });
+          });
         }
       }
     }
