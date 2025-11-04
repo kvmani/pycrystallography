@@ -6,6 +6,7 @@ import { StructureForm } from './components/StructureForm';
 import { TemPattern } from './components/TemPattern';
 import { UnitCellViewer } from './components/UnitCellViewer';
 import { ViewerControls } from './components/ViewerControls';
+import { PlaneOverlayControls } from './components/PlaneOverlayControls';
 import { XrdChart } from './components/XrdChart';
 import { useDiffractionStore } from './hooks/useDiffractionStore';
 import { fetchUiConfig } from './services/api';
@@ -49,6 +50,7 @@ export default function App() {
         <section className="left-panel">
           <StructureForm />
           <ViewerControls />
+          <PlaneOverlayControls />
         </section>
         <section className="right-panel">
           <UnitCellViewer />
