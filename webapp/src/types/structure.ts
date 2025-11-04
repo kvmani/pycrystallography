@@ -93,3 +93,16 @@ export interface UiConfig {
   default_supercell: [number, number, number];
   element_colors: ElementColor[];
 }
+
+export interface PlaneOverlay {
+  id: string;
+  hkl: [number, number, number];
+  uvw: [number, number, number];
+  offset: number;
+  color: string;
+  arrowColor: string;
+  opacity: number;
+  arrowLength: number;
+  visible: boolean;
+  label?: string | null;
+}

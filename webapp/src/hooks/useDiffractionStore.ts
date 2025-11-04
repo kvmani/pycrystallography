@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import type {
   AtomSite,
   LatticeParameters,
+  PlaneOverlay,
   PowderPatternResponse,
   StructureModel,
   StructureSummary,
@@ -22,6 +23,7 @@ type DiffractionState = {
   uiConfig: UiConfig | null;
   supercell: [number, number, number];
   elementColors: Record<string, string>;
+  planeOverlays: PlaneOverlay[];
   setStructure: (structure: StructureModel, summary?: StructureSummary | null) => void;
   updateLattice: (updates: Partial<LatticeParameters>) => void;
   updateAtomSite: (index: number, updates: Partial<AtomSite>) => void;
@@ -38,6 +40,11 @@ type DiffractionState = {
   setElementColor: (element: string, color: string) => void;
   setStructureName: (name: string | null) => void;
   setSpaceGroup: (spaceGroup: string | null) => void;
+  addPlaneOverlay: (overlay: Omit<PlaneOverlay, 'id'> & { id?: string }) => void;
+  removePlaneOverlay: (id: string) => void;
+  updatePlaneOverlay: (id: string, updates: Partial<PlaneOverlay>) => void;
+  setPlaneVisibility: (id: string, visible: boolean) => void;
+  clearPlaneOverlays: () => void;
 };
 
 function clampSupercell([a, b, c]: [number, number, number]): [number, number, number] {
@@ -60,6 +67,26 @@ const defaultTem: TemSettings = {
 };
 
 const defaultSupercell: [number, number, number] = [1, 1, 1];
+
+const defaultPlaneOverlay: PlaneOverlay = {
+  id: 'default-plane-100-001',
+  hkl: [1, 0, 0],
+  uvw: [0, 0, 1],
+  offset: 0,
+  color: '#38bdf8',
+  arrowColor: '#f97316',
+  opacity: 0.45,
+  arrowLength: 2.5,
+  visible: true,
+  label: '(100)[001]'
+};
+
+function createPlaneId() {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return crypto.randomUUID();
+  }
+  return `plane-${Math.random().toString(36).slice(2, 9)}`;
+}
 
 const defaultStructure: StructureModel = {
   name: 'Fe (bcc)',
@@ -88,6 +115,7 @@ export const useDiffractionStore = create<DiffractionState>((set) => ({
   uiConfig: null,
   supercell: clampSupercell(defaultSupercell),
   elementColors: {},
+  planeOverlays: [defaultPlaneOverlay],
   setStructure: (structure, summary = null) =>
     set((state) => ({
       structure,
@@ -192,7 +220,28 @@ export const useDiffractionStore = create<DiffractionState>((set) => ({
             }
           }
         : {}
-    )
+    ),
+  addPlaneOverlay: (overlay) =>
+    set((state) => {
+      const id = overlay.id ?? createPlaneId();
+      const next: PlaneOverlay = {
+        ...defaultPlaneOverlay,
+        ...overlay,
+        id
+      };
+      return { planeOverlays: [...state.planeOverlays, next] };
+    }),
+  removePlaneOverlay: (id) =>
+    set((state) => ({ planeOverlays: state.planeOverlays.filter((item) => item.id !== id) })),
+  updatePlaneOverlay: (id, updates) =>
+    set((state) => ({
+      planeOverlays: state.planeOverlays.map((item) => (item.id === id ? { ...item, ...updates } : item))
+    })),
+  setPlaneVisibility: (id, visible) =>
+    set((state) => ({
+      planeOverlays: state.planeOverlays.map((item) => (item.id === id ? { ...item, visible } : item))
+    })),
+  clearPlaneOverlays: () => set({ planeOverlays: [] })
 }));
 
 export const selectStructure = () => useDiffractionStore.getState().structure;
